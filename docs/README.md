@@ -29,3 +29,10 @@ While `Saved by Callee` means the function is the one responsible for storing th
 The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets). 
 
 ## Instruction Groups
+As said before, C0 architecture contains only 40 unique instructions, Thinks of this CPU as a "calculator" CPU. Which making this architecture (almost) impossible to implement OS on.<br>
+This section will describe all the instructions that have been implemented on C0 architecture.
+### Aritchmetic and Logic
+### Load and Store
+### Branch
+### Address Constructor
+### Jump
