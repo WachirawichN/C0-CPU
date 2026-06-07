@@ -6,7 +6,8 @@ The cut off modern Processor features and design techniques includes Cache, Supe
 
 ## Registers
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
-The following table will list all 32 registers and its description from [RISC-V ABI](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html) doucment.<br>
+
+The following table will list all 32 registers and its description from [RISC-V ABI doucment](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html).<br>
 FYI, ABI is like a common agreement on how to write code for RISC-V. Which mean that, if you wanted to write an assembly for this processor, you can use ABI Mnemonic to refer to specific register, the compiler will handle which register you're trying to refer to.
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
@@ -28,9 +29,24 @@ FYI, ABI is like a common agreement on how to write code for RISC-V. Which mean 
 While `Saved by Callee` means the function is the one responsible for storing the data inside registers before overwriting anyone of them, and also restore the value back to being the same as before.<br>
 The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets). 
 
+## Instruction Formats
+There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
+
+**Note:** If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it need to jump to, etc...<br>
+
+![Instruction formats](./imgs/instruction_formats.png)
+Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
+
+`opcode` field is use determine the instruction group or whether the instruction is immediate or not, while the `funct3` and `funct7` are used to determine the specific function inside the group.<br>
+
+`rs1` and `rs2` (source) is the register where the operand are located, while `rd` (destination) are used to specify the register where the output of that instruction will be save to.<br>
+
+For `imm` (immediate) field, there are many use cases on this field. The use case of this field is up to the instruction the CPU is executing, there will be more information about this field on [Instruction Groups](#instruction-groups) section. But tldr, CPU will directly use value from this field.
+
 ## Instruction Groups
-As said before, C0 architecture contains only 40 unique instructions, Thinks of this CPU as a "calculator" CPU. Which making this architecture (almost) impossible to implement OS on.<br>
-This section will describe all the instructions that have been implemented on C0 architecture.
+This section will be go over all the instructions that have been implemented on C0 architecture.<br>
+
+As said before, C0 architecture contains only 38 unique instructions, Thinks of this CPU as a very bad "calculator" CPU. Which making this architecture (almost I hope) impossible to implement OS on.<br>
 ### Aritchmetic and Logic
 ### Load and Store
 ### Branch
