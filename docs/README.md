@@ -54,7 +54,7 @@ For `imm` (immediate) field, there are many use cases on this field. The use cas
 ## Instruction Groups
 This section will be go over all the instructions that have been implemented on C0 architecture.
 Some of the groups may have multiple forms of the instruction depend on the instruction format.<br>
-### Aritchmetic and Logic
+### Arithmetic and Logic
 #### R-type
 The following table list all arithmetic and logic instructions that utilize `R-type` instruction format.<br>
 
