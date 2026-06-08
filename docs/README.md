@@ -1,8 +1,8 @@
 # Architecture
 C0's architecture is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
-This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most of modern Processor features and design techniques, resulting in only 38 instructions from rv32i's 40 unique instructions (replace FENCE instruction with NOP and shrink SYSTEM instruction group into one instruction).<br>
+This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most of modern Processor features and design techniques, resulting in only 38 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
 
-The cut off modern Processor features and design techniques includes Cache, Superscalar design, Out of Order execution and even Instruction Pipelining, resulting in measly 1 instruction per 3 clock cycles (I hope).<br>
+The cut off modern Processor features and design techniques includes Cache, Superscalar design and Out of Order execution, resulting in at best 1 instruction per clock cycles.<br>
 
 ## Registers
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
@@ -34,8 +34,16 @@ There are a total of 6 instruction formats specified by RISC-V, the table below 
 
 **Note:** If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it need to jump to, etc...<br>
 
-![Instruction formats](./imgs/instruction_formats.png)
+![Instruction formats](./imgs/instruction_formats.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
+
+The following are the full name of each types.
+- R-type: Register / Register
+- I-type: Immediate
+- S-type: Store
+- B-type: Branch
+- U-type: Upper immediate
+- J-type: Jump
 
 `opcode` field is use determine the instruction group or whether the instruction is immediate or not, while the `funct3` and `funct7` are used to determine the specific function inside the group.<br>
 
@@ -44,10 +52,27 @@ Image taken from [RISC-V specification document](https://docs.riscv.org/referenc
 For `imm` (immediate) field, there are many use cases on this field. The use case of this field is up to the instruction the CPU is executing, there will be more information about this field on [Instruction Groups](#instruction-groups) section. But tldr, CPU will directly use value from this field.
 
 ## Instruction Groups
-This section will be go over all the instructions that have been implemented on C0 architecture.<br>
-
-As said before, C0 architecture contains only 38 unique instructions, Thinks of this CPU as a very bad "calculator" CPU. Which making this architecture (almost I hope) impossible to implement OS on.<br>
+This section will be go over all the instructions that have been implemented on C0 architecture.
+Some of the groups may have multiple forms of the instruction depend on the instruction format.<br>
 ### Aritchmetic and Logic
+#### R-type
+The following table list all arithmetic and logic instructions that utilize `R-type` instruction format.<br>
+
+The opcode for these instructions would be `0110011`
+
+| funct 7   | funct 3   | mnemonic  | operation     | description   |
+|-----------|-----------|-----------|---------------|---------------|
+| 0000000   | 000       | ADD       | rd = r1 + r2  | add           |
+| 0100000   | 000       | SUB       | rd = r1 - r2  | subtract      |
+| 0000000   | 001       | SLL       | rd = r1 << r2 | shift left    |
+| 0000000   | 010       | SLT       | rd = r1 < r2  | is less than  |
+| 0000000   | 011       | SLTU      | rd =  |  |
+| 0000000   | 100       | XOR       | rd =  |  |
+| 0000000   | 101       | SRL       | rd =  |  |
+| 0100000   | 101       | SRA       | rd =  |  |
+| 0000000   | 110       | OR        | rd =  |  |
+| 0000000   | 111       | AND       | rd =  |  |
+#### I-type
 ### Load and Store
 ### Branch
 ### Address Constructor
