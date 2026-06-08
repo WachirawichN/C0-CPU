@@ -56,22 +56,19 @@ This section will be go over all the instructions that have been implemented on 
 Some of the groups may have multiple forms of the instruction depend on the instruction format.<br>
 ### Arithmetic and Logic
 #### R-type
-The following table list all arithmetic and logic instructions that utilize `R-type` instruction format.<br>
-
 The opcode for these instructions would be `0110011`
-
-| funct 7   | funct 3   | mnemonic  | operation     | description   |
-|-----------|-----------|-----------|---------------|---------------|
-| 0000000   | 000       | ADD       | rd = r1 + r2  | add           |
-| 0100000   | 000       | SUB       | rd = r1 - r2  | subtract      |
-| 0000000   | 001       | SLL       | rd = r1 << r2 | shift left    |
-| 0000000   | 010       | SLT       | rd = r1 < r2  | is less than  |
-| 0000000   | 011       | SLTU      | rd =  |  |
-| 0000000   | 100       | XOR       | rd =  |  |
-| 0000000   | 101       | SRL       | rd =  |  |
-| 0100000   | 101       | SRA       | rd =  |  |
-| 0000000   | 110       | OR        | rd =  |  |
-| 0000000   | 111       | AND       | rd =  |  |
+| funct 7   | funct 3   | mnemonic  | operation                 | description                                   |
+|-----------|-----------|-----------|---------------------------|-----------------------------------------------|
+| 0000000   | 000       | ADD       | rd = r1 + r2              | add r2 to r1                                  |
+| 0100000   | 000       | SUB       | rd = r1 - r2              | subtract r2 from r1                           |
+| 0000000   | 001       | SLL       | rd = r1 << r2             | logical shift r1 left by r2                   |
+| 0000000   | 010       | SLT       | rd = r1 < r2 (signed)     | is r1 less than r2 (compare signed version)   |
+| 0000000   | 011       | SLTU      | rd = r1 < r2 (unsigned)   | is r1 less than r2 (compare unsigned version) |
+| 0000000   | 100       | XOR       | rd = r1 ^ r2              | bitwise xor                                   |
+| 0000000   | 101       | SRL       | rd = r1 >> r2 (logical)   | logical shift r1 right by r2                  |
+| 0100000   | 101       | SRA       | rd = r1 >> r2 (arithmetic)| arithmetic shift r1 right by r2               |
+| 0000000   | 110       | OR        | rd = r1 \| r2             | bitwise or                                    |
+| 0000000   | 111       | AND       | rd = r1 & r2              | bitwise and                                   |
 #### I-type
 ### Load and Store
 ### Branch
