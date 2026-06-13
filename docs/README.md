@@ -7,9 +7,10 @@ The cut-off modern Processor features and design techniques includes Cache, Supe
 ## Registers
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
 
-The following table will list all 32 registers and its description from [RISC-V ABI doucment](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html).<br>
+The following table will list all 32 registers and its description from [RISC-V ABI document](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html).<br>
 
-**Note:** RISC-V actually specified that all 32 registers are actually a general purpose register, meaning you could use all registers for anything you like. But, ABI (which is also specified by RISC-V) is like a common agreement on how to write codes for RISC-V, and it specifies the purpose of each register, so it is probably better to ABI instead of using all 32 registers for whatever you want.<br>
+> [!NOTES]
+> RISC-V actually specified that all 32 registers are actually a general purpose register, meaning you could use all registers for anything you like. But, ABI (which is also specified by RISC-V) is like a common agreement on how to write codes for RISC-V, and it specifies the purpose of each register, so it is probably better to ABI instead of using all 32 registers for whatever you want.
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
 |-----------|---------------|-------------------------------------------|-----------|
@@ -33,7 +34,8 @@ The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/
 ## Instruction Formats
 There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
 
-**Note:** If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it need to jump to, etc...<br>
+> [!NOTES]
+> If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it needs to jump to, etc...
 
 ![Instruction formats](./imgs/instruction_formats.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
@@ -56,7 +58,8 @@ For `imm` (immediate) field, there are many use cases on this field. The use cas
 C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
 Some groups may have multiple forms of the same instruction depend on the instruction format.<br>
 ### Arithmetic and Logic
-**Note:** The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
+> [!NOTES]
+> The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
 The opcode for these instructions would be `0110011`
 | funct 7   | funct 3   | mnemonic  | operation                 | description                                   |
