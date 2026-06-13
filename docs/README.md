@@ -1,14 +1,15 @@
 # Architecture
 C0's architecture is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
-This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most of modern Processor features and design techniques, resulting in only 38 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
+This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most modern Processor features and design techniques, resulting in only 38 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
 
-The cut off modern Processor features and design techniques includes Cache, Superscalar design and Out of Order execution, resulting in at best 1 instruction per clock cycles.<br>
+The cut-off modern Processor features and design techniques includes Cache, Superscalar design and Out of Order execution, resulting in at best 1 instruction per clock cycles.<br>
 
 ## Registers
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
 
 The following table will list all 32 registers and its description from [RISC-V ABI doucment](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html).<br>
-FYI, ABI is like a common agreement on how to write code for RISC-V. Which mean that, if you wanted to write an assembly for this processor, you can use ABI Mnemonic to refer to specific register, the compiler will handle which register you're trying to refer to.
+
+**Note:** RISC-V actually specified that all 32 registers are actually a general purpose register, meaning you could use all registers for anything you like. But, ABI (which is also specified by RISC-V) is like a common agreement on how to write codes for RISC-V, and it specifies the purpose of each register, so it is probably better to ABI instead of using all 32 registers for whatever you want.<br>
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
 |-----------|---------------|-------------------------------------------|-----------|
@@ -37,7 +38,7 @@ There are a total of 6 instruction formats specified by RISC-V, the table below 
 ![Instruction formats](./imgs/instruction_formats.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
 
-The following are the full name of each types.
+The following are the full name of each format.
 - R-type: Register / Register
 - I-type: Immediate
 - S-type: Store
@@ -49,13 +50,13 @@ The following are the full name of each types.
 
 `rs1` and `rs2` (source) is the register where the operand are located, while `rd` (destination) are used to specify the register where the output of that instruction will be save to.<br>
 
-For `imm` (immediate) field, there are many use cases on this field. The use case of this field is up to the instruction the CPU is executing, there will be more information about this field on [Instruction Groups](#instruction-groups) section. But tldr, CPU will directly use value from this field.
+For `imm` (immediate) field, there are many use cases on this field. The use case of this field is up to the instruction the CPU is executing, there will be more information about this field on [Instruction Groups](#instruction-groups) section. But TLDR, CPU will directly use value from this field.
 
 ## Instruction Groups
 C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
 Some groups may have multiple forms of the same instruction depend on the instruction format.<br>
 ### Arithmetic and Logic
-**Note:** The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without carring about being signed or not.
+**Note:** The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
 The opcode for these instructions would be `0110011`
 | funct 7   | funct 3   | mnemonic  | operation                 | description                                   |
@@ -76,7 +77,7 @@ The opcode for these instructions would be `0010011`
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I loves to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those for the table.<br>
+I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those for the table.<br>
 In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
 
 | funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
