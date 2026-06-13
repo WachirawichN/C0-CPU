@@ -52,8 +52,8 @@ The following are the full name of each types.
 For `imm` (immediate) field, there are many use cases on this field. The use case of this field is up to the instruction the CPU is executing, there will be more information about this field on [Instruction Groups](#instruction-groups) section. But tldr, CPU will directly use value from this field.
 
 ## Instruction Groups
-This section will be go over all the instructions that have been implemented on C0 architecture.
-Some of the groups may have multiple forms of the instruction depend on the instruction format.<br>
+C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
+Some groups may have multiple forms of the same instruction depend on the instruction format.<br>
 ### Arithmetic and Logic
 **Note:** The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without carring about being signed or not.
 #### R-type
@@ -76,7 +76,8 @@ The opcode for these instructions would be `0010011`
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I loves to think that bit ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification.<br>
+I loves to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those for the table.<br>
+In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
 
 | funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
 |-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
