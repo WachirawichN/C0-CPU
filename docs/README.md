@@ -95,6 +95,9 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | -         | 110       | ORI       | rd = r1 \| imm                | bitwise or                                    |
 | -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
+#### Load (I-type)
+For load instructions, 
+#### Store (S-type)
 ### Branch
 ### Address Constructor
 ### Jump
