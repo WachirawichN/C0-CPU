@@ -62,18 +62,18 @@ Some groups may have multiple forms of the same instruction depend on the instru
 > The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
 The opcode for these instructions would be `0110011`
-| funct 7   | funct 3   | mnemonic  | operation                 | description                                   |
-|-----------|-----------|-----------|---------------------------|-----------------------------------------------|
-| 0000000   | 000       | ADD       | rd = r1 + r2              | add r2 to r1                                  |
-| 0100000   | 000       | SUB       | rd = r1 - r2              | subtract r2 from r1                           |
-| 0000000   | 001       | SLL       | rd = r1 << r2             | logical shift r1 left by r2                   |
-| 0000000   | 010       | SLT       | rd = r1 < r2 (signed)     | is r1 less than r2 (compare signed version)   |
-| 0000000   | 011       | SLTU      | rd = r1 < r2 (unsigned)   | is r1 less than r2 (compare unsigned version) |
-| 0000000   | 100       | XOR       | rd = r1 ^ r2              | bitwise xor                                   |
-| 0000000   | 101       | SRL       | rd = r1 >> r2 (logical)   | logical shift r1 right by r2                  |
-| 0100000   | 101       | SRA       | rd = r1 >> r2 (arithmetic)| arithmetic shift r1 right by r2               |
-| 0000000   | 110       | OR        | rd = r1 \| r2             | bitwise or                                    |
-| 0000000   | 111       | AND       | rd = r1 & r2              | bitwise and                                   |
+| funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
+|-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
+| 0000000   | 000       | ADD       | rd = r1 + r2                  | add r2 to r1                                  |
+| 0100000   | 000       | SUB       | rd = r1 - r2                  | subtract r2 from r1                           |
+| -         | 001       | SLL       | rd = r1 << r2                 | logical shift r1 left by r2                   |
+| -         | 010       | SLT       | rd = r1 < r2 (signed)         | is r1 less than r2 (compare signed version)   |
+| -         | 011       | SLTU      | rd = r1 < r2 (unsigned)       | is r1 less than r2 (compare unsigned version) |
+| -         | 100       | XOR       | rd = r1 ^ r2                  | bitwise xor                                   |
+| 0000000   | 101       | SRL       | rd = r1 >> r2 (logical)       | logical shift r1 right by r2                  |
+| 0100000   | 101       | SRA       | rd = r1 >>> r2 (arithmetic)   | arithmetic shift r1 right by r2               |
+| -         | 110       | OR        | rd = r1 \| r2                 | bitwise or                                    |
+| -         | 111       | AND       | rd = r1 & r2                  | bitwise and                                   |
 #### I-type
 The opcode for these instructions would be `0010011`
 
@@ -86,12 +86,12 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
 |-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
 | -         | 000       | ADDI      | rd = r1 + imm                 | add imm to r1                                 |
-| 0000000   | 001       | SLLI      | rd = r1 << shamt              | logical shift r1 left by shamt                |
+| -         | 001       | SLLI      | rd = r1 << shamt              | logical shift r1 left by shamt                |
 | -         | 010       | SLTI      | rd = r1 < imm (signed)        | is r1 less than imm (compare signed version)  |
 | -         | 011       | SLTUI     | rd = r1 < imm (unsigned)      | is r1 less than imm (compare unsigned version)|
 | -         | 100       | XORI      | rd = r1 ^ imm                 | bitwise xor                                   |
 | 0000000   | 101       | SRLI      | rd = r1 >> shamt (logical)    | logical shift r1 right by shamt               |
-| 0100000   | 101       | SRAI      | rd = r1 >> shamt (arithmetic) | arithmetic shift r1 right by shamt            |
+| 0100000   | 101       | SRAI      | rd = r1 >>> shamt (arithmetic)| arithmetic shift r1 right by shamt            |
 | -         | 110       | ORI       | rd = r1 \| imm                | bitwise or                                    |
 | -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
