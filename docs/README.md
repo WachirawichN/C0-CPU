@@ -96,7 +96,14 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
 #### Load (I-type)
-For load instructions, 
+For these operations, the opcode would be ''.
+| funct 3   | mnemonic  | load size | description                                   |
+|-----------|-----------|-----------|-----------------------------------------------|
+| 000       | LB        | 8         | |
+| 001       | LH        | 16        | |
+| 010       | LW        | 32        | |
+| 100       | LBU       | 8         | |
+| 101       | LHU       | 16        | |
 #### Store (S-type)
 ### Branch
 ### Address Constructor
