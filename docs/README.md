@@ -56,7 +56,7 @@ For `imm` (immediate) field, there are many use cases on this field. The use cas
 
 ## Instruction Groups
 C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
-Some groups may have multiple forms of the same instruction depend on the instruction format.<br>
+Some groups may have multiple forms of the same instruction depend on the instruction format, or may have multiple subgroup that do completely difference thing with difference instruction format. But all in all, the opcode would be different, even though they belong to the same group<br>
 ### Arithmetic and Logic
 > [!NOTE]
 > The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
