@@ -1,0 +1,4 @@
+# Vivado
+hardware/.Xil
+hardware/xvlog.pb
+hardware/C0_vivado*
