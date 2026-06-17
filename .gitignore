@@ -1,3 +1,4 @@
 # Vivado
-hardware/C0_vivado/*
-!hardware/C0_vivado/C0_vivado.xpr
+hardware/.Xil
+hardware/xvlog.pb
+hardware/C0_vivado*

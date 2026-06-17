@@ -1,9 +1,0 @@
-0.7
-2020.2
-Mar 19 2026
-13:48:41
-/home/page/Work/C0-CPU/hardware/C0_vivado/C0_vivado.sim/sim_1/behav/xsim/glbl.v,1762536278,verilog,,,,glbl,,uvm,,,,,,
-/home/page/Work/C0-CPU/hardware/enums/AluOperation.sv,1781603127,systemVerilog,/home/page/Work/C0-CPU/hardware/srcs/ALU/ALU.sv;/home/page/Work/C0-CPU/hardware/srcs/ALU/AluOperationDecoder.sv;/home/page/Work/C0-CPU/hardware/tests/AluTestBench.sv,/home/page/Work/C0-CPU/hardware/srcs/ALU/ALU.sv,,$unit_AluOperation_sv_352373260;alu_operation_pkg,,uvm,../../../../../../../../AMD/2025.2.1/data/rsb/busdef,,,,,
-/home/page/Work/C0-CPU/hardware/srcs/ALU/ALU.sv,1781603158,systemVerilog,,/home/page/Work/C0-CPU/hardware/srcs/ALU/AluOperationDecoder.sv,,ALU,,uvm,../../../../../../../../AMD/2025.2.1/data/rsb/busdef,,,,,
-/home/page/Work/C0-CPU/hardware/srcs/ALU/AluOperationDecoder.sv,1781608603,systemVerilog,,/home/page/Work/C0-CPU/hardware/tests/AluTestBench.sv,,AluOperationDecoder,,uvm,../../../../../../../../AMD/2025.2.1/data/rsb/busdef,,,,,
-/home/page/Work/C0-CPU/hardware/tests/AluTestBench.sv,1781608700,systemVerilog,,,,AluTestBench,,uvm,../../../../../../../../AMD/2025.2.1/data/rsb/busdef,,,,,

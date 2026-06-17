@@ -1,7 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/page/Work/C0-CPU/hardware/enums/AluOperation.sv" into library xil_defaultlib
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/page/Work/C0-CPU/hardware/srcs/ALU/ALU.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ALU
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/page/Work/C0-CPU/hardware/srcs/ALU/AluOperationDecoder.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module AluOperationDecoder
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/page/Work/C0-CPU/hardware/tests/AluTestBench.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module AluTestBench
