@@ -61,7 +61,7 @@ Some groups may have multiple forms of the same instruction depend on the instru
 > [!NOTE]
 > The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
-The opcode for these instructions would be `0110011`
+The opcode for these instructions would be `0110011`<br>
 | funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
 |-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
 | 0000000   | 000       | ADD       | rd = r1 + r2                  | add r2 to r1                                  |
@@ -75,7 +75,7 @@ The opcode for these instructions would be `0110011`
 | -         | 110       | OR        | rd = r1 \| r2                 | bitwise or                                    |
 | -         | 111       | AND       | rd = r1 & r2                  | bitwise and                                   |
 #### I-type
-The opcode for these instructions would be `0010011`
+The opcode for these instructions would be `0010011`<br>
 
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/special_i-type_format.png)<br>
@@ -96,14 +96,19 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
 #### Load (I-type)
-For these operations, the opcode would be ''.
-| funct 3   | mnemonic  | load size | description                                   |
-|-----------|-----------|-----------|-----------------------------------------------|
-| 000       | LB        | 8         | |
-| 001       | LH        | 16        | |
-| 010       | LW        | 32        | |
-| 100       | LBU       | 8         | |
-| 101       | LHU       | 16        | |
+For these operations, they're used for loading some amount of bits from memory, then store to `rd`.<br>
+The effective address of that memory is calculated by adding value from `rs1` to immediate field that have been sign-extended.<br>
+
+For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
+
+Opcode for these instructions would be `0000011`.<br>
+| funct 3   | mnemonic  | load size | note                      |
+|-----------|-----------|-----------|---------------------------|
+| 000       | LB        | 8         | sign-extended to 32-bits  |
+| 001       | LH        | 16        | sign-extended to 32-bits  |
+| 010       | LW        | 32        | -                         |
+| 100       | LBU       | 8         | zero extended to 32-bits  |
+| 101       | LHU       | 16        | zero extended to 32-bits  |
 #### Store (S-type)
 ### Branch
 ### Address Constructor
