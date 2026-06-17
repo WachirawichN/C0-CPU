@@ -96,7 +96,7 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
 #### Load (I-type)
-For these operations, they're used for loading some amount of bits from memory, then store to `rd`.<br>
+For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
 The effective address of that memory is calculated by adding value from `rs1` to immediate field that have been sign-extended.<br>
 
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
@@ -110,6 +110,15 @@ Opcode for these instructions would be `0000011`.<br>
 | 100       | LBU       | 8         | zero extended to 32-bits  |
 | 101       | LHU       | 16        | zero extended to 32-bits  |
 #### Store (S-type)
+For store group, these instructions copy the last ... bits (specify in `store size` column) from `rs2` to memory.<br>
+The effective address of the memory for these instructions use the same way of calculating as the load group. The immediate field of S-type format mights be a bit wonky to look at.<br>
+
+Opcode for these instructions would be `0100011`.<br>
+| funct 3   | mnemonic  | store size |
+|-----------|-----------|-----------|
+| 000       | SB        | 8         |
+| 001       | SH        | 16        |
+| 010       | SW        | 32        |
 ### Branch
 ### Address Constructor
 ### Jump
