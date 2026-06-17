@@ -2,7 +2,7 @@ package alu_operation_pkg;
     // Zero will be reserve for none.
     typedef enum logic [3:0] {
         ALU_NONE,
-        ALU_ADD = 1,
+        ALU_ADD,
         ALU_SUB,
         ALU_SLL,
         ALU_SLT,

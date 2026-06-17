@@ -23,11 +23,11 @@ module ALU (
             ALU_ADD  : result = operand_1 + operand_2;
             ALU_SUB  : result = operand_1 - operand_2;
             ALU_SLL  : result = operand_1 << operand_2;
-            ALU_SLT  : result = $signed(operand_1) < $signed(operand_2);
+            ALU_SLT  : result = signed'(operand_1) < signed'(operand_2);
             ALU_SLTU : result = operand_1 < operand_2;
             ALU_XOR  : result = operand_1 ^ operand_2;
             ALU_SRL  : result = operand_1 >> operand_2;
-            ALU_SRA  : result = operand_1 >>> operand_2;
+            ALU_SRA  : result = signed'(operand_1) >>> operand_2;
             ALU_OR   : result = operand_1 | operand_2;
             ALU_AND  : result = operand_1 & operand_2;
             default  : result = 0;
