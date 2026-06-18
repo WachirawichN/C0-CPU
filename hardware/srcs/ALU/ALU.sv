@@ -8,7 +8,7 @@ module ALU (
         output logic [31:0] result,
         output logic zero
     );
-    import alu_operation_pkg::*;
+    import operation_pkg::*;
 
     AluOperation_e operation;
 

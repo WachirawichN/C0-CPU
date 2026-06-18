@@ -80,20 +80,20 @@ The opcode for these instructions would be `0010011`<br>
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those for the table.<br>
-In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
+I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
 
-| funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
-|-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
-| -         | 000       | ADDI      | rd = r1 + imm                 | add imm to r1                                 |
-| -         | 001       | SLLI      | rd = r1 << shamt              | logical shift r1 left by shamt                |
-| -         | 010       | SLTI      | rd = r1 < imm (signed)        | is r1 less than imm (compare signed version)  |
-| -         | 011       | SLTUI     | rd = r1 < imm (unsigned)      | is r1 less than imm (compare unsigned version)|
-| -         | 100       | XORI      | rd = r1 ^ imm                 | bitwise xor                                   |
-| 0000000   | 101       | SRLI      | rd = r1 >> shamt (logical)    | logical shift r1 right by shamt               |
-| 0100000   | 101       | SRAI      | rd = r1 >>> shamt (arithmetic)| arithmetic shift r1 right by shamt            |
-| -         | 110       | ORI       | rd = r1 \| imm                | bitwise or                                    |
-| -         | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
+In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
+| funct 7 (bit 25 - 31) | funct 3   | mnemonic  | operation                     | description                                   |
+|-----------------------|-----------|-----------|-------------------------------|-----------------------------------------------|
+| -                     | 000       | ADDI      | rd = r1 + imm                 | add imm to r1                                 |
+| -                     | 001       | SLLI      | rd = r1 << shamt              | logical shift r1 left by shamt                |
+| -                     | 010       | SLTI      | rd = r1 < imm (signed)        | is r1 less than imm (compare signed version)  |
+| -                     | 011       | SLTUI     | rd = r1 < imm (unsigned)      | is r1 less than imm (compare unsigned version)|
+| -                     | 100       | XORI      | rd = r1 ^ imm                 | bitwise xor                                   |
+| 0000000               | 101       | SRLI      | rd = r1 >> shamt (logical)    | logical shift r1 right by shamt               |
+| 0100000               | 101       | SRAI      | rd = r1 >>> shamt (arithmetic)| arithmetic shift r1 right by shamt            |
+| -                     | 110       | ORI       | rd = r1 \| imm                | bitwise or                                    |
+| -                     | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
 ### Load and Store
 #### Load (I-type)
 For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
