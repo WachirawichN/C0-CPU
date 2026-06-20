@@ -62,18 +62,18 @@ Some groups may have multiple forms of the same instruction depend on the instru
 > The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
 The opcode for these instructions would be `0110011`<br>
-| funct 7   | funct 3   | mnemonic  | operation                     | description                                   |
-|-----------|-----------|-----------|-------------------------------|-----------------------------------------------|
-| 0000000   | 000       | ADD       | rd = r1 + r2                  | add r2 to r1                                  |
-| 0100000   | 000       | SUB       | rd = r1 - r2                  | subtract r2 from r1                           |
-| -         | 001       | SLL       | rd = r1 << r2                 | logical shift r1 left by r2                   |
-| -         | 010       | SLT       | rd = r1 < r2 (signed)         | is r1 less than r2 (compare signed version)   |
-| -         | 011       | SLTU      | rd = r1 < r2 (unsigned)       | is r1 less than r2 (compare unsigned version) |
-| -         | 100       | XOR       | rd = r1 ^ r2                  | bitwise xor                                   |
-| 0000000   | 101       | SRL       | rd = r1 >> r2 (logical)       | logical shift r1 right by r2                  |
-| 0100000   | 101       | SRA       | rd = r1 >>> r2 (arithmetic)   | arithmetic shift r1 right by r2               |
-| -         | 110       | OR        | rd = r1 \| r2                 | bitwise or                                    |
-| -         | 111       | AND       | rd = r1 & r2                  | bitwise and                                   |
+| funct 7   | funct 3   | mnemonic  | operation                         | description                                           |
+|-----------|-----------|-----------|-----------------------------------|-------------------------------------------------------|
+| 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                | add `rs2` to `rs1`                                    |
+| 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                | subtract `rs2` from `rs1`                             |
+| -         | 001       | SLL       | rd = `rs1` << `rs2`               | logical shift `rs1` left by `rs2`                     |
+| -         | 010       | SLT       | rd = `rs1` < `rs2` (signed)       | is `rs1` less than `rs2` (compare signed version)     |
+| -         | 011       | SLTU      | rd = `rs1` < `rs2` (unsigned)     | is `rs1` less than `rs2` (compare unsigned version)   |
+| -         | 100       | XOR       | rd = `rs1` ^ `rs2`                | bitwise xor                                           |
+| 0000000   | 101       | SRL       | rd = `rs1` >> `rs2` (logical)     | logical shift `rs1` right by `rs2`                    |
+| 0100000   | 101       | SRA       | rd = `rs1` >>> `rs2` (arithmetic) | arithmetic shift `rs1` right by `rs2`                 |
+| -         | 110       | OR        | rd = `rs1` \| `rs2`               | bitwise or                                            |
+| -         | 111       | AND       | rd = `rs1` & `rs2`                | bitwise and                                           |
 #### I-type
 The opcode for these instructions would be `0010011`<br>
 
@@ -83,17 +83,17 @@ Image taken from [RISC-V specification document](https://docs.riscv.org/referenc
 I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
 
 In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
-| funct 7 (bit 25 - 31) | funct 3   | mnemonic  | operation                     | description                                   |
-|-----------------------|-----------|-----------|-------------------------------|-----------------------------------------------|
-| -                     | 000       | ADDI      | rd = r1 + imm                 | add imm to r1                                 |
-| -                     | 001       | SLLI      | rd = r1 << shamt              | logical shift r1 left by shamt                |
-| -                     | 010       | SLTI      | rd = r1 < imm (signed)        | is r1 less than imm (compare signed version)  |
-| -                     | 011       | SLTUI     | rd = r1 < imm (unsigned)      | is r1 less than imm (compare unsigned version)|
-| -                     | 100       | XORI      | rd = r1 ^ imm                 | bitwise xor                                   |
-| 0000000               | 101       | SRLI      | rd = r1 >> shamt (logical)    | logical shift r1 right by shamt               |
-| 0100000               | 101       | SRAI      | rd = r1 >>> shamt (arithmetic)| arithmetic shift r1 right by shamt            |
-| -                     | 110       | ORI       | rd = r1 \| imm                | bitwise or                                    |
-| -                     | 111       | ANDI      | rd = r1 & imm                 | bitwise and                                   |
+| funct 7 (bit 25 - 31) | funct 3   | mnemonic  | operation                         | description                                       |
+|-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
+| -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
+| -                     | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
+| -                     | 010       | SLTI      | rd = `rs1` < imm (signed)         | is `rs1` less than imm (compare signed version)   |
+| -                     | 011       | SLTUI     | rd = `rs1` < imm (unsigned)       | is `rs1` less than imm (compare unsigned version) |
+| -                     | 100       | XORI      | rd = `rs1` ^ imm                  | bitwise xor                                       |
+| 0000000               | 101       | SRLI      | rd = `rs1` >> shamt (logical)     | logical shift `rs1` right by shamt                |
+| 0100000               | 101       | SRAI      | rd = `rs1` >>> shamt (arithmetic) | arithmetic shift `rs1` right by shamt             |
+| -                     | 110       | ORI       | rd = `rs1` \| imm                 | bitwise or                                        |
+| -                     | 111       | ANDI      | rd = `rs1` & imm                  | bitwise and                                       |
 ### Load and Store
 #### Load (I-type)
 For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
@@ -120,5 +120,17 @@ Opcode for these instructions would be `0100011`.<br>
 | 001       | SH        | 16        |
 | 010       | SW        | 32        |
 ### Branch
+This group of instructions will add specific number to the program counter of the processor, when a condition of instruction is met. Effectively, an if-else instruction.<br>
+Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
+
+For this group of instructions, the format would only be B-type, and the opcode would be `1100011`.<br>
+| funct 3   | mnemonic  | description                                               |
+|-----------|-----------|-----------------------------------------------------------|
+| 000       | BEQ       | branch if `rs1` and `rs2` are equal                       |
+| 001       | BNE       | branch if `rs1` and `rs2` are not equal                   |
+| 100       | BLT       | branch if `rs1` is less than `rs2` (signed version)       |
+| 101       | BGE       | branch if `rs1` is greater than `rs2` (signed version)    |
+| 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)     |
+| 111       | BGEU      | branch if `rs1` is greater than `rs2` (unsigned version)  |
 ### Address Constructor
 ### Jump
