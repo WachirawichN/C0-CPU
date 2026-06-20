@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module ALU (
+module LSU (
         input logic [2:0]   func_3,
     );
     import operation_pkg::*;
