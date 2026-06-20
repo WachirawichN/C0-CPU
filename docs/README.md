@@ -119,11 +119,12 @@ Opcode for these instructions would be `0100011`.<br>
 | 000       | SB        | 8         |
 | 001       | SH        | 16        |
 | 010       | SW        | 32        |
-### Branch
+### Jump
+#### Conditional Jump (Branch, B-type)
 This group of instructions will add specific number to the program counter of the processor, when a condition of instruction is met. Effectively, an if-else instruction.<br>
 Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
-For this group of instructions, the format would only be B-type, and the opcode would be `1100011`.<br>
+The opcode for this instruction group would be `1100011`.<br>
 | funct 3   | mnemonic  | description                                               |
 |-----------|-----------|-----------------------------------------------------------|
 | 000       | BEQ       | branch if `rs1` and `rs2` are equal                       |
@@ -132,5 +133,6 @@ For this group of instructions, the format would only be B-type, and the opcode 
 | 101       | BGE       | branch if `rs1` is greater than `rs2` (signed version)    |
 | 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)     |
 | 111       | BGEU      | branch if `rs1` is greater than `rs2` (unsigned version)  |
-### Address Constructor
-### Jump
+#### Unconditional Jump
+
+### Other
