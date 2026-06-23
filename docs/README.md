@@ -58,11 +58,11 @@ The following are the full name of each format.
 For the `imm` field, this field is use as a direct value use for computation instead of value in a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor. After all the bits are in their position, the processor will automatically sign-extended the data to become 32-bits.<br>
 Some format with some instruction might do something before extending to 32-bits, like B-type which add 0 to the end before extending. This type of stuff will be explained in the next section of some instruction group.<br>
 > [!NOTE]
-> By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.<br>
-For example, lets says there is a B-type instruction, which is
+> By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.
+
+For example, lets says there is a B-type instruction, which is<br>
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | ... | ... | 8 | 9 | 0 | a | b | ... |
 |---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|
-|   |   |   |   |   |   |   |     |     |     |   |   |   |   |   |     |
 
 (`1` and `0` in this situation really means in binary in this situation, but other value can be anything. I just want to make it easier to identify each bit.)<br>
 
