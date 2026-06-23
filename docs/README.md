@@ -1,8 +1,7 @@
 # Architecture
+This section will be about the ISA, which C0 is based on. Essentially, what the CPU does.<br>
 C0's architecture is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
 This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most modern Processor features and design techniques, resulting in only 37 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
-
-The cut-off modern Processor features and design techniques includes Cache, Superscalar design and Out of Order execution, resulting in at best 1 instruction per clock cycles.<br>
 
 ## Registers
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
@@ -161,10 +160,15 @@ Opcode for `JAL` instruction is `1101111`.<br>
 Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction format.
 ### Upper Immediate
 This group contains two instructions just like Unconditional Jump group. Job of this group's instructions is to load upper 20-bits of immediate value to target register.<br>
-This instructions group use U-type format, but there are two difference opcode for each of the instruction.<br>
+This instruction group use U-type format, but there are two difference opcodes for each of the instruction.<br>
 #### LUI
 `LUI` loads first 20-bits then left shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the left.<br>
 The opcode for this instruction is `0110111`.<br>
 #### AUIPC
 `AUIPC` pretty much does what `LUI` does, but added the current value from program counter before loading into `rd`.<br>
 This instruction use `0010111` as its opcode.<br>
+
+
+# Microarchitecture
+For this section, I'll be talking more about the hardware now. It's now how the CPU does it.<br>
+As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like cache, out of order execution, and Superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism.
