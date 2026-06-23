@@ -137,7 +137,7 @@ Opcode for these instructions would be `0100011`.<br>
 | 010       | SW        | 32        |
 ### Jump
 #### Conditional Jump (Branch, B-type)
-This group of instructions will add specific number to the program counter of the processor, when a condition of instruction is met. Effectively, an if-else instruction.<br>
+This group of instructions will add specific number to the program counter of the processor to jump to new instruction address, when a condition of instruction is met. Effectively, an if-else instruction.<br>
 Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
 The opcode for this instruction group would be `1100011`.<br>
@@ -150,5 +150,13 @@ The opcode for this instruction group would be `1100011`.<br>
 | 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)     |
 | 111       | BGEU      | branch if `rs1` is greater than `rs2` (unsigned version)  |
 #### Unconditional Jump
+This type of jump will also add specific number to the program counter, to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
+This group of instructions contains two instructions, both use difference opcode and instruction format. They are listed down below.
+##### JAL (J-type)
+This instruction use J-type instruction format. Like the B-type instruction format, 0 is also added to the end of the immediate value and signed-extended.<br>
+This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also save current instruction address (before jumping) with 4 (bytes) added to, to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
+Opcode for `JAL` instruction is `1101111`.<br>
+##### JALR (I-type)
+Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction format.
 
 ### Other
