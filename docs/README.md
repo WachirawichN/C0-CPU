@@ -66,10 +66,9 @@ For example, let's say there is a B-type instruction, which is<br>
 
 (`1` and `0` in this situation really means it in binary in this situation, but other value can be anything. I just want to make it easier to identify each bit.)<br>
 
-The product of swapping each bit to its correspond position would be `1b234567890a`.
-Next, because this is B-type format, 0 would be added to the back, resulting in `1b234567890a0` as a product.
+The product of swapping each bit to its correspond position would be `1b234567890a`.<br>
+Next, because this is B-type format, 0 would be added to the back, resulting in `1b234567890a0` as a product.<br>
 Finally, the sign will be extended to 32-bits, the final value will be `11111111111111111111b234567890a0`, because this is sign-extended the remainings 19-bits would be 1.<br>
-
 
 ## Instruction Groups
 C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
