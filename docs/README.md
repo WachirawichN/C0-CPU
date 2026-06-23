@@ -7,9 +7,8 @@ This architecture is more of a CPU understanding foundation for me rather than a
 Registers of C0 have the same registers as [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) registers, meaning that in C0 there will be a total of 32 registers (not counting program counter, of course).<br>
 
 The following table will list all 32 registers and its description from [RISC-V ABI document](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html).<br>
-
 > [!NOTE]
-> RISC-V actually specified that all 32 registers are actually a general purpose register, meaning you could use all registers for anything you like. But, ABI (which is also specified by RISC-V) is like a common agreement on how to write codes for RISC-V, and it specifies the purpose of each register, so it is probably better to ABI instead of using all 32 registers for whatever you want.
+> RISC-V actually specified that all 32 registers are actually a general purpose register, meaning you could use all registers for anything you like. But, ABI (which is also specified by RISC-V) is like a common agreement on how to write codes for RISC-V, and it specifies the purpose of each register, so it is probably better to stick to ABI instead of using all 32 registers for whatever you want.
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
 |-----------|---------------|-------------------------------------------|-----------|
@@ -24,6 +23,7 @@ The following table will list all 32 registers and its description from [RISC-V 
 | x10 - x17 | a0 - a7       | Argument registers                        | Caller    |
 | x18 - x27 | s2 - s11      | Callee-saved registers                    | Callee    |
 | x28 - x31 | t3 - t6       | Temporaries registers                     | Caller    |
+
 The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets). <br>
 
 `Saved by` column referred to which part of the code is responsible for storing data from those register to somewhere else (usually the stack) before calling any function.<br>
@@ -31,7 +31,6 @@ The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/
 `Saved by Caller` means the code that called the function is responsible for storing data from registers before calling a function, this is due to the freedom of being able to overwrite data given to the function.<br>
 
 While `Saved by Callee` means the function is the one responsible for storing the data inside registers before overwriting anyone of them, and also restore the value back to being the same as before.<br>
-
 
 ## Instruction Formats
 There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
