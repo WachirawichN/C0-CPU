@@ -157,6 +157,7 @@ This instruction use J-type instruction format. Like the B-type instruction form
 This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also save current instruction address (before jumping) with 4 (bytes) added to, to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
 Opcode for `JAL` instruction is `1101111`.<br>
 ##### JALR (I-type)
+`JALR` is I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0. The program counter is then set to this value. The x1 register is also used by the instruction to save the address before jumping with 4 added to, just like `JAL`.<br>
 Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction format.
 
 ### Other
