@@ -64,7 +64,7 @@ For example, let's say there is a B-type instruction, with this as their immedia
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | ... | ... | 8 | 9 | 0 | a | b | ... |
 |---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|
 
-(`1` and `0` in this situation really means it in binary in this situation, but other value can be anything. I just want to make it easier to identify each bit.)<br>
+(`1` and `0` in this situation really means it in binary in this situation, but other value can be anything that is `1` or `0`. I just want to make it easier to identify each bit.)<br>
 
 The product of swapping each bit to its correspond position would be `1b234567890a`.<br>
 Next, because this is B-type format, 0 would be added to the back, resulting in `1b234567890a0` as a product.<br>
