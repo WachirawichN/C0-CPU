@@ -60,7 +60,7 @@ Some format with some instruction might do something before extending to 32-bits
 > [!NOTE]
 > By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.
 
-For example, lets says there is a B-type instruction, which is<br>
+For example, let's say there is a B-type instruction, which is<br>
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | ... | ... | 8 | 9 | 0 | a | b | ... |
 |---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|
 
