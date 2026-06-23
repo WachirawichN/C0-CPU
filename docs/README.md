@@ -62,7 +62,7 @@ Some format with some instruction might do something before extending to 32-bits
 
 For example, lets says there is a B-type instruction, which is<br>
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | ... | ... | 8 | 9 | 0 | a | b | ... |
-|---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|
+|---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|<br>
 (`1` and `0` in this situation really means it in binary in this situation, but other value can be anything. I just want to make it easier to identify each bit.)<br>
 
 The product of swapping each bit to its correspond position would be `1b234567890a`.
