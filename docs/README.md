@@ -172,5 +172,33 @@ This instruction use `0010111` as its opcode.<br>
 
 
 # Microarchitecture
-For this section, I'll be talking more about the hardware now. It's now how the CPU does it.<br>
-As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like cache, out of order execution, and Superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism.
+For this section, I'll be talking a little bit more about the hardware now. It's now, how will the CPU do it.<br>
+As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like cache, out of order execution, and Superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism.<br>
+
+The following image is the diagram of the processor.<br>
+![Processor diagram](./imgs/processor_diagram.png)<br>
+The sections down below will be over how each component work. I've written each section in order how the processor retrieves instruction and execute it.<br>
+
+## Virtual Memory
+Normal processor doesn't have this part, but I've decided that writing a real DRAM controller and storage interface would be a bit too hard for me, so I write this virtual memory using FPGA's BRAM. This is also the reason why I named the CPU C0, because I did not intend it to be a normal working CPU.<br>
+
+Anyway, the working of each memory is quite straight forward. There is 32-bits address line, 32-bits bidirectional data line, read line and there is also a write line for RAM.<br>
+More description for each memory will be down below.<br>
+### RAM
+### ROM
+
+## Control Unit
+Control Unit (CU) doesn't execute the instruction directly, but it acts as an orchestrator that control the flow of instruction execution.<br>
+That cycle is called instruction pipeline.
+### Program Counter
+### Instruction Decoder
+
+## Bus
+
+## Register File
+
+## Arithmetic and Logic Unit
+### Operation Decoder
+
+## Load-Store Unit
+### Operation Decoder
