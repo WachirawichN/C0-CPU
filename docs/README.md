@@ -180,7 +180,7 @@ The following image is the diagram of the processor.<br>
 The sections down below will be over how each component work. I've written each section in order how the processor retrieves instruction and execute it.<br>
 
 ## Virtual Memory
-Normal processor doesn't have this part, but I've decided that writing a real DRAM controller and storage interface would be a bit too hard for me, so I write this virtual memory using FPGA's BRAM. This is also the reason why I named the CPU C0, because I did not intend it to be a normal working CPU.<br>
+Normal processor doesn't have this part, but I've decided that writing a real DRAM and I/O controller would be a bit too hard for me, so I write this virtual memory using FPGA's BRAM. This is also the reason why I named the CPU C0, because I did not intend it to be a normal working CPU.<br>
 
 Anyway, the working of each memory is quite straight forward. There is 32-bits address line, 32-bits bidirectional data line, read line and there is also a write line for RAM.<br>
 More description for each memory will be down below.<br>
@@ -189,7 +189,7 @@ More description for each memory will be down below.<br>
 
 ## Control Unit
 Control Unit (CU) doesn't execute the instruction directly, but it acts as an orchestrator that control the flow of instruction execution.<br>
-That cycle is called instruction pipeline.
+That cycle is called instruction pipeline. In C0, the instruction pipeline follows RISC style instruction pipeline, with 5 stages.
 ### Program Counter
 ### Instruction Decoder
 
