@@ -177,19 +177,100 @@ As I said in the first section, I've cut out most modern processor design featur
 
 ## Instruction Cycle
 In C0, execution of an instruction will be divided into 5 stages, there are<br>
-1. Fetch
+1. Fetch (IF)
     * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [program counter](#program-counter).
-2. Decode
+2. Decode (ID)
     * The instruction is decoded by the CPU. This process tell the CPU what is the instruction format, opcode, func3/7 and the registers.
-3. Execute
+3. Execute (EX)
     * The information is passed from Decode stage into this stage to do all sort of calculation (except operation that interact with memory, but address calculation will be doing here).
-4. Memory
+4. Memory (MEM)
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory.
-5. Write back
+5. Writeback (WB)
     * If required, the result will be written back to register at this stage.
 
 ## Instruction Pipeline
 Instruction Pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
+
+The table below is how processor without instruction pipeline execute instruction<br>
+<table>
+  <tr>
+    <th rowspan="2">Instruction</th>
+    <th colspan="2">Clock cycle no.</th>
+  </tr>
+  <tr>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+    <th>8</th>
+    <th>9</th>
+    <th>10</th>
+    <th>11</th>
+    <th>12</th>
+    <th>13</th>
+    <th>14</th>
+    <th>15</th>
+  </tr>
+  <tr>
+    <td>Instruction 1</td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Instruction 2</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Instruction 3</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+  </tr>
+</table>
+At first, this might look ok, but this waste a lot of clock cycle. Because when the first instruction is in decode stage the fetch stage and it hardware is free to execute next instruction, this is true to all the stage.<br>
+
 
 
 
