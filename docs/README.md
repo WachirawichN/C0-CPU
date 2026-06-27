@@ -173,7 +173,28 @@ This instruction use `0010111` as its opcode.<br>
 
 # Microarchitecture
 For this section, I'll be talking a little bit more about the hardware now. It's now, how will the CPU do it.<br>
-As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like cache, out of order execution, and Superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism.<br>
+As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like I/O, interrupts, cache, being in-order execution, and superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism, and almost no use, but this is why there is 0 in C0.<br>
+
+## Instruction Cycle
+In C0, execution of an instruction will be divided into 5 stages, there are<br>
+1. Fetch
+    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [program counter](#program-counter).
+2. Decode
+    * The instruction is decoded by the CPU. This process tell the CPU what is the instruction format, opcode, func3/7 and the registers.
+3. Execute
+    * The information is passed from Decode stage into this stage to do all sort of calculation (except operation that interact with memory, but address calculation will be doing here).
+4. Memory
+    * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory.
+5. Write back
+    * If required, the result will be written back to register at this stage.
+
+## Instruction Pipeline
+Instruction Pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
+
+
+
+
+C0 implement the 5 stages instruction pipelines that many RISC CPU utilize, instruction pipeline increase CPU performance by overlapping the execution of multiple instructions. For each instruction, the execution of that instruction will be divided into 5 stages, these are<br>
 
 The following image is the diagram of the processor.<br>
 ![Processor diagram](./imgs/processor_diagram.png)<br>
