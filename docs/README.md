@@ -189,13 +189,13 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
     * If required, the result will be written back to register at this stage.
 
 ## Instruction Pipeline
-Instruction Pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
+Instruction pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
 
 The table below is how processor without instruction pipeline execute instruction<br>
 <table>
   <tr>
     <th rowspan="2">Instruction</th>
-    <th colspan="2">Clock cycle no.</th>
+    <th colspan="15">Clock cycle no.</th>
   </tr>
   <tr>
     <th>1</th>
@@ -271,7 +271,69 @@ The table below is how processor without instruction pipeline execute instructio
 </table>
 At first, this might look ok, but this waste a lot of clock cycle. Because when the first instruction is in decode stage the fetch stage and it hardware is free to execute next instruction, this is true to all the stage.<br>
 
-
+The table below is how processor with instruction pipeline implemented on<br>
+<table>
+  <tr>
+    <th rowspan="2">Instruction</th>
+    <th colspan="15">Clock cycle no.</th>
+  </tr>
+  <tr>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>7</th>
+  </tr>
+  <tr>
+    <td>Instruction 1</td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Instruction 2</td>
+    <td></td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Instruction 3</td>
+    <td></td>
+    <td></td>
+    <td>IF</td>
+    <td>ID</td>
+    <td>EX</td>
+    <td>MEM</td>
+    <td>WB</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 
 
