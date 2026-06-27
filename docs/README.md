@@ -191,7 +191,8 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
 ## Instruction Pipeline
 Instruction pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
 
-The table below is how processor without instruction pipeline execute instruction<br>
+Two tables below is the comparison between processor that didn't implement instruction pipeline and one that did.
+
 <table>
   <tr>
     <th rowspan="2">Instruction</th>
@@ -269,13 +270,11 @@ The table below is how processor without instruction pipeline execute instructio
     <td>WB</td>
   </tr>
 </table>
-At first, this might look ok, but this waste a lot of clock cycle. Because when the first instruction is in decode stage the fetch stage and it hardware is free to execute next instruction, this is true to all the stage.<br>
-
-The table below is how processor with instruction pipeline implemented on<br>
+Processor that didn't implement instruction pipeline.<br>
 <table>
   <tr>
     <th rowspan="2">Instruction</th>
-    <th colspan="15">Clock cycle no.</th>
+    <th colspan="7">Clock cycle no.</th>
   </tr>
   <tr>
     <th>1</th>
@@ -295,7 +294,6 @@ The table below is how processor with instruction pipeline implemented on<br>
     <td>WB</td>
     <td></td>
     <td></td>
-    <td></td>
   </tr>
   <tr>
     <td>Instruction 2</td>
@@ -305,14 +303,6 @@ The table below is how processor with instruction pipeline implemented on<br>
     <td>EX</td>
     <td>MEM</td>
     <td>WB</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
     <td></td>
   </tr>
   <tr>
@@ -324,20 +314,13 @@ The table below is how processor with instruction pipeline implemented on<br>
     <td>EX</td>
     <td>MEM</td>
     <td>WB</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
   </tr>
 </table>
+Processor that did implement instruction pipeline.<br>
 
+As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.
 
-
-C0 implement the 5 stages instruction pipelines that many RISC CPU utilize, instruction pipeline increase CPU performance by overlapping the execution of multiple instructions. For each instruction, the execution of that instruction will be divided into 5 stages, these are<br>
+<!-- C0 implement the 5 stages instruction pipelines that many RISC CPU utilize, instruction pipeline increase CPU performance by overlapping the execution of multiple instructions. For each instruction, the execution of that instruction will be divided into 5 stages, these are<br>
 
 The following image is the diagram of the processor.<br>
 ![Processor diagram](./imgs/processor_diagram.png)<br>
@@ -365,4 +348,4 @@ That cycle is called instruction pipeline. In C0, the instruction pipeline follo
 ### Operation Decoder
 
 ## Load-Store Unit
-### Operation Decoder
+### Operation Decoder -->
