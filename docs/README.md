@@ -320,7 +320,7 @@ Processor that did implement instruction pipeline.<br>
 
 As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
 ### Challenge
-But instruction pipeline comes with a catch, the easiest one to thinks about is branch or jump instruction. These instructions wouldn't change [program counter](#program-counter)'s value until their finish, but by then four instructions would already be fetched for their own execution. There are more problems can cause by instruction pipeline, but anyway these problems are call "Hazards". You can find more information on [Wikipedia](https://en.wikipedia.org/wiki/Instruction_pipelining#Hazards)<br>
+But instruction pipeline comes with a catch, the easiest one to thinks about is branch or jump instruction. These instructions wouldn't change [program counter](#program-counter)'s value until their finish, but by then four instructions would already be fetched for their own execution. There are more problems can cause by instruction pipeline, but anyway these problems are call "Hazards". You can find more information on [Wikipedia](https://en.wikipedia.org/wiki/Hazard_(computer_architecture))<br>
 
 <!-- C0 implement the 5 stages instruction pipelines that many RISC CPU utilize, instruction pipeline increase CPU performance by overlapping the execution of multiple instructions. For each instruction, the execution of that instruction will be divided into 5 stages, these are<br>
 
