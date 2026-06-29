@@ -193,7 +193,7 @@ Each of these stages took 1 clock cycle to complete, this type of instruction ex
 Image below will be about each stages.
 
 ## Instruction Pipeline
-Instruction pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
+Instruction pipeline is a technique use to increase execution speed of a processor, it is done by taking instruction cycle from section above then stack multiple instruction cycles on top of each other with an offset of 1.<br>
 
 Two tables below is the comparison between processor that didn't implement instruction pipeline and one that did.
 
