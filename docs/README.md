@@ -79,7 +79,7 @@ Some groups may have multiple forms of the same instruction depend on the instru
 > The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
 The opcode for these instructions would be `0110011`<br>
-| func 7    | func 3    | mnemonic  | operation                         | description                                           |
+| funct 7   | funct 3   | mnemonic  | operation                         | description                                           |
 |-----------|-----------|-----------|-----------------------------------|-------------------------------------------------------|
 | 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                | add `rs2` to `rs1`                                    |
 | 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                | subtract `rs2` from `rs1`                             |
@@ -97,10 +97,10 @@ The opcode for these instructions would be `0010011`<br>
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/architecture/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I love to think that field of bits ranging from bit 25 to 31 are used like func 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
+I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
 
 In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
-| func 7 (bit 25 - 31)  | func 3    | mnemonic  | operation                         | description                                       |
+| funct 7 (bit 25 - 31) | funct 3   | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
 | -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
 | -                     | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
@@ -119,7 +119,7 @@ The effective address of that memory is calculated by adding value from `rs1` to
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
 
 Opcode for these instructions would be `0000011`.<br>
-| func 3    | mnemonic  | load size | note                      |
+| funct 3   | mnemonic  | load size | note                      |
 |-----------|-----------|-----------|---------------------------|
 | 000       | LB        | 8         | sign-extended to 32-bits  |
 | 001       | LH        | 16        | sign-extended to 32-bits  |
@@ -131,7 +131,7 @@ For store group, these instructions copy the last ... bits (specify in `store si
 The effective address of the memory for these instructions use the same way of calculating as the load group. The immediate field of S-type format mights be a bit wonky to look at.<br>
 
 Opcode for these instructions would be `0100011`.<br>
-| func 3    | mnemonic  | store size |
+| funct 3   | mnemonic  | store size |
 |-----------|-----------|-----------|
 | 000       | SB        | 8         |
 | 001       | SH        | 16        |
@@ -142,7 +142,7 @@ This group of instructions will add specific number to the program counter of th
 Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
 The opcode for this instruction group would be `1100011`.<br>
-| func 3    | mnemonic  | description                                               |
+| funct 3   | mnemonic  | description                                               |
 |-----------|-----------|-----------------------------------------------------------|
 | 000       | BEQ       | branch if `rs1` and `rs2` are equal                       |
 | 001       | BNE       | branch if `rs1` and `rs2` are not equal                   |
