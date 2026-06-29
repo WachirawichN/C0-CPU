@@ -187,6 +187,10 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory.
 5. Writeback (WB)
     * If required, the result will be written back to register at this stage.
+Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
+
+
+Image below will be about each stages.
 
 ## Instruction Pipeline
 Instruction pipeline is a technique use to increase execution speed of a processor, it is done by stacking multiple instruction cycle on top of each other with an offset of 1.<br>
