@@ -207,6 +207,10 @@ This part is usually handles by some sort of decoder, then of course we need mor
 This is now the datapath we construct.<br>
 
 ### Execute
+In this stage, we took all the information from last stage, select the designated register, then put all that information through ALU.<br>
+
+Let's start off by selecting the designated register.<br>
+Registers are grouped in register file, 
 
 
 ## Instruction Pipeline
