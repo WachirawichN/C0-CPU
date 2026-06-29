@@ -189,7 +189,7 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
     * If required, the result will be written back to register at this stage.
   
 Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
-Below will be about each stage (I omit clock port on all diagram).<br>
+Below will be about each stage (I omit clock port on all diagram), and the datapath which is just a diagram of how the processor will retrieve instruction and process it.<br>
 
 ### Fetch
 ![Program Counter](./imgs/microarchitecture/fetch/pc.png)<br>
@@ -198,6 +198,13 @@ The processor use a component called program counter to keep track of the curren
 Then we need to hook the program counter to some sort of instruction memory, it could be cache, RAM or ROM, so that the processor can get the instruction.<br>
 ![Program Counter](./imgs/microarchitecture/fetch/all.png)<br>
 Being multi-cycle datapath, it needs register to hold the data retrieved from instruction memory for next stage. If we didn't have this register it would just turn into single-cycle, which due to performance reason (memory latency, and some other reasons) it is inferior to multi-cycle. Each stage register will be a tall rectangle to separate each stage.<br>
+
+### Decode
+After we got instruction from the memory, we need to decode it to identify the instruction format, and separate all the information contain inside the instruction. Let's also give the decoder an ability to assemble immediate field according to the instruction format.<br>
+![Program Counter](./imgs/microarchitecture/decode/decoder.png)<br>
+This part is usually handles by some sort of decoder, then of course we need more registers to hold the information for next stage.<br>
+![Program Counter](./imgs/microarchitecture/decode/all.png)<br>
+This is now the datapath we construct.<br>
 
 
 ## Instruction Pipeline
