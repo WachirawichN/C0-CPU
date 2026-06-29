@@ -38,7 +38,7 @@ There are a total of 6 instruction formats specified by RISC-V, the table below 
 > [!NOTE]
 > If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it needs to jump to, etc...
 
-![Instruction formats](./imgs/instruction_formats.png)<br>
+![Instruction formats](./imgs/architecture/instruction_formats.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
 
 The following are the full name of each format.
@@ -95,7 +95,7 @@ The opcode for these instructions would be `0110011`<br>
 The opcode for these instructions would be `0010011`<br>
 
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
-![Special I-type format](./imgs/special_i-type_format.png)<br>
+![Special I-type format](./imgs/architecture/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
 I love to think that field of bits ranging from bit 25 to 31 are used like func 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
 
@@ -187,10 +187,18 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory.
 5. Writeback (WB)
     * If required, the result will be written back to register at this stage.
+  
 Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
+Below will be about each stage (I omit clock port on all diagram).<br>
 
+### Fetch
+![Program Counter](./imgs/microarchitecture/fetch/pc.png)<br>
+The processor use a component called program counter to keep track of the current instruction that the processor need to execute. If everything goes right the program counter will add 4 to itself to jump to next instruction, which is 4 bytes away.<br>
+![Program Counter](./imgs/microarchitecture/fetch/pc+inst_mem.png)<br>
+Then we need to hook the program counter to some sort of instruction memory, it could be cache, RAM or ROM, so that the processor can get the instruction.<br>
+![Program Counter](./imgs/microarchitecture/fetch/all.png)<br>
+Being multi-cycle datapath, it needs register to hold the data retrieved from instruction memory for next stage. If we didn't have this register it would just turn into single-cycle, which due to performance reason (memory latency, and some other reasons) it is inferior to multi-cycle. Each stage register will be a tall rectangle to separate each stage.<br>
 
-Image below will be about each stages.
 
 ## Instruction Pipeline
 Instruction pipeline is a technique use to increase execution speed of a processor, it is done by taking instruction cycle from section above then stack multiple instruction cycles on top of each other with an offset of 1.<br>
