@@ -2,3 +2,6 @@
 hardware/.Xil
 hardware/xvlog.pb
 hardware/C0_vivado*
+
+# Draw.io
+*.bkp
