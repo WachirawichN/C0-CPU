@@ -180,7 +180,7 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
 1. Fetch (IF)
     * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [program counter](#program-counter).
 2. Decode (ID)
-    * The instruction is decoded by the CPU. This process tell the CPU what is the instruction format, opcode, func3/7 and the registers.
+    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction format, opcode, func3/7, the registers and others.
 3. Execute (EX)
     * The information is passed from Decode stage into this stage to do all sort of calculation (except operation that interact with memory, but address calculation will be doing here).
 4. Memory (MEM)
@@ -189,21 +189,25 @@ In C0, execution of an instruction will be divided into 5 stages, there are<br>
     * If required, the result will be written back to register at this stage.
   
 Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
-Below will be about each stage (I omit clock port on all diagram), and the datapath which is just a diagram of how the processor will retrieve instruction and process it.<br>
+At the end of each stage (except WB stage), there will be a set of registers for passing data from one stage to another.<br>
 
+![Entire datapath](./imgs/microarchitecture/entire_datapath.png)<br>
+Image of C0's entire datapath.<br>
+
+Below will be about each stage (I omit clock port on all diagram), and the datapath which is just a diagram of how the processor will retrieve instruction and process it.<br>
 ### Fetch
 The processor use a component called program counter to keep track of the current instruction that the processor need to execute. If everything goes right the program counter will add 4 to itself to jump to next instruction, which is 4 bytes away.<br>
 ![Program Counter](./imgs/microarchitecture/fetch/pc.png)<br>
 Then we need to hook the program counter to some sort of instruction memory, it could be cache, RAM or ROM, so that the processor can get the instruction.<br>
 ![Program Counter](./imgs/microarchitecture/fetch/pc+inst_mem.png)<br>
 Being multi-cycle datapath, it needs register to hold the data retrieved from instruction memory for next stage. If we didn't have this register it would just turn into single-cycle, which due to performance reason (memory latency, and some other reasons) it is inferior to multi-cycle. Each stage register will be a tall rectangle to separate each stage.<br>
-![Program Counter](./imgs/microarchitecture/fetch/all.png)<br>
+![Entire fetch stage datapath](./imgs/microarchitecture/fetch/all.png)<br>
 
 ### Decode
 After we got instruction from the memory, we need to decode it to identify the instruction format, and separate all the information contain inside the instruction. Let's also give the decoder an ability to assemble immediate field according to the instruction format.<br>
 ![Program Counter](./imgs/microarchitecture/decode/decoder.png)<br>
 This part is usually handles by some sort of decoder, then of course we need more registers to hold the information for next stage.<br>
-![Program Counter](./imgs/microarchitecture/decode/all.png)<br>
+![Entire decode stage datapath](./imgs/microarchitecture/decode/all.png)<br>
 This is now the datapath we construct.<br>
 
 ### Execute
@@ -211,6 +215,14 @@ In this stage, we took all the information from last stage, select the designate
 
 Let's start off by selecting the designated register.<br>
 Registers are grouped in register file, 
+
+![Entire execute stage datapath](./imgs/microarchitecture/execute/all.png)<br>
+
+### Memory
+![Entire memory stage datapath](./imgs/microarchitecture/memory/all.png)<br>
+
+### Writeback
+![Entire writeback stage datapath](./imgs/microarchitecture/writeback/all.png)<br>
 
 
 ## Instruction Pipeline
