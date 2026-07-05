@@ -318,8 +318,15 @@ Processor that didn't implement instruction pipeline.<br>
 Processor that did implement instruction pipeline.<br>
 
 As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
-### Challenge
-But instruction pipeline comes with a catch, the easiest one to thinks about is branch or jump instruction. These instructions wouldn't change [program counter](#program-counter)'s value until their finish, but by then four instructions would already be fetched for their own execution. There are more problems can cause by instruction pipeline, but anyway these problems are call "Hazards". You can find more information on [Wikipedia](https://en.wikipedia.org/wiki/Hazard_(computer_architecture))<br>
+### Hazards
+But instruction pipeline comes with a catch, because pipeline fetch a new instruction before knowing the outcome of the instruction before this one. These type of situations are called "Hazard".<br>
+There are multiple types of hazard, they will be list down below.<br>
+#### Structural Hazards
+This type of hazard occur when there are multiple instructions tried to use the same component, this won't occur in C0 though. This hazard can be fixed by implement same component multiple times which is called superscalar design.<br>
+#### Data Hazards
+Data hazard occur when one instruction depend on the result of another instruction that hasn't finished execute yet.<br>
+#### Control Hazards
+Control hazard occur for every jump/branch instruction, this is due to new instructions are being fetched with old address before the instruction finally having an effect on the program counter.<br>
 
 ## Datapath
 Datapath is a physical implementation of instruction cycle. The datapath are divided into 5 stages correspond for the stages specified in [instruction cycle](#instruction-cycle). As said before, the datapath is pipelined, meaning that, at every ending part of each stage (except the writeback stage) will have a set of registers to hold the data from that stage and forward those to the next at the next clock cycle.<br>
