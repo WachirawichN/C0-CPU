@@ -1679,7 +1679,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="GOvBUfe1WN8k8d7fW6Z6" name="Memory stage">
-    <mxGraphModel dx="744" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
+    <mxGraphModel dx="478" dy="277" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1779,8 +1779,8 @@
         <mxCell id="Kel1QZ2SXNmd7WPEGccX-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#000000);" value="Operation Decoder" vertex="1">
           <mxGeometry height="60" width="70" x="710" y="1070" as="geometry" />
         </mxCell>
-        <mxCell id="JVhoD8uxu9AXLMir2RRa-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;Write Address&lt;/font&gt;" vertex="1">
-          <mxGeometry height="10" width="60" x="690" y="1020" as="geometry" />
+        <mxCell id="JVhoD8uxu9AXLMir2RRa-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;Address&lt;/font&gt;" vertex="1">
+          <mxGeometry height="10" width="30" x="700" y="1020" as="geometry" />
         </mxCell>
         <mxCell id="JVhoD8uxu9AXLMir2RRa-3" edge="1" parent="1" source="Kel1QZ2SXNmd7WPEGccX-9" style="endArrow=classic;html=1;rounded=0;exitX=1.007;exitY=0.161;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" target="Kel1QZ2SXNmd7WPEGccX-8" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
