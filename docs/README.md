@@ -99,8 +99,7 @@ For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit diffe
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
 I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
 
-In the table, the "imm" would be referring to the entire 12 bits immediate filed.<br>
-| funct 7 (bit 25 - 31) | funct 3   | mnemonic  | operation                         | description                                       |
+| funct 7 (bit 31 - 25) | funct 3   | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
 | -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
 | -                     | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
@@ -111,6 +110,8 @@ In the table, the "imm" would be referring to the entire 12 bits immediate filed
 | 0100000               | 101       | SRAI      | rd = `rs1` >>> shamt (arithmetic) | arithmetic shift `rs1` right by shamt             |
 | -                     | 110       | ORI       | rd = `rs1` \| imm                 | bitwise or                                        |
 | -                     | 111       | ANDI      | rd = `rs1` & imm                  | bitwise and                                       |
+
+"imm" refers to the entire 12 bits immediate field.<br>
 ### Load and Store
 #### Load (I-type)
 For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
@@ -419,3 +420,5 @@ That cycle is called instruction pipeline. In C0, the instruction pipeline follo
 
 ## Load-Store Unit
 ### Operation Decoder -->
+
+# FPGA Implementation
