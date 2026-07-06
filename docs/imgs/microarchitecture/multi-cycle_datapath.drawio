@@ -1,6 +1,6 @@
 <mxfile host="Electron" pages="6">
   <diagram name="Entire datapath" id="tSMmNGwJzHPRAvTk1bWk">
-    <mxGraphModel dx="325" dy="218" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" background="none" math="0" shadow="0">
+    <mxGraphModel dx="302" dy="157" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -742,7 +742,7 @@
             <Array as="points">
               <mxPoint x="10" y="220" />
             </Array>
-            <mxPoint x="10" y="130" as="sourcePoint" />
+            <mxPoint x="10" y="150" as="sourcePoint" />
             <mxPoint x="-90" y="180" as="targetPoint" />
           </mxGeometry>
         </mxCell>
@@ -2114,7 +2114,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="Voym5N0Krx0i14EdULGB" name="Writeback stage">
-    <mxGraphModel dx="488" dy="328" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
+    <mxGraphModel dx="449" dy="234" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -2307,7 +2307,7 @@
             <Array as="points">
               <mxPoint x="1560" y="1180" />
             </Array>
-            <mxPoint x="1560" y="1090" as="sourcePoint" />
+            <mxPoint x="1560" y="1110" as="sourcePoint" />
             <mxPoint x="1460" y="1140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
