@@ -5,3 +5,4 @@ hardware/C0_vivado*
 
 # Draw.io
 *.bkp
+.dtmp
