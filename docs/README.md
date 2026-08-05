@@ -174,7 +174,7 @@ This instruction use `0010111` as its opcode.<br>
 
 # Microarchitecture
 For this section, I'll be talking a little bit more about the hardware now. It's now, how will the CPU do it.<br>
-As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like I/O, interrupts, cache, being in-order execution, and superscalar design. This will result in 1 instruction per clock cycles (and it should stucks at 1 instruction per cycle) from no instruction level parallelism, and almost no use, but this is why there is 0 in C0.<br>
+As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like I/O, interrupts, cache, being in-order execution, and superscalar design. This will result in 1 instruction per clock cycles (and it should stuck at 1 instruction per cycle) from no instruction level parallelism, and almost no use, but this is why there is 0 in C0.<br>
 
 ## Instruction Cycle
 Instruction cycle are processes the CPU have to take to complete the execution of an instruction. In C0, there are 5 stages of instruction cycle. They follow classic RISC style instruction cycle, there are<br>
@@ -321,7 +321,9 @@ Processor that did implement instruction pipeline.<br>
 As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
 ### Hazards
 But instruction pipeline comes with a catch, because pipeline fetch a new instruction before knowing the outcome of the instruction before this one. These type of situations are called "Hazard".<br>
-There are multiple types of hazard, they will be list down below.<br>
+Usually hazards are handled by dedicated hardware unit like branch predictor, or design technique like superscalar design. But, in my design, I've decided to push all the responsibility to the programmer to switch the execution to instruction that aren't data dependent on other instruction, or to just call multiple NOP instructions before continuing the execution to keep the design simple.<br>
+
+There are multiple types of hazards. I've written a brief description about them down below, if you're interested.<br>
 #### Structural Hazards
 This type of hazard occur when there are multiple instructions tried to use the same component, this won't occur in C0 though. This hazard can be fixed by implement same component multiple times which is called superscalar design.<br>
 #### Data Hazards
