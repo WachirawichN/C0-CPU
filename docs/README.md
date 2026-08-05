@@ -18,8 +18,8 @@ The following table will list all 32 registers and its description from [RISC-V 
 | x3        | gp            | Global pointer                            |           |
 | x4        | tp            | Thread pointer                            |           |
 | x5 - x7   | t0 - t2       | Temporaries registers                     | Caller    |
-| x8        | s0 - s1       | Callee-saved registers / Frame Pointer    | Callee    |
-| x9        | s0 - s1       | Callee-saved registers                    | Callee    |
+| x8        | s0 / fp       | Callee-saved registers / Frame Pointer    | Callee    |
+| x9        | s1            | Callee-saved registers                    | Callee    |
 | x10 - x17 | a0 - a7       | Argument registers                        | Caller    |
 | x18 - x27 | s2 - s11      | Callee-saved registers                    | Callee    |
 | x28 - x31 | t3 - t6       | Temporaries registers                     | Caller    |
@@ -31,6 +31,8 @@ The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/
 `Saved by Caller` means the code that called the function is responsible for storing data from registers before calling a function, this is due to the freedom of being able to overwrite data given to the function.<br>
 
 While `Saved by Callee` means the function is the one responsible for storing the data inside registers before overwriting anyone of them, and also restore the value back to being the same as before.<br>
+
+### Register types
 
 ## Instruction Formats
 There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
