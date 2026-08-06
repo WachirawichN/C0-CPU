@@ -12,11 +12,11 @@ The following section utilizes [RISC-V ABI document](https://docs.riscv.org/refe
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
 |-----------|---------------|-------------------------------------------|-----------|
-| x0        | zero          | Constant zero                             |           |
+| x0        | zero          | Constant zero                             | na        |
 | x1        | ra            | Return address                            | Caller    |
 | x2        | sp            | Stack pointer                             | Callee    |
-| x3        | gp            | Global pointer                            |           |
-| x4        | tp            | Thread pointer                            |           |
+| x3        | gp            | Global pointer                            | na        |
+| x4        | tp            | Thread pointer                            | na        |
 | x5 - x7   | t0 - t2       | Temporaries registers                     | Caller    |
 | x8        | s0 / fp       | Callee-saved registers / Frame Pointer    | Callee    |
 | x9        | s1            | Callee-saved register                     | Callee    |
@@ -28,32 +28,29 @@ The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/
 
 ### Register types
 1. Constant Zero Register
-    - This type of register have it value always set to 0. This might sound useless, but this register enabled the functionality of `NOP` psuedoinstruction, which add 0 to 0 into register 0.<br>
-
+    - This type of register have it value always set to 0. This might sound useless, but this register enabled the functionality of `NOP` psuedoinstruction, which add 0 to 0 into register 0.
 2. Return Address Register
-    - This register hold the value of address to jump to after finish executing current function.<br>
-
+    - This register hold the value of address to jump to after finish executing current function.
 3. Stack Pointer Register
-    - This register point to the very top of the stack.<br>
-
+    - This register points to the very top of the stack.
 4. Global Pointer Register
     - Global pointer points to the middle of all global variables live. The reason for pointing to the middle is so that there is no need to store full 32-bits address, instead it can access specific variable with a little bit of offset to global pointer.
-
 5. Thread Pointer Register
-    - Thread pointer points to current thread's thread-local storage.
-
+    - Thread pointer points to current thread's thread-local storage. This register act as that pointer.
 6. Frame Pointer Register
-
+    - This register points to a specific place inside the stack. It always points to the very bottom of current function's frame.
 7. Temporary Register
     - These register is free to use for anything, the only catch to these registers is that caller must save data from these registers to somewhere before calling a function.
 8. Callee-Saved Register
+    - This is similar to Temporary Register, but as the name imply, callee is now responsible for saving and restoring the original data on these register before jumping back to the parent function that called this function.
 9. Argument Register
+    - Argument Registers are used to pass function arguments, but sometimes, these registers are also used to pass return values from a function back to it caller.
 ### Saved by types
-`Saved by` column referred to which part of the code is responsible for storing data from those register to somewhere else (usually the stack) before calling any function.<br>
-
-`Saved by Caller` means the code that called the function is responsible for storing data from registers before calling a function, this is due to the freedom of being able to overwrite data given to the function.<br>
-
-While `Saved by Callee` means the function is the one responsible for storing the data inside registers before overwriting anyone of them, and also restore the value back to being the same as before.<br>
+`Saved by` column referred to which part of the code is responsible for storing data from those register to somewhere else (usually the stack) before calling a function.<br>
+1. Saved by Caller
+    - This means the code that called a function is responsible for storing data from registers before calling a function.
+2. Saved by Callee
+    - This means the function being called is the one responsible for storing the data inside these registers, and restore the value back to being the same as before calling the function.
 
 ## Instruction Formats
 There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
