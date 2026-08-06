@@ -185,7 +185,7 @@ Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction forma
 This group contains two instructions just like Unconditional Jump group. Job of this group's instructions is to load upper 20-bits of immediate value to target register.<br>
 This instruction group use U-type format, but there are two difference opcodes for each of the instruction.<br>
 #### LUI
-`LUI` loads first 20-bits then left shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the left.<br>
+`LUI` loads first 20-bits then lef`t shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the right.<br>
 The opcode for this instruction is `0110111`.<br>
 #### AUIPC
 `AUIPC` pretty much does what `LUI` does, but added the current value from program counter before loading into `rd`.<br>
