@@ -1,7 +1,8 @@
 # Architecture
 This section will be about the ISA, which C0 is based on. Essentially, what the CPU does.<br>
-C0's architecture is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
-This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most modern Processor features and design techniques, resulting in only 37 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
+
+C0's ISA is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
+This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most modern processor features and design techniques, resulting in only 37 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
 
 ## Registers
 C0 have the same registers as the rv32i specification. In the rv32i, there are 32 registers, first one is constant zero register, and the other 31 are general purpose.<br>
@@ -341,7 +342,7 @@ Processor that did implement instruction pipeline.<br>
 As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
 ### Hazards
 But instruction pipeline comes with a catch, because pipeline fetch a new instruction before knowing the outcome of the instruction before this one. These type of situations are called "Hazard".<br>
-Usually hazards are handled by dedicated hardware unit like branch predictor, or design technique like superscalar design. But, in my design, I've decided to push all the responsibility to the programmer to switch the execution to instruction that aren't data dependent on other instruction, or to just call multiple NOP instructions before continuing the execution to keep the design simple.<br>
+Usually hazards are handled by dedicated hardware unit like branch predictor, or design technique like superscalar design. But, in my design, I've decided to push all the responsibility to the programmer to switch the execution to instruction that aren't data dependent on other instruction, or to just call multiple `NOP` instructions before continuing the execution to keep the design simple.<br>
 
 There are multiple types of hazards. I've written a brief description about them down below, if you're interested.<br>
 #### Structural Hazards
