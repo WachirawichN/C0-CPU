@@ -361,21 +361,24 @@ Image of entire datapath.<br>
 ### Fetch Stage (IF)
 It begins with fetch stage.<br>
 ![Entire datapath of fetch stage](./imgs/microarchitecture/fetch/all.png)<br>
-In this stage, program counter do the job of keeping remembering the current address of executing instruction. Every clock cycle, program counter either go up by 4 bytes which is the next instruction because 32-bits, or it could choose to use the target address coming from writeback stage to jump to whole new address. The program counter's value is also pass to program counter register, in case the processor need to compute a jump address.<br>
+In this stage, program counter (PC) do the job of remembering the current address of executing instruction. Every clock cycle, program counter either go up by 4 bytes which is the next instruction because 32-bits, or it could choose to use the target address coming from writeback stage to jump to whole new address. The program counter's value is also pass to program counter register, in case the processor need to compute a jump address.<br>
 The value inside program counter is then used to retrieve instruction from the instruction memory (separating data and instruction memory will be easier to design, but a memory can hold both type of data). Then the instruction is passed to instruction register, which will be accessible to the next stage.<br>
 ### Decode Stage (ID)
 ![Entire datapath of decode stage](./imgs/microarchitecture/decode/all.png)<br>
-In this stage, the instruction data passed from last stage is then decoded into multiple part to be then pass further to next stage. This stage also retrieves data from register and assemble immediate value into full 32-bits value.<br>
+In this stage, the instruction data passed from last stage is then decoded into multiple part to be then pass further to next stage. This stage also retrieves data from register lives inside register files, and assemble immediate value into full 32-bits value by Immediate Assembler.<br>
+
+> [!NOTE]
+> Immediate Assembler is usually called Sign-Extend / Zero-Extend Unit, but Immediate Assembler sounds a lot cooler to me \*clash royale laughing emoji\*
 ### Execute Stage (EX)
 ![Entire datapath of execute stage](./imgs/microarchitecture/execute/all.png)<br>
-All the math and logic stuffs happen in this stage. The ALU computes all the math and logic, but there is also an adder for computing the jump address.<br>
-The operation decoder took opcode, funct 3 and 7 to select the computation correspond to all that field, it is also handle selecting register source or immediate data for selecting the second operand that will be feed into the ALU.<br>
+All the math and logic stuffs happen in this stage. The ALU computes all the math and logic, but there is also an adder for computing the address associated stuffs, such as computing jump address or `AUIPC` instruction.<br>
+The operation decoder uses opcode, funct 3, and funct 7 or imm for selecting the ALU's operation, it also handles selecting between register or immediate value for the second ALU operand.<br>
 ### Memory Stage (MEM)
 ![Entire datapath of memory stage](./imgs/microarchitecture/memory/all.png)<br>
-In this stage, the operation decoder decided weather to read, write or not doing anything to the data memory. This stage only use opcode and funct3 field for selecting the operation and only rs2 and result from ALU to be the write data and address of the operation.<br>
+In this stage, the operation decoder decided weather to read, write or not doing anything to the data memory. This stage only use opcode and funct3 field for selecting the read/write operation, rs2 for data to be written to the memory, and result from ALU to select the address the processor wanted to interact with.<br>
 ### Writeback Stage (WB)
 ![Entire datapath of writeback stage](./imgs/microarchitecture/writeback/all.png)<br>
-This stage return all the data receives from all the previous stages back to their correspond destination, which will be program counter if it needs to jump and destination register. This stage also need an operation decoder to select the source of data writing to destination register.<br>
+This stage return all the data from all the previous stages back to their correspond destination, which will be the program counter if it needs to jump or destination register. This stage also need an operation decoder for selecting the source of the data writing to destination register, and the source of the next program counter.<br>
 
 <!-- ## Datapath
 Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
