@@ -77,7 +77,7 @@ The following are the full name of each format.
 `rs1` and `rs2` (source) is the register where the operand are located, while `rd` (destination) are used to specify the register where the output of that instruction will be saved to.<br>
 
 ### Immediate field
-For the `imm` field, this field is use as a direct value use for computation instead of value in a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor. After all the bits are in their position, the processor will automatically sign-extended the data to become 32-bits.<br>
+For the `imm` field, this field is use as a direct value use for computation instead of value from a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor. After all the bits are in their position, the processor will automatically sign-extended the immediate value into 32-bits value.<br>
 Some format with some instruction might do something before extending to 32-bits, like B-type which add 0 to the end before extending. This type of stuff will be explained in the next section of some instruction group.<br>
 > [!NOTE]
 > By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.
@@ -118,12 +118,15 @@ The opcode for these instructions would be `0010011`<br>
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/architecture/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I love to think that field of bits ranging from bit 25 to 31 are used like funct 7 field from R-type format, while bit 20 to 24 are use as normal immediate field for shifting values. This field is called shamt in the official RISC-V specification, I would also be using those in the table.<br>
+I love to think that immediate field ranging from bit 31 down to bit 25 in the special format are used like funct 7 field, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
+
+In the table below, there would be either "imm" or "shamt" as a second operand.
+"imm" means that the instruction use full 12-bits immediate value as the second operand, while "shamt" means that the processor use only last 5-bits from the immediate value of the "special" I-type format as the second operand.
 
 | funct 7 (bit 31 - 25) | funct 3   | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
 | -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
-| -                     | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
+| 0000000               | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
 | -                     | 010       | SLTI      | rd = `rs1` < imm (signed)         | is `rs1` less than imm (compare signed version)   |
 | -                     | 011       | SLTUI     | rd = `rs1` < imm (unsigned)       | is `rs1` less than imm (compare unsigned version) |
 | -                     | 100       | XORI      | rd = `rs1` ^ imm                  | bitwise xor                                       |
