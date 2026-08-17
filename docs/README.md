@@ -450,4 +450,20 @@ That cycle is called instruction pipeline. In C0, the instruction pipeline follo
 ## Load-Store Unit
 ### Operation Decoder -->
 
-# FPGA Implementation
+# Hardware Design
+This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.
+## Control Unit (CU)
+For this design, control unit will handle the fetch stage and decode stage of the pipeline.
+## Arithmetic and Logic Unit (ALU)
+## Register File
+Register File is where all 32 registers of this processor live.<br>
+![Register File Diagram](./imgs/hardware_design/register_file.png)
+There are a total of 5 input for Register File, each is either for writing data into one specific register, or it is for reading two specific register.<br>
+
+For reading data from a register, there are two specific 5-bits input, both are for selecting the source register. There are two because this Register File design support reading from 2 registers simultaneously.<br>
+
+For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
+
+There are actually 2 more input, CLK, and reset signal. Reset input would be unused for this design, and the CLK will be share between all 32 registers.<br>
+## Instruction Memory
+## Data Memory
