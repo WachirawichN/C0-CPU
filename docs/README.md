@@ -203,7 +203,7 @@ As I said in the first section, I've cut out most modern processor design featur
 ## Instruction Cycle
 Instruction cycle are processes the CPU have to take to complete the execution of an instruction. In C0, there are 5 stages of instruction cycle. They follow classic RISC style instruction cycle, there are<br>
 1. Fetch (IF)
-    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [program counter](#program-counter).
+    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's program counter.
 2. Decode (ID)
     * The instruction is decoded by the CPU. This process tells the CPU what is the instruction format, opcode, func3/7, the registers and others.
 3. Execute (EX)
