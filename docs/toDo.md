@@ -1,0 +1,1 @@
+- Finalizing weather to having the memory offsetting unit as a separate component or sharing the functionality with the ALU.

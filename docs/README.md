@@ -451,10 +451,37 @@ That cycle is called instruction pipeline. In C0, the instruction pipeline follo
 ### Operation Decoder -->
 
 # Hardware Design
-This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.
+This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
+
+The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
 ## Control Unit (CU)
-For this design, control unit will handle the fetch stage and decode stage of the pipeline.
+Control Unit handles the job of fetching the instruction from the memory, then decoding it to prepare the instruction data for the next stage, it also handles the address of instruction. Handling those three jobs basically make the Control Unit control the entire processor.<br>
+In short, it handles both fetch, a little bit of decode and writeback stage, making it the first component that will be occurred in the pipeline.<br>
+
+Control Unit contains three basic subcomponents for handling it job, they are listed down below.<br>
+### Program Counter
+Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter +4 bytes, or also the value of Program Counter with difference processing rather than +4, like +offset.<br>
+
+Diagram of the inside of Program Counter<br>
+### Instruction Register
+Instruction Register temporary holds instruction from Instruction Memory.<br>
+The processor took address value from Program Counter, which is called instruction address, and push the value to Instruction Memory. The Instruction Memory should now give instruction at that specific address back to the processor. The processor is then put that instruction into Instruction Register.<br>
+Width of Instruction Register is 32-bits long.
+### Instruction Decoder
+Instruction Decoder took the full 32-bits instruction from the Instruction Register, then split it into multiple parts for further handling by other unit.<br>
+
+## Instruction Memory
+C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
+Instruction Memory holds all the instruction that the processor will use for processing. The Control unit uses 32-btis address from Program Counter to fetch an instruction from that specific address.<br>
+
+Usually, on most processor, memory lives on separate chip, but C0's approach is similar to microcontroller, where the memory lives on the same chip as the processor.<br>
+
+## Immediate Assembler
+Immediate Assembler took raw immediate data and format type from Program Counter's Instruction Decoder, and assemble the immediate value into usable 32-bits length value.
+
 ## Arithmetic and Logic Unit (ALU)
+Arithmetic and Logic Unit executes math and logic stuff. In execute stage of the pipeline, there is also an operation decoder for the ALU as well. That operation decoder will get bundle into ALU, while the multiplexer at the second operand input, will not be bundle into the ALU.<br>
+
 ## Register File
 Register File is where all 32 registers of this processor live.<br>
 ![Register File Diagram](./imgs/hardware_design/register_file.png)
@@ -465,5 +492,8 @@ For reading data from a register, there are two specific 5-bits input, both are 
 For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
 
 There are actually 2 more input, CLK, and reset signal. Reset input would be unused for this design, and the CLK will be share between all 32 registers.<br>
-## Instruction Memory
+
 ## Data Memory
+As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the instruction memory. The processor use 32-bits address value calculate using the [ALU](#arithmetic-and-logic-unit-alu), for accessing the data from Data Memory.<br>
+
+Like [Instruction Memory](#instruction-memory), the Data Memory also lives on the same chip as well like microcontroller, while modern processor push the Data Memory onto separate chip.<br>
