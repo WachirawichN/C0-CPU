@@ -1,3 +1,4 @@
 - Finalizing weather to having the memory offsetting unit as a separate component or sharing the functionality with the ALU.
     - Remove the Adder instead use the ALU directly. Address register and rs1 are now fed into mux before fed into operand 1.
     - In execute stage, address register is always +4 now before passing into next address register.
+- In writeback stage, there could be a bit of change at the 4 inputs mux, and the target address line. I thinks.
