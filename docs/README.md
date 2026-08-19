@@ -77,8 +77,97 @@ The following are the full name of each format.
 `rs1` and `rs2` (source) is the register where the operand are located, while `rd` (destination) are used to specify the register where the output of that instruction will be saved to.<br>
 
 ### Immediate field
-For the `imm` field, this field is use as a direct value use for computation instead of value from a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor. After all the bits are in their position, the processor will automatically sign-extended the immediate value into 32-bits value.<br>
+For the `imm` field, value from this field is used directly for computation instead of value from a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor.
+After all the bits are in their position, the processor will automatically sign-extended the immediate value into 32-bits value.<br>
 Some format with some instruction might do something before extending to 32-bits, like B-type which add 0 to the end before extending. This type of stuff will be explained in the next section of some instruction group.<br>
+
+The table below shows how the processor position each immediate bit. imm[11] of I-type in the table is as the same as in the instruction format above, this also apply to all other imm[...]<br>
+<table>
+  <tr>
+    <th rowspan="2">Instruction Format</th>
+    <th colspan="32">Bit no.</th>
+  </tr>
+  <tr>
+    <th>31</th>
+    <th>30</th>
+    <th>29</th>
+    <th>28</th>
+    <th>27</th>
+    <th>26</th>
+    <th>25</th>
+    <th>24</th>
+    <th>23</th>
+    <th>22</th>
+    <th>21</th>
+    <th>20</th>
+    <th>19</th>
+    <th>18</th>
+    <th>17</th>
+    <th>16</th>
+    <th>15</th>
+    <th>14</th>
+    <th>13</th>
+    <th>12</th>
+    <th>11</th>
+    <th>10</th>
+    <th>9</th>
+    <th>8</th>
+    <th>7</th>
+    <th>6</th>
+    <th>5</th>
+    <th>4</th>
+    <th>3</th>
+    <th>2</th>
+    <th>1</th>
+    <th>0</th>
+  </tr>
+  <tr>
+    <td>I-Type</td>
+    <td colspan="20">Signed-extended into 32-bits</td>
+    <td colspan="12">imm[11:0]</td>
+  </tr>
+  <tr>
+    <td>S-Type</td>
+    <td colspan="20">Signed-extended into 32-bits</td>
+    <td colspan="7">imm[11:5]</td>
+    <td colspan="5">imm[4:0]</td>
+  </tr>
+  <tr>
+    <td>B-Type</td>
+    <td colspan="19">Signed-extended into 32-bits</td>
+    <td>imm[12]</td>
+    <td>imm[11]</td>
+    <td colspan="6">imm[10:5]</td>
+    <td colspan="4">imm[4:1]</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>U-Type</td>
+    <td colspan="20">imm[31:12]</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>J-Type</td>
+    <td colspan="11">Signed-extended into 32-bits</td>
+    <td>imm[20]</td>
+    <td colspan="8">imm[19:12]</td>
+    <td>imm[11]</td>
+    <td colspan="10">imm[10:1]</td>
+    <td>0</td>
+  </tr>
+</table>
+
 > [!NOTE]
 > By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.
 
