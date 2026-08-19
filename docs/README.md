@@ -121,7 +121,7 @@ Image taken from [RISC-V specification document](https://docs.riscv.org/referenc
 I love to think that immediate field ranging from bit 31 down to bit 25 in the special format are used like funct 7 field, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
 
 In the table below, there would be either "imm" or "shamt" as a second operand.
-"imm" means that the instruction use full 12-bits immediate value as the second operand, while "shamt" means that the processor use only last 5-bits from the immediate value of the "special" I-type format as the second operand.
+"imm" implys that the instruction use full 12-bits immediate value as the second operand, while "shamt" means that the processor use only last 5-bits from the immediate value of the "special" I-type format as the second operand.<br>
 
 | funct 7 (bit 31 - 25) | funct 3   | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
@@ -135,25 +135,24 @@ In the table below, there would be either "imm" or "shamt" as a second operand.
 | -                     | 110       | ORI       | rd = `rs1` \| imm                 | bitwise or                                        |
 | -                     | 111       | ANDI      | rd = `rs1` & imm                  | bitwise and                                       |
 
-"imm" refers to the entire 12 bits immediate field.<br>
 ### Load and Store
 #### Load (I-type)
 For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
-The effective address of that memory is calculated by adding value from `rs1` to immediate field that have been sign-extended.<br>
+The effective address of that memory is calculated by adding value from `rs1` to immediate field that have been sign-extended, giving it an ability to offset ±2K addresses from `rs1`.<br>
 
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
 
 Opcode for these instructions would be `0000011`.<br>
-| funct 3   | mnemonic  | load size | note                      |
-|-----------|-----------|-----------|---------------------------|
-| 000       | LB        | 8         | sign-extended to 32-bits  |
-| 001       | LH        | 16        | sign-extended to 32-bits  |
-| 010       | LW        | 32        | -                         |
-| 100       | LBU       | 8         | zero extended to 32-bits  |
-| 101       | LHU       | 16        | zero extended to 32-bits  |
+| funct 3   | mnemonic  | load size | note                                    |
+|-----------|-----------|-----------|-----------------------------------------|
+| 000       | LB        | 8         | loaded data is sign-extended to 32-bits |
+| 001       | LH        | 16        | loaded data is sign-extended to 32-bits |
+| 010       | LW        | 32        | -                                       |
+| 100       | LBU       | 8         | loaded data is zero extended to 32-bits |
+| 101       | LHU       | 16        | loaded data is zero extended to 32-bits |
 #### Store (S-type)
 For store group, these instructions copy the last ... bits (specify in `store size` column) from `rs2` to memory.<br>
-The effective address of the memory for these instructions use the same way of calculating as the load group. The immediate field of S-type format mights be a bit wonky to look at.<br>
+The effective address of the memory for these instructions use the same way of calculating as the load group, also giving it an ability to offset the address from `rs1` for ±2K addresses. The immediate field of S-type format mights be a bit wonky to look at, but it is the same as 12-bits field of I-type format, just placing differently.<br>
 
 Opcode for these instructions would be `0100011`.<br>
 | funct 3   | mnemonic  | store size |
@@ -180,16 +179,16 @@ This type of jump will also add specific number to the program counter, to jump 
 This group of instructions contains two instructions, both use difference opcode and instruction format. They are listed down below.
 ##### JAL (J-type)
 This instruction use J-type instruction format. Like the B-type instruction format, 0 is also added to the end of the immediate value and signed-extended.<br>
-This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also save current instruction address (before jumping) with 4 (bytes) added to, to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
+This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also saves next instruction address (current + 4 bytes) to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
 Opcode for `JAL` instruction is `1101111`.<br>
 ##### JALR (I-type)
-`JALR` is I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0. The program counter is then set to this value. The x1 register is also used by the instruction to save the address before jumping with 4 added to, just like `JAL`.<br>
+`JALR` is I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0 (not 0 added to the back). The program counter is then set to this value. The x1 register is also used by the instruction to save the next instruction address (current + 4 bytes), just like `JAL`.<br>
 Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction format.
 ### Upper Immediate
 This group contains two instructions just like Unconditional Jump group. Job of this group's instructions is to load upper 20-bits of immediate value to target register.<br>
 This instruction group use U-type format, but there are two difference opcodes for each of the instruction.<br>
 #### LUI
-`LUI` loads first 20-bits then lef`t shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the right.<br>
+`LUI` loads first 20-bits then left shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the right.<br>
 The opcode for this instruction is `0110111`.<br>
 #### AUIPC
 `AUIPC` pretty much does what `LUI` does, but added the current value from program counter before loading into `rd`.<br>
