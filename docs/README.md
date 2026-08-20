@@ -546,15 +546,21 @@ That cycle is called instruction pipeline. In C0, the instruction pipeline follo
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
+## Program Counter (PC)
+Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter +4 bytes, or also the value of Program Counter with difference processing rather than +4, like +offset.<br>
+
+Diagram of the inside of Program Counter<br>
 ## Control Unit (CU)
+Control Unit is a stateless combinational logic that controls the flow of the data executing. It controls the flow of data by sending multiple control signal to multiple part of the processor.<br>
+
+Being a stateless combinational logic means that the CU updates it controls signal instantly after receiving new input values.<br>
+
+
+
 Control Unit handles the job of fetching the instruction from the memory, decoding it, controlling which data flows into [ALU](#arithmetic-and-logic-unit-alu), and also handles the address of instruction. Handling those three jobs basically make the Control Unit control the entire processor.<br>
 In short, it handles both fetch, a little bit of decode, execute and writeback stage, making it the first component that will be occurred in the pipeline.<br>
 
 Control Unit contains three basic subcomponents for handling it job, they are listed down below.<br>
-### Program Counter
-Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter +4 bytes, or also the value of Program Counter with difference processing rather than +4, like +offset.<br>
-
-Diagram of the inside of Program Counter<br>
 ### Instruction Register
 Instruction Register temporary holds instruction from Instruction Memory.<br>
 The processor took address value from Program Counter, which is called instruction address, and push the value to Instruction Memory. The Instruction Memory should now give instruction at that specific address back to the processor. The processor is then put that instruction into Instruction Register.<br>
@@ -582,7 +588,17 @@ For writing data into the Register File, there is 1 input for enabling the write
 
 There are actually 2 more input, CLK, and reset signal. Reset input would be unused for this design, and the CLK will be share between all 32 registers.<br>
 
-## Arithmetic and Logic Unit (ALU)
+## Execution Unit (EU)
+Execution Unit pack multiple components for handling the execution stage of the pipeline into one component.<br>
+
+All Execution Unit's subcomponent are listed down below.<br>
+### Arithmetic and Logic Unit (ALU)
+Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a +4 adder.<br>
+
+### Operation Decoder
+
+### Operand Multiplexer
+
 Arithmetic and Logic Unit executes math and logic stuff. The Operation Decoder that handles decoding opcode, funct3 and funct7 will also get bundle into the ALU. This Operation Decoder will not handle choosing between inputs as the operands, that will be the job of Control Unit to dictate the flow of data.<br>
 
 ## Data Memory
