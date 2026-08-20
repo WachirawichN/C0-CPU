@@ -291,15 +291,15 @@ As I said in the first section, I've cut out most modern processor design featur
 ## Instruction Cycle
 Instruction cycle are processes the CPU have to take to complete the execution of an instruction. In C0, there are 5 stages of instruction cycle. They follow classic RISC style instruction cycle, there are<br>
 1. Fetch (IF)
-    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's program counter.
+    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [Program Counter](#program-counter-pc).
 2. Decode (ID)
-    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction format, opcode, func3/7, the registers and others.
+    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive opcode and funct3/7, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
 3. Execute (EX)
-    * The information is passed from Decode stage into this stage to do all sort of calculation (except operation that interact with memory, but address calculation will be doing here).
+    * Every math and logic related operations happen in this stage (including calculating the jump address, or memory address). The control signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage.
 4. Memory (MEM)
-    * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory.
+    * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory (if the operation is memory interaction).
 5. Writeback (WB)
-    * If required, the result will be written back to register at this stage.
+    * If required, the result will be written back to the designated register at this stage.
 
 ## Instruction Pipeline
 Instruction pipeline is a technique use to increase execution speed of a processor, it is done by taking instruction cycle from section above then stack multiple instruction cycles on top of each other with an offset of 1 clock cycle. Doing this make every stage of the cycle (almost) always busy making performance much higher.<br>
@@ -444,110 +444,59 @@ Data hazard occur when one instruction depend on the result of another instructi
 Control hazard occur for every jump/branch instruction, this is due to new instructions are being fetched with old address before the instruction finally having an effect on the program counter.<br>
 
 ## Datapath
-Datapath is a physical implementation of instruction cycle. The datapath are divided into 5 stages correspond for the stages specified in [instruction cycle](#instruction-cycle). As said before, the datapath is pipelined, meaning that, at every ending part of each stage (except the writeback stage) will have a set of registers to hold the data from that stage and forward those to the next at the next clock cycle.<br>
+Datapath is a physical implementation of [Instruction Cycle](#instruction-cycle). The datapath is divided into 5 stages correspond for the stages specified in [Instruction Cycle](#instruction-cycle). As said before, the datapath is pipelined, meaning that, at every ending part of each stage (except the writeback stage) will have a set of registers to hold the data from that stage and forward those to the next at the edge of the next clock cycle, to give the capability of handling multiple stages at a time to the processor.<br>
 
 ![Entire datapath](./imgs/microarchitecture/entire_datapath.png)<br>
 Image of entire datapath.<br>
 
 ### Fetch Stage (IF)
-It begins with fetch stage.<br>
 ![Entire datapath of fetch stage](./imgs/microarchitecture/fetch_stage.png)<br>
-In this stage, program counter (PC) do the job of remembering the current address of executing instruction. Every clock cycle, program counter either go up by 4 bytes which is the next instruction because 32-bits, or it could choose to use the target address coming from writeback stage to jump to whole new address. The program counter's value is also pass to program counter register, in case the processor need to compute a jump address.<br>
-The value inside program counter is then used to retrieve instruction from the instruction memory (separating data and instruction memory will be easier to design, but a memory can hold both type of data). Then the instruction is passed to instruction register, which will be accessible to the next stage.<br>
+In this stage, program counter (PC) do the job of remembering the current instruction address, that address is then used for accessing the instruction from the [Instruction Memory](#instruction-memory). The fetched instruction is then passed to [Instruction Register](#instruction-register) to be then decoded by the next stage.<br>
+
+Every clock cycle, program counter either go up by 4 bytes which is the next instruction because 32-bits, or could use the target address and jump signal coming from writeback stage to jump to whole new address.<br>
+
+The program counter's value is also pass to program counter register, in case the processor need to compute a jump address with an offset, or remembering the return address.<br>
 
 ### Decode Stage (ID)
 ![Entire datapath of decode stage](./imgs/microarchitecture/decode_stage.png)<br>
-In this stage, the instruction data passed from last stage is then decoded into multiple part to be then pass further to next stage. This stage also retrieves data from register lives inside register files, and assemble immediate value into full 32-bits value by Immediate Assembler.<br>
+This stage is all about preparing all the required data for processing in the future.<br>
+The instruction inside the [Instruction Register](#instruction-register) is decoded into multiple part, which is then processed further to generate control signals, full 32-bits immediate value, and source register's addresses.<br>
+After extracting the source register's addresses, the processor is then used those addresses to access data from [Register File](#register-field), to be then used as `rs1` and `rs2`.<br>
 
 > [!NOTE]
-> Immediate Assembler is usually called Sign-Extend / Zero-Extend Unit, but Immediate Assembler sounds a lot cooler to me \*clash royale laughing emoji\*
+> [Immediate Assembler](#immediate-assembler) handles the job of extending immediate value into full 32-bits. It is usually called Sign-Extend / Zero-Extend Unit, but [Immediate Assembler](#immediate-assembler) sounds a lot cooler to me.
+
+After processing, all those values is pass to the next stage using registers.
 
 ### Execute Stage (EX)
 ![Entire datapath of execute stage](./imgs/microarchitecture/execute_stage.png)<br>
-All the math and logic stuffs happen in this stage. The ALU computes all the math and logic, but there is also an adder for computing the address associated stuffs, such as computing jump address or `AUIPC` instruction.<br>
-The operation decoder uses opcode, funct 3, and funct 7 or imm for selecting the ALU's operation, it also handles selecting between register or immediate value for the second ALU operand.<br>
+All the math and logic stuffs happen in this stage.<br>
+The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic related operations. The control signal which tell the [ALU](#arithmetic-and-logic-unit-alu) what to do, and what operand to choose is generated from [ID](#decode-stage-id). The signal is pass to this stage using registers.<br>
+There is also an adder, which always add 4 to the [PC](#program-counter-pc), before passing to the next stage. This value is used for when the processor wanted to jump, but also wanted to remember the return address. This adder helps to achieve this functionality.<br>
+
+This stage also ended with many registers to pass all sort of values to the next stage.<br>
 
 ### Memory Stage (MEM)
 ![Entire datapath of memory stage](./imgs/microarchitecture/memory_stage.png)<br>
-In this stage, the operation decoder decided weather to read, write or not doing anything to the data memory. This stage only use opcode and funct3 field for selecting the read/write operation, rs2 for data to be written to the memory, and result from ALU to select the address the processor wanted to interact with.<br>
+This stage use control signals to decided whether it wanted to read from, write to, or does nothing to the [Data Memory](#data-memory).<br>
+If there will be an interaction happen with the [Data Memory](#data-memory), the processor will use result from the [ALU](#arithmetic-and-logic-unit-alu) as the address of interaction, and `rs2`'s value as a data writing into the [Data Memory](#data-memory), if the operation is to write the memory. But, if it is read operation, the result of reading will be pass to the register for the next stage<br>
+
+Again, this stage passes some data to the next stage using multiple registers.<br>
 
 ### Writeback Stage (WB)
 ![Entire datapath of writeback stage](./imgs/microarchitecture/writeback_stage.png)<br>
-This stage return all the data from all the previous stages back to their correspond destination, which will be the program counter if it needs to jump or destination register. This stage also need an operation decoder for selecting the source of the data writing to destination register, and the source of the next program counter.<br>
-
-<!-- ## Datapath
-Each of these stages took 1 clock cycle to complete, this type of instruction execution where multiple clock cycles are required to complete one instruction is called "multi-cycle datapath".<br>
-At the end of each stage (except WB stage), there will be a set of registers for passing data from one stage to another.<br>
-
-![Entire datapath](./imgs/microarchitecture/entire_datapath.png)<br>
-Image of C0's entire datapath.<br>
-
-Below will be about each stage (I omit clock port on all diagram), and the datapath which is just a diagram of how the processor will retrieve instruction and process it.<br>
-### Fetch
-The processor use a component called program counter to keep track of the current instruction that the processor need to execute. If everything goes right the program counter will add 4 to itself to jump to next instruction, which is 4 bytes away.<br>
-![Program Counter](./imgs/microarchitecture/fetch/pc.png)<br>
-Then we need to hook the program counter to some sort of instruction memory, it could be cache, RAM or ROM, so that the processor can get the instruction.<br>
-![Program Counter](./imgs/microarchitecture/fetch/pc+inst_mem.png)<br>
-Being multi-cycle datapath, it needs register to hold the data retrieved from instruction memory for next stage. If we didn't have this register it would just turn into single-cycle, which due to performance reason (memory latency, and some other reasons) it is inferior to multi-cycle. Each stage register will be a tall rectangle to separate each stage.<br>
-![Entire fetch stage datapath](./imgs/microarchitecture/fetch/all.png)<br>
-
-### Decode
-After we got instruction from the memory, we need to decode it to identify the instruction format, and separate all the information contain inside the instruction. Let's also give the decoder an ability to assemble immediate field according to the instruction format.<br>
-![Program Counter](./imgs/microarchitecture/decode/decoder.png)<br>
-This part is usually handles by some sort of decoder, then of course we need more registers to hold the information for next stage.<br>
-![Entire decode stage datapath](./imgs/microarchitecture/decode/all.png)<br>
-This is now the datapath we construct.<br>
-
-### Execute
-In this stage, we took all the information from last stage, select the designated register, then put all that information through ALU.<br>
-
-Let's start off by selecting the designated register.<br>
-Registers are grouped in register file, 
-
-![Entire execute stage datapath](./imgs/microarchitecture/execute/all.png)<br>
-
-### Memory
-![Entire memory stage datapath](./imgs/microarchitecture/memory/all.png)<br>
-
-### Writeback
-![Entire writeback stage datapath](./imgs/microarchitecture/writeback/all.png)<br> -->
-
-<!-- C0 implement the 5 stages instruction pipelines that many RISC CPU utilize, instruction pipeline increase CPU performance by overlapping the execution of multiple instructions. For each instruction, the execution of that instruction will be divided into 5 stages, these are<br>
-
-The following image is the diagram of the processor.<br>
-![Processor diagram](./imgs/processor_diagram.png)<br>
-The sections down below will be over how each component work. I've written each section in order how the processor retrieves instruction and execute it.<br>
-
-## Virtual Memory
-Normal processor doesn't have this part, but I've decided that writing a real DRAM and I/O controller would be a bit too hard for me, so I write this virtual memory using FPGA's BRAM. This is also the reason why I named the CPU C0, because I did not intend it to be a normal working CPU.<br>
-
-Anyway, the working of each memory is quite straight forward. There is 32-bits address line, 32-bits bidirectional data line, read line and there is also a write line for RAM.<br>
-More description for each memory will be down below.<br>
-### RAM
-### ROM
-
-## Control Unit
-Control Unit (CU) doesn't execute the instruction directly, but it acts as an orchestrator that control the flow of instruction execution.<br>
-That cycle is called instruction pipeline. In C0, the instruction pipeline follows RISC style instruction pipeline, with 5 stages.
-### Program Counter
-### Instruction Decoder
-
-## Bus
-
-## Register File
-
-## Arithmetic and Logic Unit
-### Operation Decoder
-
-## Load-Store Unit
-### Operation Decoder -->
+This stage return all the data from all the previous stages back to their correspond destination. The write back data are the following.<br>
+1. [Program Counter](#program-counter-pc)'s jump address.
+    - The [Program Counter](#program-counter-pc) will have to either choose its value + 4 (calculated inside the [IF stage](#fetch-stage-if)), or the jump address, which is just an [ALU](#arithmetic-and-logic-unit-alu)'s result (calculated inside [EX stage](#execute-stage-ex)). The signal from [ID stage](#decode-stage-id) that have been pass to this stage using register is used for choosing between the two.
+2. `rd`'s write data.<br>
+    - The processor use control signal from [ID stage](#decode-stage-id) to choose between PC + 4, `rs2`'s data, or [ALU](#arithmetic-and-logic-unit-alu)'s result as a data writing into `rd` with an address it got from [ID stage](#decode-stage-id). There is also control signals that tell whether if the processor really wanted to write the data or not.
 
 # Hardware Design
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
 ## Program Counter (PC)
-Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter +4 bytes, or also the value of Program Counter with difference processing rather than +4, like +offset.<br>
+Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter + 4 bytes, or also the value of Program Counter with difference processing rather than + 4, like + offset.<br>
 
 Diagram of the inside of Program Counter<br>
 ## Control Unit (CU)
@@ -593,7 +542,7 @@ Execution Unit pack multiple components for handling the execution stage of the 
 
 All Execution Unit's subcomponent are listed down below.<br>
 ### Arithmetic and Logic Unit (ALU)
-Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a +4 adder.<br>
+Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a + 4 adder.<br>
 
 ### Operation Decoder
 
