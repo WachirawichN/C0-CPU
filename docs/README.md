@@ -547,8 +547,8 @@ This section covers each component inside the processor. This is difference from
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
 ## Control Unit (CU)
-Control Unit handles the job of fetching the instruction from the memory, then decoding it to prepare the instruction data for the next stage, it also handles the address of instruction. Handling those three jobs basically make the Control Unit control the entire processor.<br>
-In short, it handles both fetch, a little bit of decode and writeback stage, making it the first component that will be occurred in the pipeline.<br>
+Control Unit handles the job of fetching the instruction from the memory, decoding it, controlling which data flows into [ALU](#arithmetic-and-logic-unit-alu), and also handles the address of instruction. Handling those three jobs basically make the Control Unit control the entire processor.<br>
+In short, it handles both fetch, a little bit of decode, execute and writeback stage, making it the first component that will be occurred in the pipeline.<br>
 
 Control Unit contains three basic subcomponents for handling it job, they are listed down below.<br>
 ### Program Counter
@@ -571,9 +571,6 @@ Usually, on most processor, memory lives on separate chip, but C0's approach is 
 ## Immediate Assembler
 Immediate Assembler took raw immediate data and format type from Program Counter's Instruction Decoder, and assemble the immediate value into usable 32-bits length value.
 
-## Arithmetic and Logic Unit (ALU)
-Arithmetic and Logic Unit executes math and logic stuff. In execute stage of the pipeline, there is also an operation decoder for the ALU as well. That operation decoder will get bundle into ALU, while the multiplexer at the second operand input, will not be bundle into the ALU.<br>
-
 ## Register File
 Register File is where all 32 registers of this processor live.<br>
 ![Register File Diagram](./imgs/hardware_design/register_file.png)
@@ -584,6 +581,9 @@ For reading data from a register, there are two specific 5-bits input, both are 
 For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
 
 There are actually 2 more input, CLK, and reset signal. Reset input would be unused for this design, and the CLK will be share between all 32 registers.<br>
+
+## Arithmetic and Logic Unit (ALU)
+Arithmetic and Logic Unit executes math and logic stuff. The Operation Decoder that handles decoding opcode, funct3 and funct7 will also get bundle into the ALU. This Operation Decoder will not handle choosing between inputs as the operands, that will be the job of Control Unit to dictate the flow of data.<br>
 
 ## Data Memory
 As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the instruction memory. The processor use 32-bits address value calculate using the [ALU](#arithmetic-and-logic-unit-alu), for accessing the data from Data Memory.<br>
