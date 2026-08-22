@@ -493,7 +493,7 @@ The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic relate
 If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and JmpOp Control Signal are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new control signal called PCSrc, which specify if the [PC](#program-counter-pc) should jump or not.<br>
 
 > [!NOTE]
-> Modern processor move the [Jmp Handler](#jmp-handler)'s functionality to [ID stage](#decode-stage-id), which use dedicated comparator instead of [ALU](#arithmetic-and-logic-unit-alu)'s flags.
+> Modern processor move the [Jmp Handler](#jmp-handler)'s functionality to [ID stage](#decode-stage-id), which use dedicated comparator instead of [ALU](#arithmetic-and-logic-unit-alu)'s flags. This reduce the penalty of branch operation down to 1 cycle.
 
 There is also an adder, which always add 4 to the [PC](#program-counter-pc), before passing to the next stage. This value is used for when the processor wanted to jump, but also wanted to remember the return address. This adder helps to achieve this functionality.<br>
 
@@ -513,6 +513,9 @@ This stage return all the data from all the previous stages back to their corres
     - The [Program Counter](#program-counter-pc) will have to either choose its value + 4 (calculated inside the [IF stage](#fetch-stage-if)) or the jump address, which is just an [ALU](#arithmetic-and-logic-unit-alu)'s result (calculated inside [EX stage](#execute-stage-ex)). The signal from [EX stage](#execute-stage-ex) that have been pass to this stage using register is used for choosing between the two.
 2. `rd`'s write data.<br>
     - The processor use control signal from [ID stage](#decode-stage-id) to choose between PC + 4, [ALU](#arithmetic-and-logic-unit-alu)'s result or read data from the memory as a data writing into `rd` with an address it got from [ID stage](#decode-stage-id). There is also control signals that tell whether if the processor really wanted to write the data or not.
+
+> [!NOTE]
+> The write back of PCSrc Control Signal could be moved to [EX stage](#execute-stage-ex) after computing this Control Signal, this make the branch penalty goes down to 2 cycles. But, 4 cycles branch penalty look "insane" to me, so WB stage here I come.
 
 # Hardware Design
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
