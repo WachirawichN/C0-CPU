@@ -295,7 +295,7 @@ Instruction cycle are processes the CPU have to take to complete the execution o
 2. Decode (ID)
     * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive opcode and funct3/7, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
 3. Execute (EX)
-    * Every math and logic related operations happen in this stage (including calculating the jump address, or memory address). The control signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage.
+    * Every math and logic related operations happen in this stage (including calculating the jump address, or memory address). The control signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage. This stage also generates new Control Signal that decided whether the processor wanted to jump or not.
 4. Memory (MEM)
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory (if the operation is memory interaction).
 5. Writeback (WB)
