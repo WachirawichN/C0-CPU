@@ -522,61 +522,95 @@ This section covers each component inside the processor. This is difference from
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
 ## Program Counter (PC)
-Program Counter keeps track of the current instruction address. Program Counter is 32-bits registers with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it input are either value of the Program Counter + 4 bytes, or also the value of Program Counter with difference processing rather than + 4, like + offset.<br>
+Program Counter keeps track of the current instruction address.<br>
+Program Counter is a 32-bits register with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it output is either value of the Program Counter + 4 bytes (essentially the next instruction address), or also the value of Program Counter with difference processing like + offset.<br>
+The PCSrc Control Signal for controlling the source of the output is generated from the [Execution Unit](#execution-unit-eu).<br>
 
+![Program Counter Diagram](./imgs/hardware_design/program_counter.png)<br>
 Diagram of the inside of Program Counter<br>
-## Control Unit (CU)
-Control Unit is a stateless combinational logic that controls the flow of the data executing. It controls the flow of data by sending multiple control signal to multiple part of the processor.<br>
 
-Being a stateless combinational logic means that the CU updates it controls signal instantly after receiving new input values.<br>
+## Instruction Memory
+Instruction Memory holds all the instruction that the processor will use for processing. The processor uses 32-bits address from Program Counter to fetch an instruction from that specific address.<br>
 
+C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
 
+Usually, on most processor, memory lives on separate chip, but C0's approach is similar to some microcontroller, where the memory lives on the same chip as the processor.<br>
 
-Control Unit handles the job of fetching the instruction from the memory, decoding it, controlling which data flows into [ALU](#arithmetic-and-logic-unit-alu), and also handles the address of instruction. Handling those three jobs basically make the Control Unit control the entire processor.<br>
-In short, it handles both fetch, a little bit of decode, execute and writeback stage, making it the first component that will be occurred in the pipeline.<br>
-
-Control Unit contains three basic subcomponents for handling it job, they are listed down below.<br>
+## IF/ID Stage Registers
+Just like in the pipeline diagram, there are two registers, both are 32-bits long. They're the following.<br>
 ### Instruction Register
 Instruction Register temporary holds instruction from Instruction Memory.<br>
 The processor took address value from Program Counter, which is called instruction address, and push the value to Instruction Memory. The Instruction Memory should now give instruction at that specific address back to the processor. The processor is then put that instruction into Instruction Register.<br>
-Width of Instruction Register is 32-bits long.
+### PC Register
+This register only hold the value of the current instruction address, it's for further processing in the [EX Stage](#execute-stage-ex) of the pipeline, or by the [EU](#execution-unit-eu).<br>
+
+## Control Unit (CU)
+Control Unit is a stateless combinational logic that controls the flow of the data. It controls the flow of data by sending multiple Control Signals to multiple part of the processor.<br>
+Being a stateless combinational logic means that the CU updates its Control Signals instantly after receiving new input values.<br>
+
+Control Unit have about 2 subcomponents, which are the following.<br>
 ### Instruction Decoder
-Instruction Decoder took the full 32-bits instruction from the Instruction Register, then split it into multiple parts for further handling by other unit.<br>
-
-## Instruction Memory
-C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
-Instruction Memory holds all the instruction that the processor will use for processing. The Control unit uses 32-btis address from Program Counter to fetch an instruction from that specific address.<br>
-
-Usually, on most processor, memory lives on separate chip, but C0's approach is similar to microcontroller, where the memory lives on the same chip as the processor.<br>
+Instruction Decoder took the instruction currently hold inside the [Instruction Register](#instruction-register), and separate that instruction into multiple parts according to the [Instruction Format](#instruction-formats) of the instruction.
+### Control Signals Generator
+This unit generates all sort of Control Signals for the processor. It took opcode, funct3/7 and raw immediate value decoded by the [Instruction Decoder](#instruction-decoder) to generate the Control Signals.<br>
+The Control Signals generate by this unit is the same as the one in the [ID Stage](#decode-stage-id) diagram.<br>
 
 ## Immediate Assembler
-Immediate Assembler took raw immediate data and format type from Program Counter's Instruction Decoder, and assemble the immediate value into usable 32-bits length value.
+Immediate Assembler took raw immediate data and format type from [Instruction Decoder](#instruction-decoder), and assemble the immediate value into usable 32-bits length form.
 
 ## Register File
 Register File is where all 32 registers of this processor live.<br>
 ![Register File Diagram](./imgs/hardware_design/register_file.png)
-There are a total of 5 input for Register File, each is either for writing data into one specific register, or it is for reading two specific register.<br>
+There are a total of 5 inputs for Register File (not counting reset data and clock line), each is either for writing data into one specific register, or it is for reading two specific register.<br>
 
-For reading data from a register, there are two specific 5-bits input, both are for selecting the source register. There are two because this Register File design support reading from 2 registers simultaneously.<br>
+For reading data from two registers, there are two specific 5-bits input, both are for selecting the source register. The design of this Register File support reading from 2 registers simultaneously.<br>
 
 For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
 
-There are actually 2 more input, CLK, and reset signal. Reset input would be unused for this design, and the CLK will be share between all 32 registers.<br>
+## ID/EX Stage Registers
+This stage's Registers contain 12 registers, which are the following.<br>
+1. Immediate Value Register
+2. `rs1` Data Register
+3. `rs2` Data Register
+4. `rd` Address Register
+5. [PC](#program-counter-pc) Register
+6. `ALUOp` Control Signal Register
+7. `ALUOperand` Control Signal Register
+8. `MEMRead` Control Signal Register
+9. `MEMWrite` Control Signal Register
+10. `rdSrc` Control Signal Register
+11. `rdWrite` Control Signal Register
+12. `JmpOp` Control Signal Register
 
 ## Execution Unit (EU)
-Execution Unit pack multiple components for handling the execution stage of the pipeline into one component.<br>
+Execution Unit pack multiple components for handling the [EX Stage](#execute-stage-ex) of the pipeline into one component.<br>
 
 All Execution Unit's subcomponent are listed down below.<br>
 ### Arithmetic and Logic Unit (ALU)
-Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a + 4 adder.<br>
-
-### Operation Decoder
+Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a [+ 4 Adder](#-4-adder).<br>
+The ALU use Control Signal from the Control Unit to select it operation, this Control Signal is called `ALUOp`.<br>
 
 ### Operand Multiplexer
+There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Control Signals Generator](#control-signals-generator) generates the signal for controlling these multiplexers. This Control Signal is called `ALUOperand`.
 
-Arithmetic and Logic Unit executes math and logic stuff. The Operation Decoder that handles decoding opcode, funct3 and funct7 will also get bundle into the ALU. This Operation Decoder will not handle choosing between inputs as the operands, that will be the job of Control Unit to dictate the flow of data.<br>
+### Jmp Handler
+This unit handle the jump operation. It took `JmpOp` Control Signal from the [CU](#control-unit-cu), and added [ALU](#arithmetic-and-logic-unit-alu)'s branching associated flags. This will result in `1x` if the jump condition is met, and `0x` if the jump condition is not met (`x` could be `1` or `0`). The Jmp Handler will generate new Control Signal using the second bit of the result. This would mean that `1` means jump, while `0` means it would not.<br>
+
+### + 4 Adder
+All this adder do is took the value from [PC](#program-counter-pc), and you guess it, add four to it.<br>
+This is specifically for handling jump instruction that link the return address, this is because the [ALU](#arithmetic-and-logic-unit-alu) will be occupied by address calculation. So, there is this small adder for calculating the next instruction address.<br>
+
+## EX/MEM Stage Registers
+This stage's Registers contain 9 register, mostly still Control Signal registers.<br>
 
 ## Data Memory
-As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the instruction memory. The processor use 32-bits address value calculate using the [ALU](#arithmetic-and-logic-unit-alu), for accessing the data from Data Memory.<br>
+As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the [Instruction Memory](#instruction-memory). The processor use 32-bits address value calculated using the [ALU](#arithmetic-and-logic-unit-alu) for accessing the data from Data Memory.<br>
+Data Memory also uses 2 Control Signals from the [CU](#control-unit-cu), one is signified if the processor wanted to write to the Data Memory called `MEMWrite`, and the other is called `MEMRead` for read operation.<br>
 
 Like [Instruction Memory](#instruction-memory), the Data Memory also lives on the same chip as well like microcontroller, while modern processor push the Data Memory onto separate chip.<br>
+
+## MEM/WB Stage Registers
+
+## Destination Register Multiplexer
+This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result or data read from the [Data Memory](#data-memory).<br>
+This multiplexer is controlled by a Control Signal called `rdSrc`.<br>
