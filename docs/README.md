@@ -536,7 +536,7 @@ C0's memory is similar to Harvard Architecture's memory, meaning that instructio
 
 Usually, on most processor, memory lives on separate chip, but C0's approach is similar to some microcontroller, where the memory lives on the same chip as the processor.<br>
 
-## IF/ID Stage Registers
+## IF/ID Interstage Registers
 Just like in the pipeline diagram, there are two registers, both are 32-bits long. They're the following.<br>
 1. Instruction Register
     - Instruction Register temporary holds instruction from [Instruction Memory](#instruction-memory).<br>
@@ -567,7 +567,7 @@ For reading data from two registers, there are two specific 5-bits input, both a
 
 For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
 
-## ID/EX Stage Registers
+## ID/EX Interstage Registers
 This interstage contains 12 registers. From this point on, if there are no description for specific registers that would mean they are the same as previous interstage register.<br>
 1. Immediate Value Register
     - This stage register holds the extended form of `imm` field value from the [Immediate Assembler](#immediate-assembler), this register is 32-bits long.
@@ -577,11 +577,11 @@ This interstage contains 12 registers. From this point on, if there are no descr
     - This stage register is the same as `rs1`'s, but holds the data of `rs2` instead.
 4. `rd` Address Register
     - This register holds the address of `rd`, this register is only 5-bits long.
-5. [PC Register](#ifid-stage-registers)
+5. [PC Register](#ifid-interstage-registers)
 6. `ALUOp` Control Signal Register
     - This register is for passing the Control Signal that control [ALU](#arithmetic-and-logic-unit-alu)'s operation, this register is 4-bits wide.
 7. `ALUOperand` Control Signal Register
-    - This register holds the Control Signal that select the source of the [ALU](#arithmetic-and-logic-unit-alu)'s operands, this register is only 1-bit wide.
+    - This register holds the Control Signal that select the source of the [ALU](#arithmetic-and-logic-unit-alu)'s operands, this register is only 2-bits wide (two mux use two separate bit).
 8. `MEMRead` Control Signal Register
     - This register holds Control Signal that signifies read operation to the [Data Memory](#data-memory), this register is also only 1-bit wide.
 9. `MEMWrite` Control Signal Register
@@ -602,29 +602,26 @@ All Execution Unit's subcomponent are listed down below.<br>
 ### Arithmetic and Logic Unit (ALU)
 Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a [+ 4 Adder](#-4-adder).<br>
 The ALU use Control Signal from the Control Unit to select it operation, this Control Signal is called `ALUOp`.<br>
-
 ### Operand Multiplexer
-There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Control Signals Generator](#control-signals-generator) generates the signal for controlling these multiplexers. This Control Signal is called `ALUOperand`.
-
+There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Control Signals Generator](#control-signals-generator) generates the signal for controlling these multiplexers. This Control Signal is called `ALUOperand`. Each of the mux use a difference bit of the Control Signal. The first operand use LSB bit, while the second use MSB bit.
 ### Jmp Handler
 This unit handle the jump operation. It took `JmpOp` Control Signal from the [CU](#control-unit-cu), and added [ALU](#arithmetic-and-logic-unit-alu)'s branching associated flags. This will result in `1x` if the jump condition is met, and `0x` if the jump condition is not met (`x` could be `1` or `0`). The Jmp Handler will generate new Control Signal using the second bit of the result. This would mean that `1` means jump, while `0` means it would not.<br>
-
 ### + 4 Adder
 All this adder do is took the value from [PC](#program-counter-pc), and you guess it, add four to it.<br>
 This is specifically for handling jump instruction that link the return address, this is because the [ALU](#arithmetic-and-logic-unit-alu) will be occupied by address calculation. So, there is this small adder for calculating the next instruction address.<br>
 
-## EX/MEM Stage Registers
+## EX/MEM Interstage Registers
 In this interstage, there will be 9 registers, mostly still Control Signal registers.<br>
 1. PC + 4 Register
     - This register holds the next instruction address register. This is useful for jump and link instructions. This register is 32-bits wide.
-2. [`rs2` Data Register](#idex-stage-registers)
+2. [`rs2` Data Register](#idex-interstage-registers)
 3. [ALU](#arithmetic-and-logic-unit-alu) Result Register
     - This register holds result from the [ALU](#arithmetic-and-logic-unit-alu), no matter if the result is integer or address calculation. This register is 32-bits long.
-4. [`rd` Address Register](#idex-stage-registers)
-5. [`MEMRead` Control Signal Register](#idex-stage-registers)
-6. [`MEMWrite` Control Signal Register](#idex-stage-registers)
-7. [`rdSrc` Control Signal Register](#idex-stage-registers)
-8. [`rdWrite` Control Signal Register](#idex-stage-registers)
+4. [`rd` Address Register](#idex-interstage-registers)
+5. [`MEMRead` Control Signal Register](#idex-interstage-registers)
+6. [`MEMWrite` Control Signal Register](#idex-interstage-registers)
+7. [`rdSrc` Control Signal Register](#idex-interstage-registers)
+8. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 9. `PCSrc` Control Signal Register
     - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
 
@@ -634,16 +631,16 @@ Data Memory also uses 2 Control Signals from the [CU](#control-unit-cu), one is 
 
 Like [Instruction Memory](#instruction-memory), the Data Memory also lives on the same chip as well like microcontroller, while modern processor push the Data Memory onto separate chip.<br>
 
-## MEM/WB Stage Registers
+## MEM/WB Interstage Registers
 This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
-1. [PC + 4 Register](#exmem-stage-registers)
-2. [ALU Result Register](#exmem-stage-registers)
+1. [PC + 4 Register](#exmem-interstage-registers)
+2. [ALU Result Register](#exmem-interstage-registers)
 3. Memory Data Register
     - This register hold the data that have been read from the [Data Memory](#data-memory).
-4. [`rd` Address Register](#idex-stage-registers)
-5. [`rdSrc` Control Signal Register](#idex-stage-registers)
-6. [`rdWrite` Control Signal Register](#idex-stage-registers)
-7. [`PCSrc` Control Signal Register](#exmem-stage-registers)
+4. [`rd` Address Register](#idex-interstage-registers)
+5. [`rdSrc` Control Signal Register](#idex-interstage-registers)
+6. [`rdWrite` Control Signal Register](#idex-interstage-registers)
+7. [`PCSrc` Control Signal Register](#exmem-interstage-registers)
 
 ## Destination Register Multiplexer
 This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result or data read from the [Data Memory](#data-memory).<br>
