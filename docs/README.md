@@ -534,8 +534,6 @@ Instruction Memory holds all the instruction that the processor will use for pro
 
 C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
 
-Usually, on most processor, memory lives on separate chip, but C0's approach is similar to some microcontroller, where the memory lives on the same chip as the processor.<br>
-
 ## IF/ID Interstage Registers
 Just like in the pipeline diagram, there are two registers, both are 32-bits long. They're the following.<br>
 1. Instruction Register
@@ -625,11 +623,18 @@ In this interstage, there will be 9 registers, mostly still Control Signal regis
 9. `PCSrc` Control Signal Register
     - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
 
-## Data Memory
-As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the [Instruction Memory](#instruction-memory). The processor use 32-bits address value calculated using the [ALU](#arithmetic-and-logic-unit-alu) for accessing the data from Data Memory.<br>
-Data Memory also uses 2 Control Signals from the [CU](#control-unit-cu), one is signified if the processor wanted to write to the Data Memory called `MEMWrite`, and the other is called `MEMRead` for read operation.<br>
+## Address Decoder
+Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the write data, [ALU](#arithmetic-and-logic-unit-alu)'s result and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
 
-Like [Instruction Memory](#instruction-memory), the Data Memory also lives on the same chip as well like microcontroller, while modern processor push the Data Memory onto separate chip.<br>
+The Address Decoder identifies the target device by simply looking at the bit(s) for identifying the target device. Which for this case, I will use the MSB, `0` for Data Memory, and `1` for any peripheral device.<br>
+
+If the target is peripheral device, the data will be redirected to [Peripheral Controller](#peripheral-controller) for further decoding to identify the exact device.<br>
+
+## Data Memory
+As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the [Instruction Memory](#instruction-memory). The processor use 31-bits address, `rs2` data and Control Flags that have been redirected from [Address Decoder](#address-decoder) for interaction with the Data Memory. This also make the largest possible data memory to be around 2GB (2GB for processor this bad? Damn).<br>
+
+## Peripheral Controller
+Peripheral Controller decode the remaining 31-bits address even further to identify the exact target peripheral, and redirect the remaining data. Essentially it is the [Address Decoder](#address-decoder) for the peripherals.
 
 ## MEM/WB Interstage Registers
 This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
