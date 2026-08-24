@@ -295,7 +295,7 @@ Instruction cycle are processes the CPU have to take to complete the execution o
 2. Decode (ID)
     * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive opcode and funct3/7, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
 3. Execute (EX)
-    * Every math and logic related operations happen in this stage (including calculating the jump address or memory address). The control signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage. This stage also generates new Control Signal that decided whether the processor wanted to jump or not.
+    * Every math and logic related operations happen in this stage (including calculating the jump address or memory address). The Control Signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage. This stage also generates new Control Signal that decided whether the processor wanted to jump or not.
 4. Memory (MEM)
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory (if the operation is memory interaction).
 5. Writeback (WB)
@@ -489,8 +489,8 @@ After processing, all those values are pass to the next stage using registers.<b
 ### Execute Stage (EX)
 ![Entire datapath of execute stage](./imgs/microarchitecture/execute_stage.png)<br>
 All the math and logic stuffs happen in this stage.<br>
-The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic related operations. The control signal which tell the [ALU](#arithmetic-and-logic-unit-alu) what to do, and what operands to choose are generated from [ID stage](#decode-stage-id). The signals are passed to this stage by registers.<br>
-If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and JmpOp Control Signal are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new control signal called PCSrc, which specify if the [PC](#program-counter-pc) should jump or not.<br>
+The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic related operations. The Control Signal which tell the [ALU](#arithmetic-and-logic-unit-alu) what to do, and what operands to choose are generated from [ID stage](#decode-stage-id). The signals are passed to this stage by registers.<br>
+If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and JmpOp Control Signal are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new Control Signal called PCSrc, which specify if the [PC](#program-counter-pc) should jump or not.<br>
 
 > [!NOTE]
 > Modern processor move the [Jmp Handler](#jmp-handler)'s functionality to [ID stage](#decode-stage-id), which use dedicated comparator instead of [ALU](#arithmetic-and-logic-unit-alu)'s flags. This reduce the penalty of branch operation down to 1 cycle.
@@ -501,8 +501,12 @@ This stage also ended with many registers to pass all sort of values to the next
 
 ### Memory Stage (MEM)
 ![Entire datapath of memory stage](./imgs/microarchitecture/memory_stage.png)<br>
-This stage use control signals to decided whether it wanted to read from, write to, or does nothing to the [Data Memory](#data-memory).<br>
-If there will be an interaction happen with the [Data Memory](#data-memory), the processor will use result from the [ALU](#arithmetic-and-logic-unit-alu) as the address of interaction, and `rs2`'s value as a data writing into the [Data Memory](#data-memory), if the operation is to write the memory. But, if it is read operation, the result of reading will be pass to the register for the next stage<br>
+After address calculation by the ALU, the processor put the 32-bits result into the [Address Decoder](#address-decoder) to find out the target device ([Data Memory](#data-memory) or any peripheral) then sent out the remaining 31-bits address, `rs2` data (write data) and the Control Signals (`MEMRead` and `MEMWrite`) to it correspond destination ([Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller) for any peripheral device).<br>
+This stage use Control Signals to decided whether it wanted to read from, write to, or does nothing to the [Data Memory](#data-memory).<br>
+
+If the target device is peripheral then the [Peripheral Controller](#peripheral-controller) will decode the remaining 31-bits to pinpoint the exact target peripheral, before passing `rs2` data (write data) and the Control Signals (`MEMRead` and `MEMWrite`) to that peripheral just like what [Address Decoder](#address-decoder) does.<br>
+
+The [Address Decoder](#address-decoder) also generates new Control Signal that controls the behavior of a mux that switch the between data from [Data Memory](#data-memory) and the [Peripheral Controller](#peripheral-controller).<br>
 
 Again, this stage passes some data to the next stage using multiple registers.<br>
 
@@ -512,7 +516,7 @@ This stage return all the data from all the previous stages back to their corres
 1. [Program Counter](#program-counter-pc)'s jump address.
     - The [Program Counter](#program-counter-pc) will have to either choose its value + 4 (calculated inside the [IF stage](#fetch-stage-if)) or the jump address, which is just an [ALU](#arithmetic-and-logic-unit-alu)'s result (calculated inside [EX stage](#execute-stage-ex)). The signal from [EX stage](#execute-stage-ex) that have been pass to this stage using register is used for choosing between the two.
 2. `rd`'s write data.<br>
-    - The processor use control signal from [ID stage](#decode-stage-id) to choose between PC + 4, [ALU](#arithmetic-and-logic-unit-alu)'s result or read data from the memory as a data writing into `rd` with an address it got from [ID stage](#decode-stage-id). There is also control signals that tell whether if the processor really wanted to write the data or not.
+    - The processor use Control Signal from [ID stage](#decode-stage-id) to choose between PC + 4, [ALU](#arithmetic-and-logic-unit-alu)'s result or read data from the memory as a data writing into `rd` with an address it got from [ID stage](#decode-stage-id). There is also Control Signals that tell whether if the processor really wanted to write the data or not.
 
 > [!NOTE]
 > The write back of PCSrc Control Signal could be moved to [EX stage](#execute-stage-ex) after computing this Control Signal, this make the branch penalty goes down to 2 cycles. But, 4 cycles branch penalty look "insane" to me, so WB stage here I come.
@@ -634,7 +638,7 @@ If the target is peripheral device, the data will be redirected to [Peripheral C
 As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the [Instruction Memory](#instruction-memory). The processor use 31-bits address, `rs2` data and Control Flags that have been redirected from [Address Decoder](#address-decoder) for interaction with the Data Memory. This also make the largest possible data memory to be around 2GB (2GB for processor this bad? Damn).<br>
 
 ## Peripheral Controller
-Peripheral Controller decode the remaining 31-bits address even further to identify the exact target peripheral, and redirect the remaining data. Essentially it is the [Address Decoder](#address-decoder) for the peripherals.
+Peripheral Controller decodes the remaining 31-bits address even further to identify the exact target peripheral, and redirect the remaining data. Essentially it is the [Address Decoder](#address-decoder) for the peripherals.
 
 ## MEM/WB Interstage Registers
 This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
