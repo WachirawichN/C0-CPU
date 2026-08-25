@@ -1,3 +1,4 @@
+- Re-order the register inside interstage registers of the datapath diagram to match the diagram of hardware design.
 - Finalize how many peripheral there would be connected to the CPU, and added that information to the Peripheral Controller.
 - Stage vs stage wording consistency
 - Chang the order of interstage registers to in the datapath diagram to match the hardware design diagram, or just make it look better overall.
