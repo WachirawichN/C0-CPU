@@ -506,7 +506,7 @@ This stage use Control Signals to decided whether it wanted to read from, write 
 
 If the target device is peripheral then the [Peripheral Controller](#peripheral-controller) will decode the remaining 31-bits to pinpoint the exact target peripheral, before passing `rs2` data (write data) and the Control Signals (`MEMRead` and `MEMWrite`) to that peripheral just like what [Address Decoder](#address-decoder) does.<br>
 
-The [Address Decoder](#address-decoder) also generates new Control Signal that controls the behavior of a mux that switch the between data from [Data Memory](#data-memory) and the [Peripheral Controller](#peripheral-controller).<br>
+The [Address Decoder](#address-decoder) also generates new Control Signal that controls the behavior of a mux that switches between data from [Data Memory](#data-memory) and the [Peripheral Controller](#peripheral-controller).<br>
 
 Again, this stage passes some data to the next stage using multiple registers.<br>
 
