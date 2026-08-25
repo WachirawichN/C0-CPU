@@ -543,7 +543,7 @@ Just like in the pipeline diagram, there are two registers, both are 32-bits lon
 1. Instruction Register
     - Instruction Register temporary holds instruction from [Instruction Memory](#instruction-memory).<br>
     The processor took address value from Program Counter, which is called instruction address, and push the value to [Instruction Memory](#instruction-memory). The [Instruction Memory](#instruction-memory) should now give instruction at that specific address back to the processor. The processor is then put that instruction into Instruction Register.<br>
-2. PC Register
+2. Current Address Register
     - This register only hold the value of the current instruction address, it's for further processing in the [EX Stage](#execute-stage-ex) of the pipeline, or by the [EU](#execution-unit-eu).<br>
 
 ## Control Unit (CU)
@@ -571,29 +571,29 @@ For writing data into the Register File, there is 1 input for enabling the write
 
 ## ID/EX Interstage Registers
 This interstage contains 12 registers. From this point on, if there are no description for specific registers that would mean they are the same as previous interstage register.<br>
-1. Immediate Value Register
+1. Extended `imm` Register
     - This stage register holds the extended form of `imm` field value from the [Immediate Assembler](#immediate-assembler), this register is 32-bits long.
-2. `rs1` Data Register
-    - This register holds the value of `rs1`'s data, which have been read from the [Register File](#register-file), this register is 32-bits long.
-3. `rs2` Data Register
+2. `rs2` Data Register
     - This stage register is the same as `rs1`'s, but holds the data of `rs2` instead.
-4. `rd` Address Register
-    - This register holds the address of `rd`, this register is only 5-bits long.
-5. [PC Register](#ifid-interstage-registers)
+3. [Current Address Register](#ifid-interstage-registers)
+4. `rs1` Data Register
+    - This register holds the value of `rs1`'s data, which have been read from the [Register File](#register-file), this register is 32-bits long.
+5. `ALUOperand` Control Signal Register
+    - This register holds the Control Signal that select the source of the [ALU](#arithmetic-and-logic-unit-alu)'s operands, this register is only 2-bits wide (two mux use two separate bit).
 6. `ALUOp` Control Signal Register
     - This register is for passing the Control Signal that control [ALU](#arithmetic-and-logic-unit-alu)'s operation, this register is 4-bits wide.
-7. `ALUOperand` Control Signal Register
-    - This register holds the Control Signal that select the source of the [ALU](#arithmetic-and-logic-unit-alu)'s operands, this register is only 2-bits wide (two mux use two separate bit).
+7. `JmpOp` Control Signal Register
+    - This register holds the type of jump operation what the instruction is. This register is 2-bits long.
 8. `MEMRead` Control Signal Register
     - This register holds Control Signal that signifies read operation to the [Data Memory](#data-memory), this register is also only 1-bit wide.
 9. `MEMWrite` Control Signal Register
     - This stage register is similar to the `MEMRead`'s register, but instead this signifies write operation.
 10. `rdSrc` Control Signal Register
     - This register holds the Control Signal that choose the source of the data written into `rd`. This register is 2-bits long for choosing between 3 sources.
-11. `rdWrite` Control Signal Register
+11. `rd` Address Register
+    - This register holds the address of `rd`, this register is only 5-bits long.
+12. `rdWrite` Control Signal Register
     - This stage register is only 1-bit long. The purpose of this register is to holds the Control Signal that choose if the processor wants to write to the `rd`.
-12. `JmpOp` Control Signal Register
-    - This register holds the type of jump operation what the instruction is. This register is 2-bits long.
 
 More information on Control Signal [here](#decode-stage-id).
 
@@ -614,18 +614,18 @@ This is specifically for handling jump instruction that link the return address,
 
 ## EX/MEM Interstage Registers
 In this interstage, there will be 9 registers, mostly still Control Signal registers.<br>
-1. PC + 4 Register
-    - This register holds the next instruction address register. This is useful for jump and link instructions. This register is 32-bits wide.
-2. [`rs2` Data Register](#idex-interstage-registers)
-3. [ALU](#arithmetic-and-logic-unit-alu) Result Register
+1. `PCSrc` Control Signal Register
+    - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
+2. [ALU](#arithmetic-and-logic-unit-alu) Result Register
     - This register holds result from the [ALU](#arithmetic-and-logic-unit-alu), no matter if the result is integer or address calculation. This register is 32-bits long.
-4. [`rd` Address Register](#idex-interstage-registers)
+3. Next Address Register
+    - This register holds the next instruction address register. This is useful for jump and link instructions. This register is 32-bits wide.
+4. [`rs2` Data Register](#idex-interstage-registers)
 5. [`MEMRead` Control Signal Register](#idex-interstage-registers)
 6. [`MEMWrite` Control Signal Register](#idex-interstage-registers)
 7. [`rdSrc` Control Signal Register](#idex-interstage-registers)
-8. [`rdWrite` Control Signal Register](#idex-interstage-registers)
-9. `PCSrc` Control Signal Register
-    - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
+8. [`rd` Address Register](#idex-interstage-registers)
+9. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 
 ## Address Decoder
 Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the write data, [ALU](#arithmetic-and-logic-unit-alu)'s result and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
@@ -642,14 +642,14 @@ Peripheral Controller decodes the remaining 31-bits address even further to iden
 
 ## MEM/WB Interstage Registers
 This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
-1. [PC + 4 Register](#exmem-interstage-registers)
+1. [`PCSrc` Control Signal Register](#exmem-interstage-registers)
 2. [ALU Result Register](#exmem-interstage-registers)
-3. Memory Data Register
-    - This register hold the data that have been read from the [Data Memory](#data-memory).
-4. [`rd` Address Register](#idex-interstage-registers)
+3. [Next Address Register](#exmem-interstage-registers)
+4. Device Read Data Register
+    - This register hold the data that have been read from the [Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller).
 5. [`rdSrc` Control Signal Register](#idex-interstage-registers)
-6. [`rdWrite` Control Signal Register](#idex-interstage-registers)
-7. [`PCSrc` Control Signal Register](#exmem-interstage-registers)
+6. [`rd` Address Register](#idex-interstage-registers)
+7. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 
 ## Destination Register Multiplexer
 This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result or data read from the [Data Memory](#data-memory).<br>
