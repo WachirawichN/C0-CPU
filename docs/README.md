@@ -637,11 +637,10 @@ In this interstage, there will be 9 registers, mostly still Control Signal regis
 
 ## Address Decoder
 ![Address Decoder Diagram](./imgs/hardware_design/address_decoder.png)
-Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the write data, [ALU](#arithmetic-and-logic-unit-alu)'s result and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
+Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the remaining address bits, write data and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
+If the target is peripheral device, the data will be redirected to [Peripheral Controller](#peripheral-controller) for further decoding to identify the exact device.<br>
 
 The Address Decoder identifies the target device by simply looking at the bit(s) for identifying the target device. Which for this case, I will use the MSB, `0` for Data Memory, and `1` for any peripheral device.<br>
-
-If the target is peripheral device, the data will be redirected to [Peripheral Controller](#peripheral-controller) for further decoding to identify the exact device.<br>
 
 Address Decoder also generates a Control Signal called `DeviceDataSrc`. That will be used by the [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
 
