@@ -524,17 +524,15 @@ This stage return all the data from all the previous stages back to their corres
 # Hardware Design
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
 
-![Processor Diagram](./imgs/hardware_design/processor.png)
+![Processor Diagram](./imgs/hardware_design/processor.png)<br>
 Entire diagram of the processor.<br>
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
 ## Program Counter (PC)
+![Program Counter Diagram](./imgs/hardware_design/program_counter.png)<br>
 Program Counter keeps track of the current instruction address.<br>
 Program Counter is a 32-bits register with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it output is either value of the Program Counter + 4 bytes (essentially the next instruction address), or also the value of Program Counter with difference processing like + offset.<br>
 The PCSrc Control Signal for controlling the source of the output is generated from the [Execution Unit](#execution-unit-eu).<br>
-
-![Program Counter Diagram](./imgs/hardware_design/program_counter.png)<br>
-Diagram of the inside of Program Counter<br>
 
 ## Instruction Memory
 Instruction Memory holds all the instruction that the processor will use for processing. The processor uses 32-bits address from Program Counter to fetch an instruction from that specific address.<br>
@@ -542,7 +540,7 @@ Instruction Memory holds all the instruction that the processor will use for pro
 C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
 
 ## IF/ID Interstage Registers
-![IF/ID Interstage Registers Diagram](./imgs/hardware_design/if-id_interstage_registers.png)
+![IF/ID Interstage Registers Diagram](./imgs/hardware_design/if-id_interstage_registers.png)<br>
 Just like in the pipeline diagram, there are two registers, both are 32-bits long. They're the following.<br>
 1. Instruction Register
     - Instruction Register temporary holds instruction from [Instruction Memory](#instruction-memory).<br>
@@ -551,7 +549,7 @@ Just like in the pipeline diagram, there are two registers, both are 32-bits lon
     - This register only hold the value of the current instruction address, it's for further processing in the [EX Stage](#execute-stage-ex) of the pipeline, or by the [EU](#execution-unit-eu).<br>
 
 ## Control Unit (CU)
-![Control Unit Diagram](./imgs/hardware_design/control_unit.png)
+![Control Unit Diagram](./imgs/hardware_design/control_unit.png)<br>
 Control Unit is a stateless combinational logic that controls the flow of the data. It controls the flow of data by sending multiple Control Signals to multiple part of the processor.<br>
 Being a stateless combinational logic means that the CU updates its Control Signals instantly after receiving new input values.<br>
 
@@ -563,11 +561,11 @@ This unit generates all sort of Control Signals for the processor. It took opcod
 The Control Signals generate by this unit is the same as the one in the [ID Stage](#decode-stage-id) diagram.<br>
 
 ## Immediate Assembler
-Immediate Assembler took raw immediate data and format type from [Instruction Decoder](#instruction-decoder), and assemble the immediate value into usable 32-bits length form.
+Immediate Assembler took raw `imm` data and [Instruction Format Type](#instruction-formats) from [Instruction Decoder](#instruction-decoder), and assemble the immediate value into usable 32-bits length form.
 
 ## Register File
+![Register File Diagram](./imgs/hardware_design/register_file.png)<br>
 Register File is where all 32 registers of this processor live.<br>
-![Register File Diagram](./imgs/hardware_design/register_file.png)
 There are a total of 5 inputs for Register File (not counting reset data and clock line), each is either for writing data into one specific register, or it is for reading two specific register.<br>
 
 For reading data from two registers, there are two specific 5-bits input, both are for selecting the source register. The design of this Register File support reading from 2 registers simultaneously.<br>
@@ -575,7 +573,7 @@ For reading data from two registers, there are two specific 5-bits input, both a
 For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
 
 ## ID/EX Interstage Registers
-![ID/EX Interstage Registers Diagram](./imgs/hardware_design/id-ex_interstage_registers.png)
+![ID/EX Interstage Registers Diagram](./imgs/hardware_design/id-ex_interstage_registers.png)<br>
 This interstage contains 12 registers. From this point on, if there are no description for specific registers that would mean they are the same as previous interstage register.<br>
 1. Extended `imm` Register
     - This stage register holds the extended form of `imm` field value from the [Immediate Assembler](#immediate-assembler), this register is 32-bits long.
@@ -604,7 +602,7 @@ This interstage contains 12 registers. From this point on, if there are no descr
 More information on Control Signal [here](#decode-stage-id).
 
 ## Execution Unit (EU)
-![Execution Unit Diagram](./imgs/hardware_design/execution_unit.png)
+![Execution Unit Diagram](./imgs/hardware_design/execution_unit.png)<br>
 Execution Unit pack multiple components for handling the [EX Stage](#execute-stage-ex) of the pipeline into one component.<br>
 
 All Execution Unit's subcomponent are listed down below.<br>
@@ -620,7 +618,7 @@ All this adder do is took the value from [PC](#program-counter-pc), and you gues
 This is specifically for handling jump instruction that link the return address, this is because the [ALU](#arithmetic-and-logic-unit-alu) will be occupied by address calculation. So, there is this small adder for calculating the next instruction address.<br>
 
 ## EX/MEM Interstage Registers
-![EX/MEM Interstage Registers Diagram](./imgs/hardware_design/ex-mem_interstage_registers.png)
+![EX/MEM Interstage Registers Diagram](./imgs/hardware_design/ex-mem_interstage_registers.png)<br>
 In this interstage, there will be 9 registers, mostly still Control Signal registers.<br>
 1. `PCSrc` Control Signal Register
     - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
@@ -636,7 +634,7 @@ In this interstage, there will be 9 registers, mostly still Control Signal regis
 9. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 
 ## Address Decoder
-![Address Decoder Diagram](./imgs/hardware_design/address_decoder.png)
+![Address Decoder Diagram](./imgs/hardware_design/address_decoder.png)<br>
 Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the remaining address bits, write data and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
 If the target is peripheral device, the data will be redirected to [Peripheral Controller](#peripheral-controller) for further decoding to identify the exact device.<br>
 
@@ -654,7 +652,7 @@ Peripheral Controller decodes the remaining 31-bits address even further to iden
 This multiplexer handles choosing between data from [Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller) by using the `DeviceDataSrc` Control Signal generated by the [Address Decoder](#address-decoder).<br>
 
 ## MEM/WB Interstage Registers
-![MEM/WB Interstage Registers Diagram](./imgs/hardware_design/mem-wb_interstage_registers.png)
+![MEM/WB Interstage Registers Diagram](./imgs/hardware_design/mem-wb_interstage_registers.png)<br>
 This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
 1. [`PCSrc` Control Signal Register](#exmem-interstage-registers)
 2. [ALU Result Register](#exmem-interstage-registers)
