@@ -122,18 +122,18 @@ The table below shows how the processor position each immediate bit. imm[11] of 
     <th>0</th>
   </tr>
   <tr>
-    <td>I-Type</td>
+    <td>I-type</td>
     <td colspan="20">Signed-extended into 32-bits</td>
     <td colspan="12">imm[11:0]</td>
   </tr>
   <tr>
-    <td>S-Type</td>
+    <td>S-type</td>
     <td colspan="20">Signed-extended into 32-bits</td>
     <td colspan="7">imm[11:5]</td>
     <td colspan="5">imm[4:0]</td>
   </tr>
   <tr>
-    <td>B-Type</td>
+    <td>B-type</td>
     <td colspan="19">Signed-extended into 32-bits</td>
     <td>imm[12]</td>
     <td>imm[11]</td>
@@ -142,7 +142,7 @@ The table below shows how the processor position each immediate bit. imm[11] of 
     <td>0</td>
   </tr>
   <tr>
-    <td>U-Type</td>
+    <td>U-type</td>
     <td colspan="20">imm[31:12]</td>
     <td>0</td>
     <td>0</td>
@@ -158,7 +158,7 @@ The table below shows how the processor position each immediate bit. imm[11] of 
     <td>0</td>
   </tr>
   <tr>
-    <td>J-Type</td>
+    <td>J-type</td>
     <td colspan="11">Signed-extended into 32-bits</td>
     <td>imm[20]</td>
     <td colspan="8">imm[19:12]</td>
@@ -183,13 +183,13 @@ Finally, the sign will be extended to 32-bits, the final value will be `11111111
 
 ## Instruction Groups
 C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
-Some groups may have multiple forms of the same instruction depend on the instruction format, or may have multiple subgroup that do completely difference thing with difference instruction format. But all in all, the opcode would be different, even though they belong to the same group<br>
+Some groups may have multiple forms of the same instruction depend on the instruction format, or may have multiple subgroup that do completely difference thing with difference instruction format. But all in all, the `opcode` would be different, even though they belong to the same group<br>
 ### Arithmetic and Logic
 > [!NOTE]
-> The difference between logical and arithmetic shift is that arithmetic will shift while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
+> The difference between logical and arithmetic shift is that arithmetic will shift, while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### R-type
-The opcode for these instructions would be `0110011`<br>
-| funct 7   | funct 3   | mnemonic  | operation                         | description                                           |
+The `opcode` for these instructions would be `0110011`<br>
+| `funct7`  | `funct3`  | mnemonic  | operation                         | description                                           |
 |-----------|-----------|-----------|-----------------------------------|-------------------------------------------------------|
 | 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                | add `rs2` to `rs1`                                    |
 | 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                | subtract `rs2` from `rs1`                             |
@@ -202,17 +202,17 @@ The opcode for these instructions would be `0110011`<br>
 | -         | 110       | OR        | rd = `rs1` \| `rs2`               | bitwise or                                            |
 | -         | 111       | AND       | rd = `rs1` & `rs2`                | bitwise and                                           |
 #### I-type
-The opcode for these instructions would be `0010011`<br>
+The `opcode` for these instructions would be `0010011`<br>
 
 For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/architecture/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I love to think that immediate field ranging from bit 31 down to bit 25 in the special format are used like funct 7 field, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
+I love to think that immediate field ranging from bit 31 down to bit 25 in the special format are used like `funct7` field, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
 
 In the table below, there would be either "imm" or "shamt" as a second operand.
 "imm" implys that the instruction use full 12-bits immediate value as the second operand, while "shamt" means that the processor use only last 5-bits from the immediate value of the "special" I-type format as the second operand.<br>
 
-| funct 7 (bit 31 - 25) | funct 3   | mnemonic  | operation                         | description                                       |
+| `funct7` (bit 31 - 25)| `funct3`  | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
 | -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
 | 0000000               | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
@@ -231,8 +231,8 @@ The effective address of that memory is calculated by adding value from `rs1` to
 
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
 
-Opcode for these instructions would be `0000011`.<br>
-| funct 3   | mnemonic  | load size | note                                    |
+`opcode` for these instructions would be `0000011`.<br>
+| `funct3`  | mnemonic  | load size | note                                    |
 |-----------|-----------|-----------|-----------------------------------------|
 | 000       | LB        | 8         | loaded data is sign-extended to 32-bits |
 | 001       | LH        | 16        | loaded data is sign-extended to 32-bits |
@@ -243,8 +243,8 @@ Opcode for these instructions would be `0000011`.<br>
 For store group, these instructions copy the last ... bits (specify in `store size` column) from `rs2` to memory.<br>
 The effective address of the memory for these instructions use the same way of calculating as the load group, also giving it an ability to offset the address from `rs1` for ±2K addresses. The immediate field of S-type format mights be a bit wonky to look at, but it is the same as 12-bits field of I-type format, just placing differently.<br>
 
-Opcode for these instructions would be `0100011`.<br>
-| funct 3   | mnemonic  | store size |
+`opcode` for these instructions would be `0100011`.<br>
+| `funct3`  | mnemonic  | store size |
 |-----------|-----------|-----------|
 | 000       | SB        | 8         |
 | 001       | SH        | 16        |
@@ -254,8 +254,8 @@ Opcode for these instructions would be `0100011`.<br>
 This group of instructions will add specific number to the program counter of the processor to jump to new instruction address, when a condition of instruction is met. Effectively, an if-else instruction.<br>
 Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
-The opcode for this instruction group would be `1100011`.<br>
-| funct 3   | mnemonic  | description                                               |
+The `opcode` for this instruction group would be `1100011`.<br>
+| `funct3`  | mnemonic  | description                                               |
 |-----------|-----------|-----------------------------------------------------------|
 | 000       | BEQ       | branch if `rs1` and `rs2` are equal                       |
 | 001       | BNE       | branch if `rs1` and `rs2` are not equal                   |
@@ -265,23 +265,23 @@ The opcode for this instruction group would be `1100011`.<br>
 | 111       | BGEU      | branch if `rs1` is greater than `rs2` (unsigned version)  |
 #### Unconditional Jump
 This type of jump will also add specific number to the program counter, to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
-This group of instructions contains two instructions, both use difference opcode and instruction format. They are listed down below.
+This group of instructions contains two instructions, both use difference `opcode` and instruction format. They are listed down below.
 ##### JAL (J-type)
 This instruction use J-type instruction format. Like the B-type instruction format, 0 is also added to the end of the immediate value and signed-extended.<br>
 This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also saves next instruction address (current + 4 bytes) to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
-Opcode for `JAL` instruction is `1101111`.<br>
+`opcode` for `JAL` instruction is `1101111`.<br>
 ##### JALR (I-type)
 `JALR` is I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0 (not 0 added to the back). The program counter is then set to this value. The x1 register is also used by the instruction to save the next instruction address (current + 4 bytes), just like `JAL`.<br>
-Opcode for `JALR` instruction is `1100111`, and it uses I-type instruction format.
+`opcode` for `JALR` instruction is `1100111`, and it uses I-type instruction format.
 ### Upper Immediate
 This group contains two instructions just like Unconditional Jump group. Job of this group's instructions is to load upper 20-bits of immediate value to target register.<br>
 This instruction group use U-type format, but there are two difference opcodes for each of the instruction.<br>
 #### LUI
 `LUI` loads first 20-bits then left shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the right.<br>
-The opcode for this instruction is `0110111`.<br>
+The `opcode` for this instruction is `0110111`.<br>
 #### AUIPC
 `AUIPC` pretty much does what `LUI` does, but added the current value from program counter before loading into `rd`.<br>
-This instruction use `0010111` as its opcode.<br>
+This instruction use `0010111` as its `opcode`.<br>
 
 
 # Microarchitecture
@@ -293,7 +293,7 @@ Instruction cycle are processes the CPU have to take to complete the execution o
 1. Fetch (IF)
     * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [Program Counter](#program-counter-pc).
 2. Decode (ID)
-    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive opcode and funct3/7, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
+    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive `opcode` and `funct3/7`, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
 3. Execute (EX)
     * Every math and logic related operations happen in this stage (including calculating the jump address or memory address). The Control Signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage. This stage also generates new Control Signal that decided whether the processor wanted to jump or not.
 4. Memory (MEM)
@@ -468,20 +468,26 @@ The processed values are listed down below.<br>
     - The [Instruction Decoder](#instruction-decoder) extract the address of `rs1` and `rs2`, these addresses are then plugged into [Register File](#register-file) for retrieving the two's data.
 3. `rd` Address
     - The [Instruction Decoder](#instruction-decoder) extract the address of `rd`, but instead of processing further, the processor pushes the address directly to the next stage. This will later be used by the [Writeback Stage](#writeback-stage-wb).
-3. Controls Signals
-    - Control Signals are generated by [Control Signal Generator](#control-signal-generator). They're used for directing the flow of data throughout the pipeline. There are many Control Signals generate by the [Control Signal Generator](#control-signal-generator) which are the following.<br>
-      1. `ALUOperand`: Signifies the [ALU](#arithmetic-and-logic-unit-alu)'s multiplexer to choose the correct data as operands for the [ALU](#arithmetic-and-logic-unit-alu).
-      2. `ALUOp`: Signifies which operation [ALU](#arithmetic-and-logic-unit-alu) have to choose. This Control Signal also required `imm` field value for processing the [I-Type arithmetic and logic instruction](#i-type).
-      3. `JmpOp`: This Control Signal signifies if the instruction's operation is a form of jump operation or not.
-      4. `MEMRead`: Signifies if the processor wanted to read from the [Data Memory](#data-memory) or any peripheral.
-      5. `MEMWrite`: This is like `MEMRead`, but instead it signifies write operation.
-      6. `rdSrc`: This signifies which data is chosen to write to the `rd`. (More information in [WB Stage](#writeback-stage-wb))
-      7. `rdWrite`: This signifies if the processor really wants to write to `rd`.
+3. Operation Values
+    - Operation Values are generated by [Operation Decoder](#operation-decoder). They're used for both controlling the behavior of their destination unit, this type is called Control Signal, or for further processing by their destination unit. Most are Control Signals, only `JmpOp` will be process further.<br>
+    There are following Operation Values generated in this stage.
+      1. `ALUOperand`
+          - Signifies the [ALU](#arithmetic-and-logic-unit-alu)'s multiplexer to choose the correct data as operands for the [ALU](#arithmetic-and-logic-unit-alu).
+      2. `ALUOp`
+          - Signifies which operation [ALU](#arithmetic-and-logic-unit-alu) have to choose. This Control Signal also required `imm` field value for processing the [I-type arithmetic and logic instruction](#i-type).
+      3. `JmpOp`
+          - This value signifies the type of jump operation the instruction is trying to do. This is not a Control Signal, but it is for further processing inside [EX Stage](#execute-stage-ex).
+      4. `MEMRead`
+          - Signifies if the processor wanted to read from the [Data Memory](#data-memory) or any peripheral.
+      5. `MEMWrite`
+          - This is like `MEMRead`, but instead it signifies write operation.
+      6. `rdSrc`
+          - This signifies which data is chosen to write to the `rd`. (More information in [WB Stage](#writeback-stage-wb)).
+      7. `rdWrite`
+          - This signifies if the processor really wants to write to `rd`.
 
 > [!NOTE]
 > [Immediate Assembler](#immediate-assembler) handles the job of extending immediate value into full 32-bits. It is usually called Sign-Extend / Zero-Extend Unit, but [Immediate Assembler](#immediate-assembler) sounds a lot cooler to me.
-> [!NOTE]
-> There are a few more Control Signals in later stages that haven't been generated by the [Control Signal Generator](#control-signal-generator).
 
 After processing, all those values are pass to the next stage using registers.<br>
 
@@ -489,7 +495,7 @@ After processing, all those values are pass to the next stage using registers.<b
 ![Entire datapath of execute Stage](./imgs/microarchitecture/execute_stage.png)<br>
 All the math and logic stuffs happen in this stage.<br>
 The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic related operations. The Control Signal which tell the [ALU](#arithmetic-and-logic-unit-alu) what to do, and what operands to choose are generated from [ID Stage](#decode-stage-id).<br>
-If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and `JmpOp` Control Signal are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new Control Signal called `PCSrc`, which specify if the [PC](#program-counter-pc) should jump or not.<br>
+If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and `JmpOp` value are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new Control Signal called `PCSrc`, which specify if the [PC](#program-counter-pc) should jump or not.<br>
 
 > [!NOTE]
 > Modern processor move the [Jmp Handler](#jmp-handler)'s functionality to [ID Stage](#decode-stage-id), which use dedicated comparator instead of [ALU](#arithmetic-and-logic-unit-alu)'s flags. This reduces the penalty of branch operation down to 1 cycle.
@@ -520,7 +526,7 @@ This stage return all the data from all the previous stages back to their corres
 > The write back of `PCSrc` Control Signal could be moved to [EX Stage](#execute-stage-ex) after computing this Control Signal, this make the branch penalty goes down to 2 cycles, or even better, the [ID Stage](#decode-stage-id). But, 4 cycles branch penalty look "insane" to me, so WB stage here I come. Just thinks about that 4 instructions wasted.
 
 # Hardware Design
-This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit, rather than how data flow through them.<br>
+This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit that make the [Microarchitecture](#microarchitecture) possible, rather than how data flow through them.<br>
 
 ![Processor Diagram](./imgs/hardware_design/processor.png)<br>
 Entire diagram of the processor.<br>
@@ -529,101 +535,192 @@ The order of each component is sorted by how early they are occurred in the inst
 ## Program Counter (PC)
 ![Program Counter Diagram](./imgs/hardware_design/program_counter.png)<br>
 Program Counter keeps track of the current instruction address.<br>
-Program Counter is a 32-bits register with input hook up to a multiplexer. The multiplexer choose between 2 source inputs for it 1 output, the source of it output is either value of the Program Counter + 4 bytes (essentially the next instruction address), or also the value of Program Counter with difference processing like + offset.<br>
-The PCSrc Control Signal for controlling the source of the output is generated from the [Execution Unit](#execution-unit-eu).<br>
+Program Counter is a 32-bits register with input hook up to a multiplexer. This multiplexer chooses between 2 source inputs for it 1 output, the source of it output is either value of the Program Counter + 4 bytes (essentially the next instruction address, this is calculated locally inside the PC itself not by [+ 4 adder](#-4-adder)), or also the value of the Program Counter with difference processing like + offset. How the multiplexer choose is to use the `PCSrc` Control Signal for controlling the source of the output, which is generated from the [Jmp Handler](#jmp-handler) inside the [Execution Unit](#execution-unit-eu).<br>
+There is also a reset input connect to the register. When this input goes high, the register's value will be set back to 0.<br>
 
 ## Instruction Memory
-Instruction Memory holds all the instruction that the processor will use for processing. The processor uses 32-bits address from Program Counter to fetch an instruction from that specific address.<br>
+Instruction Memory holds all the instructions that the processor will use for processing. The processor uses 32-bits address from the [PC](#program-counter-pc) to fetches an instruction from that specific address.<br>
+In the diagram of the processor, I've designed the Instruction Memory to be a Read-Only Memory. This also means that it doesn't require clock signal, because there is no write operation. Which is why in the diagram, the Instruction Memory may look a bit weird to have no clock input.<br>
 
-C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory. They have their own memory space.<br>
+C0's memory is similar to Harvard Architecture's memory, meaning that instruction and data lives in difference memory space. This is because of [structural hazard](#structural-hazards), when [IF Stage](#fetch-stage-if) and [MEM Stage](#memory-stage-mem) is clashing to access from the same memory.<br>
 
 ## IF/ID Interstage Registers
 ![IF/ID Interstage Registers Diagram](./imgs/hardware_design/if-id_interstage_registers.png)<br>
-Just like in the pipeline diagram, there are two registers, both are 32-bits long. They're the following.<br>
+Just like in the pipeline diagram, there are two registers for this interstage, both are 32-bits long. They're the following.<br>
 1. Instruction Register
-    - Instruction Register temporary holds instruction from [Instruction Memory](#instruction-memory).<br>
-    The processor took address value from Program Counter, which is called instruction address, and push the value to [Instruction Memory](#instruction-memory). The [Instruction Memory](#instruction-memory) should now give instruction at that specific address back to the processor. The processor is then put that instruction into Instruction Register.<br>
+    - Instruction Register temporary holds an instruction from the [Instruction Memory](#instruction-memory), after it has been fetched.<br>
 2. Current Address Register
     - This register only hold the value of the current instruction address, it's for further processing in the [EX Stage](#execute-stage-ex) of the pipeline, or by the [EU](#execution-unit-eu).<br>
 
+There is also a reset input connect to both registers, which does the same thing as [PC](#program-counter-pc)'s.<br>
+
 ## Control Unit (CU)
 ![Control Unit Diagram](./imgs/hardware_design/control_unit.png)<br>
-Control Unit is a stateless combinational logic that controls the flow of the data. It controls the flow of data by sending multiple Control Signals to multiple part of the processor.<br>
-Being a stateless combinational logic means that the CU updates its Control Signals instantly after receiving new input values.<br>
+Control Unit is a stateless combinational logic that controls the flow of the data by sending multiple Control Signals to multiple part of the processor.<br>
+Being a stateless combinational logic means that the CU updates its Control Signals instantly after receiving new input values, which is an instruction from the [Instruction Register](#ifid-stage-registers).<br>
 
-Control Unit have about 2 subcomponents, which are the following.<br>
+> [!NOTE]
+> Combinational logic means that the logic doesn't hold any value (no memory), making the output of this logic update instantly when the input changes.
+
+CU has several outputs which are the following.<br>
+1. `imm` Field Value
+2. Instruction Format
+3. `rs1` Address
+4. `rs2` Address
+5. `ALUOperand` Control Signal
+6. `ALUOp` Control Signal
+7. `JmpOp` Value
+8. `MEMRead` Control Signal
+9. `MEMWrite` Control Signal
+10. `rdSrc` Control Signal
+11. `rd` Address
+12. `rdWrite` Control Signal
+
+There will be a description on each output in the following 2 sections.<br>
 ### Instruction Decoder
-Instruction Decoder took the instruction currently hold inside the [Instruction Register](#ifid-stage-registers), and separate that instruction into multiple parts according to the [Instruction Format](#instruction-formats) of the instruction.
-### Control Signals Generator
-This unit generates all sort of Control Signals for the processor. It took opcode, funct3/7 and raw immediate value decoded by the [Instruction Decoder](#instruction-decoder) to generate the Control Signals.<br>
-The Control Signals generate by this unit is the same as the one in the [ID Stage](#decode-stage-id) diagram.<br>
+Instruction Decoder took the instruction currently holds inside the [Instruction Register](#ifid-stage-registers), and separate that instruction into multiple parts according to the [format](#instruction-formats) of the instruction. But, the output of Instruction Decoder are.<br>
+1. `imm` Field value
+    - This is an incomplete form of immediate value that have been directly extract from the instruction.
+    - Length of this output can range from 12-bits to 20-bits.
+    - If the `imm` value from the instruction is shorter than 20-bits then it will be zero-extended into 20-bits.
+2. Instruction Format
+    - Instruction Decoder identifies the [format](#instruction-formats) of current instruction, this will later be used by the [Immediate Assembler](#immediate-assembler) with the raw `imm` value.
+    - The [format](#instruction-formats) can be identifies by looking at the `opcode` field because one `opcode` hook to one specific [format](#instruction-formats).
+    - This output is 3-bits long, with the following possible values.<br>
+    `000` for R-type instruction.<br>
+    `001` for I-type instruction.<br>
+    `010` for S-type instruction.<br>
+    `011` for B-type instruction.<br>
+    `100` for U-type instruction.<br>
+    `101` for J-type instruction.<br>
+3. `rs1` Address
+    - This is just the address of the first source register.
+    - Length of this output is only 5-bits.
+4. `rs2` Address
+    - Similar to `rs1`'s, but this is for the second source register.
+5. `rd` Address
+    - Similar to two previous output, but this time it is for the destination register.
+6. `opcode` Field value
+    - This is for specifying the group of operation the instruction is trying to do. This value with `funct3/7` and `imm` will be used by [Operation Decoder](#operation-decoder) to then generate many Control Signals specific to the operation.
+    - This output is 7-bits long.
+7. `funct3` Field value
+    - This is for pinpointing the operation.
+    - This output is 3-bits long.
+8. `funct7` Field value
+    - Like `funct3`, but for pinpointing even further.
+    - This output is 7-bits long.
+### Operation Decoder
+This unit generates all sort values from `opcode`, `funct3/7` and `imm`. It took those values decoded by the [Instruction Decoder](#instruction-decoder) to generates values, most are Control Signals.<br>
+All the operation values generated by Operation Decoder are the following.<br>
+1. `ALUOperand`
+    - This is a 2-bits Control Signal is for controlling which data is the operand for the [ALU](#arithmetic-and-logic-unit-alu) by [Operand Multiplexers](#operand-multiplexer).<br>
+    The first operand mux uses the LSB of the Control Signal, while the other mux uses MSB.
+    - If the bit value is `0`, this would mean it will use `rs1` or `rs2` as the operand depending on the input of the mux, while `1` is for the other input of the mux, which is extended immediate or current address.
+2. `ALUOp`
+    - This is a 4-bits Control Signal for controlling the operation performed by the [ALU](#arithmetic-and-logic-unit-alu).
+    - The possible values are.<br>
+    `0000` for `ADD` operation.<br>
+    `0001` for `SUB` operation.<br>
+    `0010` for `SLL` operation.<br>
+    `0011` for `SLT` operation.<br>
+    `0100` for `SLTU` operation.<br>
+    `0101` for `XOR` logic operation.<br>
+    `0110` for `SRL` operation.<br>
+    `0111` for `SRA` operation.<br>
+    `1000` for `OR` logic operation.<br>
+    `1001` for `AND` logic operation.<br>
+    `1010` for `EQL` comparison operation.<br>
+    `1011` for `NEQ` comparison operation.<br>
+    `1100` for `LT` comparison operation.<br>
+    `1101` for `GE` comparison operation.<br>
+    `1110` for `LTU` comparison operation.<br>
+    `1111` for `GEU` comparison operation.<br>
+3. `JmpOp`
+    - This 2-bits value signifies the type of jump operation the instruction is trying to do. This is not a Control Signal, but it will be further process into a Control Signal by the [Jmp Handler](#jmp-handler).
+    - The possible values are.<br>
+    `00` for not a jump operation.<br>
+    `01` for a conditional jump operation.<br>
+    `10` for an unconditional jump operation.<br>
+4. `MEMRead`
+    - This 1-bit Control Signal signifies if the processor wanted to read from the [Data Memory](#data-memory) or any peripheral.
+    - `1` means read, while `0` means not.
+5. `MEMWrite`
+    - This 1-bit Control Signal is like `MEMRead`, but instead it signifies write operation.
+    - `1` means write, while `0` means not.
+6. `rdSrc`
+    - This 2-bits Control Signal chooses between 3 sources of the data written into `rd`.
+    - The possible values are.<br>
+    `00` for [ALU](#arithmetic-and-logic-unit-alu)'s result.<br>
+    `01` for next instruction address from [+ 4 Adder](#-4-adder).<br>
+    `10` for Device Read Data from [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
+7. `rdWrite`: This signifies if the processor really wants to write to `rd`.
+    - The purpose of this 1-bit Control Signal is to choose if the processor wants to write to the `rd`.
+    - `1` for it did want to write, while `0` means it did not.
 
 ## Immediate Assembler
-Immediate Assembler took raw `imm` data and [Instruction Format Type](#instruction-formats) from [Instruction Decoder](#instruction-decoder), and assemble the immediate value into usable 32-bits length form.
+Immediate Assembler took raw `imm` data and [Instruction Format Type](#instruction-formats) from the [Instruction Decoder](#instruction-decoder), and assemble the immediate value into its usable 32-bits length form.<br>
+For reference, there is a table for visualizing how the `imm` is extended in [Immediate Field](#immediate-field) section.
 
 ## Register File
 ![Register File Diagram](./imgs/hardware_design/register_file.png)<br>
 Register File is where all 32 registers of this processor live.<br>
-There are a total of 5 inputs for Register File (not counting reset data and clock line), each is either for writing data into one specific register, or it is for reading two specific register.<br>
+There are a total of 5 inputs for Register File (not counting reset data and clock line), each is either for writing data into one specific register, or it is for reading two specific registers.<br>
 
-For reading data from two registers, there are two specific 5-bits input, both are for selecting the source register. The design of this Register File support reading from 2 registers simultaneously.<br>
+For reading data from two registers, there are two specific 5-bits inputs, both are for selecting the source register. The design of this Register File support reading from 2 registers simultaneously.<br>
 
-For writing data into the Register File, there is 1 input for enabling the write mode, another 5-bits input for selecting the destination register, and the other is the 32-bits data that would be writing into a register.<br>
+For writing data into the Register File, there are 1-bit input for enabling the write mode (Write Enable), another 5-bits input for selecting the destination register (Write Address), and the other is the 32-bits data that would be writing into a register (Write Data). The Write Address is plugged into a mux for selecting the destination for Write Enable input, but the Write Data input is directly connect to all registers (except x0).<br>
+x0 register or constant zero register doesn't have any input plug to it (except reset input), making it impossible to write to this register.<br>
+When writing to any registers (except x0), two condition must be met. First, the Write Enable of target register must be high. Second, the clock must be at the edge of the trigger, which would be low to high in this design.<br>
+
+Just like other 2 sequential unit, there is also a reset input that does the same thing.<br>
+
+> [!NOTE]
+> Sequential logic means that the logic did hold some form of value, or it did have a memory. This makes this type of logic require a clock source so that it could sync up with other sequential logic. This also make the logic have to wait for the next clock edge to update its output.
 
 ## ID/EX Interstage Registers
 ![ID/EX Interstage Registers Diagram](./imgs/hardware_design/id-ex_interstage_registers.png)<br>
-This interstage contains 12 registers. From this point on, if there are no description for specific registers that would mean they are the same as previous interstage register.<br>
-1. Extended `imm` Register
-    - This stage register holds the extended form of `imm` field value from the [Immediate Assembler](#immediate-assembler), this register is 32-bits long.
+This interstage contains 12 registers. From this point on, if there are no description for specific registers that would mean the description of the value holds inside that register has been described in other section before.<br>
+1. [Extended `imm` Register](#immediate-assembler)
 2. `rs2` Data Register
-    - This stage register is the same as `rs1`'s, but holds the data of `rs2` instead.
+    - This register holds the value of `rs2`'s data, which have been read from the [Register File](#register-file) using Read Address 2 input, this register is 32-bits long.
 3. [Current Address Register](#ifid-interstage-registers)
 4. `rs1` Data Register
-    - This register holds the value of `rs1`'s data, which have been read from the [Register File](#register-file), this register is 32-bits long.
-5. `ALUOperand` Control Signal Register
-    - This register holds the Control Signal that select the source of the [ALU](#arithmetic-and-logic-unit-alu)'s operands, this register is only 2-bits wide (two mux use two separate bit).
-6. `ALUOp` Control Signal Register
-    - This register is for passing the Control Signal that control [ALU](#arithmetic-and-logic-unit-alu)'s operation, this register is 4-bits wide.
-7. `JmpOp` Control Signal Register
-    - This register holds the type of jump operation what the instruction is. This register is 2-bits long.
-8. `MEMRead` Control Signal Register
-    - This register holds Control Signal that signifies read operation to the [Data Memory](#data-memory), this register is also only 1-bit wide.
-9. `MEMWrite` Control Signal Register
-    - This stage register is similar to the `MEMRead`'s register, but instead this signifies write operation.
-10. `rdSrc` Control Signal Register
-    - This register holds the Control Signal that choose the source of the data written into `rd`. This register is 2-bits long for choosing between 3 sources.
-11. `rd` Address Register
-    - This register holds the address of `rd`, this register is only 5-bits long.
-12. `rdWrite` Control Signal Register
-    - This stage register is only 1-bit long. The purpose of this register is to holds the Control Signal that choose if the processor wants to write to the `rd`.
+    - This stage register is the same as `rs2`'s, but holds the data of `rs1` instead.
+5. [`ALUOperand` Control Signal Register](#operation-decoder)
+6. [`ALUOp` Control Signal Register](#operation-decoder)
+7. [`JmpOp` Register](#operation-decoder)
+8. [`MEMRead` Control Signal Register](#operation-decoder)
+9. [`MEMWrite` Control Signal Register](#operation-decoder)
+10. [`rdSrc` Control Signal Register](#operation-decoder)
+11. [`rd` Address Register](#instruction-decoder)
+12. [`rdWrite` Control Signal Register](#operation-decoder)
 
-More information on Control Signal [here](#decode-stage-id).
+This also have a reset input to reset all register's values back to zero.<br>
 
 ## Execution Unit (EU)
 ![Execution Unit Diagram](./imgs/hardware_design/execution_unit.png)<br>
-Execution Unit pack multiple components for handling the [EX Stage](#execute-stage-ex) of the pipeline into one component.<br>
+What it does is pure math and logic.<br>
+Execution Unit packs multiple components for handling the [EX Stage](#execute-stage-ex) of the pipeline into one component.<br>
 
-All Execution Unit's subcomponent are listed down below.<br>
-### Arithmetic and Logic Unit (ALU)
-Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle is calculating the next instruction address, that would be the job of a [+ 4 Adder](#-4-adder).<br>
-The ALU use Control Signal from the Control Unit to select it operation, this Control Signal is called `ALUOp`.<br>
+There are 7 inputs and only 3 outputs for EU, the description for each will be in their correspond unit below.<br>
 ### Operand Multiplexer
-There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Control Signals Generator](#control-signals-generator) generates the signal for controlling these multiplexers. This Control Signal is called `ALUOperand`. Each of the mux use a difference bit of the Control Signal. The first operand use LSB bit, while the second use MSB bit.
+There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Operation Decoder](#operation-decoder) generates the signal for controlling these multiplexers. This Control Signal is called [`ALUOperand`](#operation-decoder). Each of the mux use a difference bit of the Control Signal. The first operand use LSB bit, while the second use MSB bit of the Control Signal.
+### Arithmetic and Logic Unit (ALU)
+Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle are calculating the next instruction address, and for the [PC](#program-counter-pc) to jump or not, that would be the job of a [+ 4 Adder](#-4-adder) and [Jmp Handler](#jmp-handler) respectively.<br>
+The ALU use Control Signal from the Control Unit to select it operation, this Control Signal is called [`ALUOp`](#operation-decoder). The operands for calculation will be selected by two [Operand Multiplexer](#operand-multiplexer). And, the result of the calculation is, of course, 32-bits.<br>
 ### Jmp Handler
-This unit handle the jump operation. It took `JmpOp` Control Signal from the [CU](#control-unit-cu), and added [ALU](#arithmetic-and-logic-unit-alu)'s branching associated flags. This will result in `1x` if the jump condition is met, and `0x` if the jump condition is not met (`x` could be `1` or `0`). The Jmp Handler will generate new Control Signal using the second bit of the result. This would mean that `1` means jump, while `0` means it would not.<br>
+This unit handle the jump operation. It took [`JmpOp`](#operation-decoder) from the [CU](#control-unit-cu), and added [ALU](#arithmetic-and-logic-unit-alu)'s branching associated flag. Essentially. a 2-bits adder. This will result in `1x` if the jump condition is met, and `0x` if the jump condition is not met (`x` could be `1` or `0`, we don't care about the LSB bit). The Jmp Handler will generate new Control Signal using the MSB bit of the result. That Control Signal would mean `1` for jump, while `0` for it would not. This new Control Signal is 1-bit long and called `PCSrc`.<br>
 ### + 4 Adder
 All this adder do is took the value from [PC](#program-counter-pc), and you guess it, add four to it.<br>
-This is specifically for handling jump instruction that link the return address, this is because the [ALU](#arithmetic-and-logic-unit-alu) will be occupied by address calculation. So, there is this small adder for calculating the next instruction address.<br>
+This is specifically for handling jump instruction that needs to remember the return address (next instruction address from the current one), this is because the [ALU](#arithmetic-and-logic-unit-alu) will be occupied by jump address calculation. So, there is this small adder for calculating the next instruction address.<br>
+The result will be 32-bits long.<br>
 
 ## EX/MEM Interstage Registers
 ![EX/MEM Interstage Registers Diagram](./imgs/hardware_design/ex-mem_interstage_registers.png)<br>
 In this interstage, there will be 9 registers, mostly still Control Signal registers.<br>
-1. `PCSrc` Control Signal Register
-    - This interstage register holds the Control Signal that controls the source of [PC](#program-counter-pc) between the next instruction address, and the jump address calculated by the [ALU](#arithmetic-and-logic-unit-alu). This register is only 1-bit wide.
-2. [ALU](#arithmetic-and-logic-unit-alu) Result Register
-    - This register holds result from the [ALU](#arithmetic-and-logic-unit-alu), no matter if the result is integer or address calculation. This register is 32-bits long.
-3. Next Address Register
-    - This register holds the next instruction address register. This is useful for jump and link instructions. This register is 32-bits wide.
+1. [`PCSrc` Control Signal Register](#jmp-handler)
+2. [ALU Result Register](#arithmetic-and-logic-unit-alu)
+3. [Next Address Register](#-4-adder)
 4. [`rs2` Data Register](#idex-interstage-registers)
 5. [`MEMRead` Control Signal Register](#idex-interstage-registers)
 6. [`MEMWrite` Control Signal Register](#idex-interstage-registers)
@@ -631,36 +728,54 @@ In this interstage, there will be 9 registers, mostly still Control Signal regis
 8. [`rd` Address Register](#idex-interstage-registers)
 9. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 
+Again, this will also have a reset input for resetting the register's values to zero.
+
 ## Address Decoder
 ![Address Decoder Diagram](./imgs/hardware_design/address_decoder.png)<br>
-Address Decoder identify if the address is for [Data Memory](#data-memory) or for the peripheral device. After identifying the target, it then redirects the remaining address bits, write data and Control Signals into either the [Data Memory](#data-memory) or peripheral device.<br>
-If the target is peripheral device, the data will be redirected to [Peripheral Controller](#peripheral-controller) for further decoding to identify the exact device.<br>
+Address Decoder identify if the address is for [Data Memory](#data-memory) or for any peripheral device. After identifying the target, it then redirects the remaining address bits, write data and Control Signals into either the [Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller) for peripheral device.<br>
 
-The Address Decoder identifies the target device by simply looking at the bit(s) for identifying the target device. Which for this case, I will use the MSB, `0` for Data Memory, and `1` for any peripheral device.<br>
+The Address Decoder identifies the type of target device by simply looking at the bit(s) inside the address that is for identifying the type of target device. Which for this case, I will use only the MSB bit, which is `0` for [Data Memory](#data-memory), and `1` for any peripheral device.<br>
 
-Address Decoder also generates a Control Signal called `DeviceDataSrc`. That will be used by the [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
+Address Decoder also generates a 1-bit Control Signal called `DeviceDataSrc`. That will be used by the [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
+This Control Signal is linked directly to the MSB bit of the original 32-bits address, meaning that if it is a `0` it will choose data from [Data Memory](#data-memory), while `1` if data from [Peripheral Controller](#peripheral-controller).<br>
 
 ## Data Memory
-As said before in the [Instruction Memory](#instruction-memory) section, the data memory is separate from the [Instruction Memory](#instruction-memory). The processor use 31-bits address, `rs2` data and Control Flags that have been redirected from [Address Decoder](#address-decoder) for interaction with the Data Memory. This also make the largest possible data memory to be around 2GB (2GB for processor this bad? Damn).<br>
+As said before in the [Instruction Memory](#instruction-memory) section, the Data Memory is separate from the [Instruction Memory](#instruction-memory). The processor use the remainings 31-bits address, `rs2` data (write data) and Control Signals that have been redirected from [Address Decoder](#address-decoder) for interaction with the Data Memory. This also make the largest possible memory capacity to be around 2GB (2GB for processor this bad? Damn).<br>
+
+For Control Signals, there are two that Data Memory will received.<br>
+1. `MEMRead`
+    - If this has a value of `1`, the memory will go into read mode. Returning data at the 31-bits address.
+2. `MEMWrite`
+    - If this has a value of `1`, the memory goes into write mode. It will now write `rs2` data into the address of 31-bits address.
+
+If both Control Signals are somehow `1` at the same times, the default behavior of the Data Memory should be to not go into either read or write mode.<br>
+
+Data Memory also have a reset input for resetting the entire memory.<br>
 
 ## Peripheral Controller
-Peripheral Controller decodes the remaining 31-bits address even further to identify the exact target peripheral, and redirect the remaining data. Essentially it is the [Address Decoder](#address-decoder) for the peripherals.
+Peripheral Controller decodes the remaining 31-bits address even further to identifies the exact target peripheral, and redirect the 3 remaining data (`rs2` data, `MEMRead` and `MEMWrite` Control Signals) into that peripheral. Essentially it is the [Address Decoder](#address-decoder) for the peripherals.
+
+For Control Signals behavior, the Peripheral Controller behaves the same ways as the [Data Memory](#data-memory).<br>
+
+This also have a reset input.<br>
 
 ## Device Data Read Multiplexer
-This multiplexer handles choosing between data from [Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller) by using the `DeviceDataSrc` Control Signal generated by the [Address Decoder](#address-decoder).<br>
+This multiplexer handles choosing between data from [Data Memory](#data-memory) and [Peripheral Controller](#peripheral-controller) by using the [`DeviceDataSrc` Control Signal](#address-decoder) generated by the [Address Decoder](#address-decoder).<br>
+If [`DeviceDataSrc`](#address-decoder) is a `1` then it will forward the data from [Peripheral Controller](#peripheral-controller), or else it would choose [Data Memory](#data-memory).
 
 ## MEM/WB Interstage Registers
 ![MEM/WB Interstage Registers Diagram](./imgs/hardware_design/mem-wb_interstage_registers.png)<br>
-This interstage have 7 registers, most are not Control Signal now. They are the following.<br>
+This interstage have 7 registers, half are not Control Signal now. They are the following.<br>
 1. [`PCSrc` Control Signal Register](#exmem-interstage-registers)
 2. [ALU Result Register](#exmem-interstage-registers)
 3. [Next Address Register](#exmem-interstage-registers)
-4. Device Read Data Register
-    - This register hold the data that have been read from the [Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller).
+4. [Device Read Data Register](#device-data-read-multiplexer)
 5. [`rdSrc` Control Signal Register](#idex-interstage-registers)
 6. [`rd` Address Register](#idex-interstage-registers)
 7. [`rdWrite` Control Signal Register](#idex-interstage-registers)
 
+This also have a reset input for resetting all register's values back to 0.<br>
+
 ## Destination Register Multiplexer
-This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result or data read from the [Data Memory](#data-memory).<br>
-This multiplexer is controlled by a Control Signal called `rdSrc`.<br>
+This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result, or read data that have been given by [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
+This multiplexer is controlled by a 2-bits Control Signal called [`rdSrc`](#operation-decoder).<br>

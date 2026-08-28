@@ -1,6 +1,6 @@
 <mxfile host="Electron" pages="6">
   <diagram name="Entire Datapath" id="DQZojchKzbFLv_AC6RHQ">
-    <mxGraphModel dx="1417" dy="821" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="978" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -790,7 +790,7 @@
         <mxCell id="k7e5eTIhxQDdPEBaVpX5-1" parent="k7e5eTIhxQDdPEBaVpX5-71" style="rounded=0;whiteSpace=wrap;html=1;" value="Instruction Decoder" vertex="1">
           <mxGeometry height="160" width="120" x="100" y="220" as="geometry" />
         </mxCell>
-        <mxCell id="k7e5eTIhxQDdPEBaVpX5-2" parent="k7e5eTIhxQDdPEBaVpX5-71" style="rounded=0;whiteSpace=wrap;html=1;" value="Control Signal Generator" vertex="1">
+        <mxCell id="k7e5eTIhxQDdPEBaVpX5-2" parent="k7e5eTIhxQDdPEBaVpX5-71" style="rounded=0;whiteSpace=wrap;html=1;" value="Operation Decoder" vertex="1">
           <mxGeometry height="140" width="120" x="400" y="390" as="geometry" />
         </mxCell>
         <mxCell id="k7e5eTIhxQDdPEBaVpX5-3" parent="k7e5eTIhxQDdPEBaVpX5-71" style="rounded=0;whiteSpace=wrap;html=1;" value="Register File" vertex="1">
@@ -1275,14 +1275,14 @@
     </mxGraphModel>
   </diagram>
   <diagram id="GYXJDUPHbinxJaEExpdH" name="Decode Stage">
-    <mxGraphModel dx="1712" dy="992" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="978" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="1_m771pUODtvzPZonEuD-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Instruction Decoder" vertex="1">
           <mxGeometry height="160" width="120" x="180" y="260" as="geometry" />
         </mxCell>
-        <mxCell id="1_m771pUODtvzPZonEuD-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Control Signal Generator" vertex="1">
+        <mxCell id="1_m771pUODtvzPZonEuD-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Operation Decoder" vertex="1">
           <mxGeometry height="140" width="120" x="480" y="430" as="geometry" />
         </mxCell>
         <mxCell id="1_m771pUODtvzPZonEuD-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Register File" vertex="1">
