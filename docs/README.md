@@ -532,11 +532,13 @@ This section covers each component inside the processor. This is difference from
 Entire diagram of the processor.<br>
 
 The order of each component is sorted by how early they are occurred in the instruction pipeline.<br>
+> [!NOTE]
+> Reset input of any component is active at falling edge, while clk input actives at rising edge.<br>
 ## Program Counter (PC)
 ![Program Counter Diagram](./imgs/hardware_design/program_counter.png)<br>
 Program Counter keeps track of the current instruction address.<br>
 Program Counter is a 32-bits register with input hook up to a multiplexer. This multiplexer chooses between 2 source inputs for it 1 output, the source of it output is either value of the Program Counter + 4 bytes (essentially the next instruction address, this is calculated locally inside the PC itself not by [+ 4 adder](#-4-adder)), or also the value of the Program Counter with difference processing like + offset. How the multiplexer choose is to use the `PCSrc` Control Signal for controlling the source of the output, which is generated from the [Jmp Handler](#jmp-handler) inside the [Execution Unit](#execution-unit-eu).<br>
-There is also a reset input connect to the register. When this input goes high, the register's value will be set back to 0.<br>
+There is also a reset input connect to the register. When this input goes low (falling edge), the register's value will be set back to 0.<br>
 
 ## Instruction Memory
 Instruction Memory holds all the instructions that the processor will use for processing. The processor uses 32-bits address from the [PC](#program-counter-pc) to fetches an instruction from that specific address.<br>
