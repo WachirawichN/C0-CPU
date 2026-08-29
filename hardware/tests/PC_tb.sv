@@ -5,7 +5,7 @@ module PC_tb;
     bit pc_src = 0;
     int jump_address = 0;
     bit clk = 0;
-    logic[31:0] address;
+    logic [31:0] address;
 
     PC dut (
         .rst_n(rst_n),
