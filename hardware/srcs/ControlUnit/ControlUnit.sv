@@ -20,7 +20,35 @@ module ControlUnit
     output logic [4:0]                              rd_address,
     output ControlSignals_pkg::rdWrite              rd_write;
 );
-    always_comb begin
-        
-    end
+    logic [19:0] imm;
+    logic [6:0] opcode;
+    logic [2:0] funct3;
+    logic [6:0] funct7;
+
+    assign imm_field_value = imm;
+
+    InstructionDecoder inst_decoder (
+        .instruction(instruction),
+        .raw_imm_value(imm),
+        .instruction_format(instruction_format),
+        .rs1_address(rs1_address),
+        .rs2_address(rs2_address),
+        .rd_address(rd_address),
+        .opcode(opcode),
+        .funct3(funct3),
+        .funct7(funct7)
+    );
+    OperationDecoder op_decoder (
+        .opcode(opcode),
+        .funct3(funct3),
+        .funct7(funct7),
+        .raw_imm_value(imm),
+        .alu_operand(alu_operand),
+        .alu_op(alu_op),
+        .jmp_op(jmp_op),
+        .mem_read(mem_read),
+        .mem_write(mem_write),
+        .rd_src(rd_src),
+        .rd_write(rdWrite)
+    );
 endmodule
