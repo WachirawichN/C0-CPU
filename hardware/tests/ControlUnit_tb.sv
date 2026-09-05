@@ -60,14 +60,39 @@ program tb (
                 instruction[11:7] = $urandom_range(2**5-1, 1);
             end
 
-            // funct3
+            // funct3 / rs1
             if (instruction[6:0] inside {7'b0110011, 7'b0010011, 7'b0000011, 7'b1100111, 7'b0100011, 7'b1100011}) begin
                 logic [2:0] funct3;
                 case (instruction[6:0])
-                    7'b0110011, 7'b0010011 : funct3 = $urandom_range(3'b111, 3'b000);
-                    7'b0000011 : funct3 = ;
+                    7'b0110011, 7'b0010011: funct3 = $urandom_range(3'b111, 3'b000); // Arithmetic/Logic
+                    7'b0000011: begin
+                        // Load
+                        if (!std::randomize(funct3) with {funct3 inside {3'b000, 3'b001, 3'b010, 3'b100, 3'b101};}) $fatal(1, "Failed to generate random value.");
+                    end
+                    7'b0100011: begin
+                        // Store
+                        if (!std::randomize(funct3) with {funct3 inside {3'b000, 3'b001, 3'b010};}) $fatal(1, "Failed to generate random value.");
+                    end
+                    7'b1100011: begin
+                        // Branch
+                        if (!std::randomize(funct3) with {funct3 inside {3'b000, 3'b001, 3'b100, 3'b101, 3'b110, 3'b111};}) $fatal(1, "Failed to generate random value.");
+                    end
+                    default: funct3 = 3'b000; // jalr
                 endcase
                 instruction[14:12] = funct3;
+                instruction[19:15] = $urandom_range(2**5-1, 1);
+            end
+
+            // rs2
+            if (instruction[6:0] inside {7'b0110011, 7'b0100011, 7'b1100011}) begin
+                instruction[24:20] = $urandom_range(2**5-1, 1);
+            end
+
+            // funct7
+            if (instruction[6:0] inside {7'b0110011}) begin
+                logic [6:0] funct7;
+                if (!std::randomize(funct7) with {funct7 inside {7'b0000000, 7'b0100000};}) $fatal(1, "Failed to generate random value.");
+                instruction[31:25] = funct7;
             end
 
             #1ns;
