@@ -1,4 +1,4 @@
-package ControlSignals_pkg
+package ControlSignals_pkg;
     typedef enum logic [4:0] {
         // First bit = Separation Arithmetic/Logic and Branch function
 
@@ -25,7 +25,7 @@ package ControlSignals_pkg
         LT      = 5'b10100,
         GE      = 5'b10101,
         LTU     = 5'b10110,
-        GEU     = 5'b10111,
+        GEU     = 5'b10111
     } ALUOp;
     typedef enum logic [2:0] {
         // First bit or the MSB signify if the read is will be signed or unsigned extended
@@ -34,28 +34,28 @@ package ControlSignals_pkg
         MEM_READ_4_BYTES    = 3'b010,
         MEM_READ_1_BYTE     = 3'b100,
         MEM_READ_2_BYTES    = 3'b101,
-        NO_MEM_READ         = 3'b111,
+        NO_MEM_READ         = 3'b111
     } MEMRead;
     typedef enum logic [1:0] {
         MEM_WRITE_1_BYTE,
         MEM_WRITE_2_BYTES,
         MEM_WRITE_4_BYTES,
-        NO_MEM_WRITE,
+        NO_MEM_WRITE
     } MEMWrite;
     typedef enum logic [1:0] {
-        ALU_RESULT,
-        NEXT_ADDRESS,
-        DEVICE_READ_DATA,
+        RDSRC_ALU_RESULT,
+        RDSRC_NEXT_ADDRESS,
+        RDSRC_DEVICE_READ_DATA
     } rdSrc;
     typedef enum logic {
         NO_RD_WRITE,
-        RD_WRITE,
+        RD_WRITE
     } rdWrite;
 
     typedef enum logic[1:0] {
-        NEXT_ADDRESS,
-        JUMP_ADDRESS,
-        JUMP_JALR_ADDRESS
+        PCSRC_NEXT_ADDRESS,
+        PCSRC_JUMP_ADDRESS,
+        PCSRC_JUMP_JALR_ADDRESS
     } PCSrc;
 
     typedef enum logic {

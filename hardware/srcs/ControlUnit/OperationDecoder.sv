@@ -14,8 +14,8 @@ module OperationDecoder
     output logic [1:0]                  jmp_op              = 2'b00,
     output ControlSignals_pkg::MEMRead  mem_read            = NO_MEM_READ,
     output ControlSignals_pkg::MEMWrite mem_write           = NO_MEM_WRITE,
-    output ControlSignals_pkg::rdSrc    rd_src              = ALU_RESULT,
-    output ControlSignals_pkg::rdWrite  rd_write            = NO_RD_WRITE;
+    output ControlSignals_pkg::rdSrc    rd_src              = RDSRC_ALU_RESULT,
+    output ControlSignals_pkg::rdWrite  rd_write            = NO_RD_WRITE
 );
     logic funct7_bit;
     logic special_imm_bit;
@@ -27,24 +27,24 @@ module OperationDecoder
             7'b0110011: begin
                 // R-type Arithmetic and Logic
                 alu_operand = 2'b00;
-                alu_op      = ALUOp'(5'({1'b0, funct7_bit, funct3}));
+                alu_op      = ALUOp'({1'b0, funct7_bit, funct3});
                 jmp_op      = NO_JUMP;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = RD_WRITE;
             end
             7'b0010011: begin
                 // I-type Arithmetic and Logic
                 alu_operand = 2'b10;
                 case (funct3)
-                    3'b101: ALUOp'({1'b0, special_imm_bit, funct3});
+                    3'b101: alu_op = ALUOp'({1'b0, special_imm_bit, funct3});
                     default: alu_op = ALUOp'(5'(funct3));
                 endcase
                 jmp_op      = NO_JUMP;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = RD_WRITE;
             end
             7'b0000011: begin
@@ -54,7 +54,7 @@ module OperationDecoder
                 jmp_op      = NO_JUMP;
                 mem_read    = MEMRead'(funct3);
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = DEVICE_READ_DATA;
+                rd_src      = RDSRC_DEVICE_READ_DATA;
                 rd_write    = RD_WRITE;
             end
             7'b0100011: begin
@@ -64,7 +64,7 @@ module OperationDecoder
                 jmp_op      = NO_JUMP;
                 mem_read    = NO_MEM_READ;
                 mem_write   = MEMWrite'(funct3[1:0]);
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = NO_RD_WRITE;
             end
             7'b1100011: begin
@@ -74,7 +74,7 @@ module OperationDecoder
                 jmp_op      = BRANCH;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = NO_RD_WRITE;
             end
             7'b1101111: begin
@@ -84,7 +84,7 @@ module OperationDecoder
                 jmp_op      = JAL;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = NEXT_ADDRESS;
+                rd_src      = RDSRC_NEXT_ADDRESS;
                 rd_write    = RD_WRITE;
             end
             7'b1100111: begin
@@ -94,7 +94,7 @@ module OperationDecoder
                 jmp_op      = JALR;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = NEXT_ADDRESS;
+                rd_src      = RDSRC_NEXT_ADDRESS;
                 rd_write    = RD_WRITE;
             end
             7'b0110111: begin
@@ -104,7 +104,7 @@ module OperationDecoder
                 jmp_op      = NO_JUMP;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = RD_WRITE;
             end
             7'b0010111: begin
@@ -114,7 +114,7 @@ module OperationDecoder
                 jmp_op      = NO_JUMP;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = RD_WRITE;
             end
             default: begin
@@ -124,7 +124,7 @@ module OperationDecoder
                 jmp_op      = 2'b00;
                 mem_read    = NO_MEM_READ;
                 mem_write   = NO_MEM_WRITE;
-                rd_src      = ALU_RESULT;
+                rd_src      = RDSRC_ALU_RESULT;
                 rd_write    = NO_RD_WRITE;
             end
         endcase

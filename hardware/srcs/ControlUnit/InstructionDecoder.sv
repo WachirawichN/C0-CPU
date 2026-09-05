@@ -6,17 +6,17 @@ module InstructionDecoder
     input logic  [31:0]                         instruction,
 
     output logic [19:0]                         raw_imm_value       = 0,
-    output OtherSignals_pkg::InstructionFormat  instruction_format  = R_TYPE
+    output OtherSignals_pkg::InstructionFormat  instruction_format  = R_TYPE,
     output logic [4:0]                          rs1_address         = 5'b00000,
     output logic [4:0]                          rs2_address         = 5'b00000,
     output logic [4:0]                          rd_address          = 5'b00000,
 
     output logic [6:0]                          opcode              = 7'b0000000,
     output logic [2:0]                          funct3              = 3'b000,
-    output logic [6:0]                          funct7              = 7'b0000000,
+    output logic [6:0]                          funct7              = 7'b0000000
 );
-    assign opcode = instruction[6:0];
     always_comb begin
+        opcode = instruction[6:0];
         case (opcode)
             7'b0110011: begin
                 // R-type
@@ -70,10 +70,10 @@ module InstructionDecoder
                 funct3 = instruction[14:12];
                 funct7 = 7'b0000000;
             end
-            7'b1101111: begin
-                // J-type
-                raw_imm_value = instruction[31:12];
-                instruction_format = J_TYPE;
+            7'b0110111, 7'b0010111: begin
+                // U-type
+                raw_imm_value = {instruction[31], instruction[19:12], instruction[20], instruction[30:21]};
+                instruction_format = U_TYPE;
 
                 rs1_address = 5'b00000;
                 rs2_address = 5'b00000;
@@ -82,10 +82,10 @@ module InstructionDecoder
                 funct3 = 3'b000;
                 funct7 = 7'b0000000;
             end
-            7'b0110111, 7'b0010111: begin
-                // U-type
-                raw_imm_value = {instruction[31], instruction[19:12], instruction[20], instruction[30:21]};
-                instruction_format = U_TYPE;
+            7'b1101111: begin
+                // J-type
+                raw_imm_value = instruction[31:12];
+                instruction_format = J_TYPE;
 
                 rs1_address = 5'b00000;
                 rs2_address = 5'b00000;
