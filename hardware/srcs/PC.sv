@@ -1,8 +1,10 @@
 `timescale 1ns/1ps
 
-module PC (
+module PC
+    import ControlSignals_pkg::PCSrc;
+(
     input logic         rst_n,
-    input logic         pc_src,
+    input PCSrc         pc_src,
     input logic [31:0]  jump_address,
     input logic         clk,
 
@@ -13,7 +15,8 @@ module PC (
             address <= 0;
         end else begin
             case (pc_src)
-                1'b1: address <= jump_address;
+                PCSRC_JUMP_ADDRESS: address <= jump_address;
+                PCSRC_JUMP_JALR_ADDRESS: address <= {jump_address[31:1], 1'b0};
                 default: address <= address + 4;
             endcase
         end

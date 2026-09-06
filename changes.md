@@ -6,7 +6,7 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
     - Status: Unchecked
 3. `MEMWrite` Extended to 2-bits from 1 from the addition of 3 difference write width.
     - Status: Unchecked
-4. `PCSrc` Extended the width from 1-bit to 2-bits, from the addition of the specific `jalr` jump address.
+4. `PCSrc` Extended the width from 1-bit to 2-bits, from the addition of the specific `jalr` jump address. This also make the PC have to go under diagram redrawn as well for mux having new input.
     - Status: Unchecked
 5. `JmpOp` Maintain the same width, but have an additional value from separating the unconditional jump into `jal` and `jalr`.
     - Status: Unchecked
