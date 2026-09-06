@@ -48,15 +48,16 @@ program tb (
     };
 
     initial begin
-        instruction = 'b0;
 
         for (int i = 0; i <  100; i = i + 1) begin
+            // 0 will be use for verifying the immediate value exclusively.
+            instruction = 'b0;
+
             // opcode
             instruction[6:0] = possible_opcodes[$urandom_range($size(possible_opcodes)-1)];
 
             // rd
             if (instruction[6:0] inside {7'b0110011, 7'b0010011, 7'b0000011, 7'b1100111, 7'b0110111, 7'b0010111, 7'b1101111}) begin
-                // 0 will be use for verifying the immediate value exclusively.
                 instruction[11:7] = $urandom_range(2**5-1, 1);
             end
 
@@ -89,7 +90,7 @@ program tb (
             end
 
             // funct7
-            if (instruction[6:0] inside {7'b0110011}) begin
+            if (instruction[6:0] == 7'b0110011) begin
                 logic [6:0] funct7;
                 if (!std::randomize(funct7) with {funct7 inside {7'b0000000, 7'b0100000};}) $fatal(1, "Failed to generate random value.");
                 instruction[31:25] = funct7;
