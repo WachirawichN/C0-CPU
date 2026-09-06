@@ -90,7 +90,9 @@ program tb (
             end
 
             // funct7
-            if (instruction[6:0] == 7'b0110011) begin
+            // R-type before I-type, only 101 of the I-type have funct7 variant
+            if ((instruction[6:0] == 7'b0110011 && instruction[14:12] inside {3'b000, 3'b101}) ||
+                (instruction[6:0] == 7'b0010011 && instruction[14:12] == 3'b101)) begin
                 logic [6:0] funct7;
                 if (!std::randomize(funct7) with {funct7 inside {7'b0000000, 7'b0100000};}) $fatal(1, "Failed to generate random value.");
                 instruction[31:25] = funct7;
