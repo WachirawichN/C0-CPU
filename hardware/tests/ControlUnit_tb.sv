@@ -19,7 +19,7 @@ interface tb_interface;
 endinterface
 
 program tb (
-    output logic [31:0]                             instruction,
+    output logic [31:0]                            instruction,
 
     input logic [19:0]                             imm_field_value,
     input OtherSignals_pkg::InstructionFormat      instruction_format,
