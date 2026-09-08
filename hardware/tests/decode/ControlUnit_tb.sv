@@ -3,7 +3,7 @@
 import ControlSignals_pkg::*;
 import OtherSignals_pkg::*;
 
-interface tb_interface;
+interface ControlUnitTbInterface;
     logic [31:0]                             instruction;
 
     logic [19:0]                             imm_field_value;
@@ -21,7 +21,7 @@ interface tb_interface;
     ControlSignals_pkg::rdWrite              rd_write;
 endinterface
 
-program tb (
+program ControlUnitTbProgram (
     output logic [31:0]                            instruction,
 
     input logic [19:0]                             imm_field_value,
@@ -108,7 +108,7 @@ program tb (
 endprogram
 
 module ControlUnit_tb;
-    tb_interface intf();
+    ControlUnitTbInterface intf();
     ControlUnit dut (
         .instruction(intf.instruction),
         .imm_field_value(intf.imm_field_value),
@@ -124,7 +124,7 @@ module ControlUnit_tb;
         .rd_address(intf.rd_address),
         .rd_write(intf.rd_write)
     );
-    tb test_env (
+    ControlUnitTbProgram test_env (
         .instruction(intf.instruction),
         .imm_field_value(intf.imm_field_value),
         .instruction_format(intf.instruction_format),

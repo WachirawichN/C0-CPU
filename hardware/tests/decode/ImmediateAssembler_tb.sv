@@ -9,7 +9,7 @@ class RandomFormat;
     }
 endclass
 
-program tb (
+program ImmediateAssemblerTbProgram (
     output logic [19:0] imm = 0,
     output InstructionFormat format = I_TYPE,
     input logic [31:0] extended_imm
@@ -70,7 +70,7 @@ module ImmediateAssembler_tb;
         .format(format),
         .extended_imm(extended_imm)
     );
-    tb test_env (
+    ImmediateAssemblerTbProgram test_env (
         .imm(imm),
         .format(format),
         .extended_imm(extended_imm)

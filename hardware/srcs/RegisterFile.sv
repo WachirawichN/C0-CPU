@@ -9,7 +9,7 @@ module RegisterFile
     input logic [4:0] read_address_1,
     input logic [4:0] read_address_2,
     input logic [31:0] write_data,
-    input rdWrite write_enable, 
+    input rdWrite write_enable,
     input logic [4:0] write_address,
 
     output logic [31:0] read_register_1_data,
