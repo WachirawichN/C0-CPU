@@ -10,9 +10,9 @@ module InstructionMemory_tb;
     );
 
     initial begin
-        for (shortint i = 0; i < 10; i = i + 1) begin
-            #1;
-            address = address + 4;
+        repeat (1000) begin
+            #1ns;
+            address = address + 4; 
         end
         $finish;
     end

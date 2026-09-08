@@ -3,15 +3,17 @@
 module RegisterFile
     import ControlSignals_pkg::rdWrite;
 (
-    input logic rst_n;
-    input logic [4:0] read_address_1;
-    input logic [4:0] read_address_2;
-    input logic [31:0] write_data;
-    input rdWrite write_enable; 
-    input logic [4:0] write_address;
+    input logic rst_n,
+    input logic clk,
 
-    output logic [31:0] read_register_1_data;
-    output logic [31:0] read_register_2_data;
+    input logic [4:0] read_address_1,
+    input logic [4:0] read_address_2,
+    input logic [31:0] write_data,
+    input rdWrite write_enable, 
+    input logic [4:0] write_address,
+
+    output logic [31:0] read_register_1_data,
+    output logic [31:0] read_register_2_data
 );
     logic [31:0] register_array [31:0] = '{default: 0};
 

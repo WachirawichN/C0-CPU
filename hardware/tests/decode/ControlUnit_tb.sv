@@ -1,5 +1,8 @@
 `timescale 1ns/1ps
 
+import ControlSignals_pkg::*;
+import OtherSignals_pkg::*;
+
 interface tb_interface;
     logic [31:0]                             instruction;
 
@@ -105,9 +108,6 @@ program tb (
 endprogram
 
 module ControlUnit_tb;
-    import ControlSignals_pkg::*;
-    import OtherSignals_pkg::*;
-
     tb_interface intf();
     ControlUnit dut (
         .instruction(intf.instruction),

@@ -4,35 +4,34 @@ module IDEXInterstageRegisters
     import ControlSignals_pkg::*;
     import OtherSignals_pkg::*;
 (
-    input logic rst_n;
+    input logic rst_n,
+    input logic clk,
 
-    input logic [31:0]  extended_imm;
-    input logic [31:0]  rs2_data;
-    input logic [31:0]  current_address;
-    input logic [31:0]  rs1_data;
-    input logic [1:0]   alu_operand;
-    input ALUOp         alu_op;
-    input JmpOp         jmp_op;
-    input MEMRead       mem_read;
-    input MEMWrite      mem_write;
-    input rdSrc         rd_src;
-    input logic [4:0]   rd_address;
-    input rdWrite       rd_write;
+    input logic [31:0]  extended_imm,
+    input logic [31:0]  rs2_data,
+    input logic [31:0]  current_address,
+    input logic [31:0]  rs1_data,
+    input logic [1:0]   alu_operand,
+    input ALUOp         alu_op,
+    input JmpOp         jmp_op,
+    input MEMRead       mem_read,
+    input MEMWrite      mem_write,
+    input rdSrc         rd_src,
+    input logic [4:0]   rd_address,
+    input rdWrite       rd_write,
 
-    output logic [31:0] extended_imm_registe        = 0;
-    output logic [31:0] rs2_data_register           = 0;
-    output logic [31:0] current_address_register    = 0;
-    output logic [31:0] rs1_data_register           = 0;
-    output logic [1:0]  alu_operand_register        = 0;
-    output ALUOp        alu_op_register             = ADD;
-    output JmpOp        jmp_op_register             = NO_JUMP;
-    output MEMRead      mem_read_register           = NO_MEM_READ;
-    output MEMWrite     mem_write_register          = NO_MEM_WRITE;
-    output rdSrc        rd_src_register             = RDSRC_ALU_RESULT;
-    output logic [4:0]  rd_address_register         = 5'b00000;
-    output rdWrite      rd_write_register           = NO_RD_WRITE;
-
-    input logic clk;
+    output logic [31:0] extended_imm_registe        = 0,
+    output logic [31:0] rs2_data_register           = 0,
+    output logic [31:0] current_address_register    = 0,
+    output logic [31:0] rs1_data_register           = 0,
+    output logic [1:0]  alu_operand_register        = 0,
+    output ALUOp        alu_op_register             = ADD,
+    output JmpOp        jmp_op_register             = NO_JUMP,
+    output MEMRead      mem_read_register           = NO_MEM_READ,
+    output MEMWrite     mem_write_register          = NO_MEM_WRITE,
+    output rdSrc        rd_src_register             = RDSRC_ALU_RESULT,
+    output logic [4:0]  rd_address_register         = 5'b00000,
+    output rdWrite      rd_write_register           = NO_RD_WRITE
 );
     always_ff @(posedge clk or negedge rst_n) begin
         if (rst_n) begin
