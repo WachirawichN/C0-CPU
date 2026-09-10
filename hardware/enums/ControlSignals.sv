@@ -12,7 +12,7 @@ package ControlSignals_pkg;
         SRL     = 4'b0101,
         SRA     = 4'b1101,
         OR      = 4'b0110,
-        AND     = 4'b0111,
+        AND     = 4'b0111
     } ALUOp;
     typedef enum logic [2:0] {
         EQ  = 3'b000,
@@ -48,9 +48,9 @@ package ControlSignals_pkg;
     } rdWrite;
 
     typedef enum logic[1:0] {
-        PCSRC_NEXT_ADDRESS,
-        PCSRC_JUMP_ADDRESS,
-        PCSRC_JUMP_JALR_ADDRESS
+        PCSRC_NEXT_ADDRESS,     // 00
+        PCSRC_JUMP_ADDRESS,     // 01
+        PCSRC_JUMP_JALR_ADDRESS // 10
     } PCSrc;
 
     typedef enum logic {

@@ -26,11 +26,11 @@ module ExecutionUnit
         .operand_1(operand_1),
         .operand_2(operand_2),
         .alu_op(alu_op),
-        .result(alu_result),
+        .result(alu_result)
     );
     JmpHandler jmp_handler (
         .rs1_data(rs1_data),
-        .rs1_data(rs1_data),
+        .rs2_data(rs2_data),
         .com_op(com_op),
         .jmp_op(jmp_op),
         .pc_src(pc_src)
