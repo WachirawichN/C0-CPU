@@ -1,32 +1,27 @@
 package ControlSignals_pkg;
-    typedef enum logic [4:0] {
-        // First bit = Separation Arithmetic/Logic and Branch function
-
+    typedef enum logic [3:0] {
         // Arithmetic/Logic
-        // Second MSB bit signified if the operation is the funct7 variant of the funct3 operation.
+        // MSB bit signified if the operation is the funct7/special imm variant of the funct3 operation.
         // The last three bits signified the operation.
-        ADD     = 5'b00000,
-        SUB     = 5'b01000,
-        SLL     = 5'b00001,
-        SLT     = 5'b00010,
-        SLTU    = 5'b00011,
-        XOR     = 5'b00100,
-        SRL     = 5'b00101,
-        SRA     = 5'b01101,
-        OR      = 5'b00110,
-        AND     = 5'b00111,
-
-        // Branch
-        // The last three bits are the funct3.
-        // The second LSB bit signified the unsigned variant of the operation.
-        // The first and third LSB bits signified the operation.
-        EQ      = 5'b10000,
-        NEQ     = 5'b10001,
-        LT      = 5'b10100,
-        GE      = 5'b10101,
-        LTU     = 5'b10110,
-        GEU     = 5'b10111
+        ADD     = 4'b0000,
+        SUB     = 4'b1000,
+        SLL     = 4'b0001,
+        SLT     = 4'b0010,
+        SLTU    = 4'b0011,
+        XOR     = 4'b0100,
+        SRL     = 4'b0101,
+        SRA     = 4'b1101,
+        OR      = 4'b0110,
+        AND     = 4'b0111,
     } ALUOp;
+    typedef enum logic [2:0] {
+        EQ  = 3'b000,
+        NE  = 3'b001,
+        LT  = 3'b100,
+        GE  = 3'b101,
+        LTU = 3'b110,
+        GEU = 3'b111
+    } ComOp;
     typedef enum logic [2:0] {
         // First bit or the MSB signify if the read is will be signed or unsigned extended
         MEM_READ_1_U_BYTE   = 3'b000,

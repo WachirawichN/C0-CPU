@@ -7,62 +7,21 @@ module ALU
     input logic [31:0] operand_2,
     input ALUOp alu_op,
 
-    output logic [31:0] result = 0,
-    output logic branching_flag = 0
+    output logic [31:0] result = 0
 );
     always_comb begin
-        result = 0;
-        branching_flag = 0;
         case (alu_op)
-            ADD: begin
-               result = operand_1 + operand_2;
-            end
-            SUB: begin
-               result = operand_1 - operand_2;
-            end
-            SLL: begin
-               result = operand_1 << operand_2;
-            end
-            SLT: begin
-               result = $signed(operand_1) < $signed(operand_2);
-            end
-            SLTU: begin
-               result = $unsigned(operand_1) < $unsigned(operand_2);
-            end
-            XOR: begin
-               result = operand_1 ^ operand_2;
-            end
-            SRL: begin
-               result = operand_1 >> operand_2;
-            end
-            SRA: begin
-               result = operand_1 >>> operand_2;
-            end
-            OR: begin
-               result = operand_1 | operand_2;
-            end
-            AND: begin
-               result = operand_1 & operand_2;
-            end
-
-            EQ: begin
-               branching_flag = operand_1 == operand_2;
-            end
-            NEQ: begin
-               branching_flag = operand_1 != operand_2;
-            end
-            LT: begin
-               branching_flag = $signed(operand_1) < $signed(operand_2);
-            end
-            GE: begin
-               branching_flag = $signed(operand_1) > $signed(operand_2);
-            end
-            LTU: begin
-               branching_flag = $unsigned(operand_1) < $unsigned(operand_2);
-            end
-            GEU: begin
-               branching_flag = $unsigned(operand_1) > $unsigned(operand_2);
-            end
+            ADD: result = operand_1 + operand_2;
+            SUB: result = operand_1 - operand_2;
+            SLL: result = operand_1 << operand_2;
+            SLT: result = $signed(operand_1) < $signed(operand_2);
+            SLTU: result = $unsigned(operand_1) < $unsigned(operand_2);
+            XOR: result = operand_1 ^ operand_2;
+            SRL: result = operand_1 >> operand_2;
+            SRA: result = operand_1 >>> operand_2;
+            OR: result = operand_1 | operand_2;
+            AND: result = operand_1 & operand_2;
+            default: result = 0;
         endcase
     end
 endmodule

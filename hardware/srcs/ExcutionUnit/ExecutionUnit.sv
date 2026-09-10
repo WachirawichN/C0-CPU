@@ -10,6 +10,7 @@ module ExecutionUnit
     input logic [31:0] rs1_data,
     input logic [1:0] alu_operand,
     input ALUOp alu_op,
+    input ComOp com_op,
     input JmpOp jmp_op,
 
     output PCSrc pc_src,
@@ -20,17 +21,17 @@ module ExecutionUnit
 
     logic [31:0] operand_1;
     logic [31:0] operand_2;
-    logic branching_flag;
 
     ALU alu (
         .operand_1(operand_1),
         .operand_2(operand_2),
         .alu_op(alu_op),
         .result(alu_result),
-        .branching_flag(branching_flag)
     );
     JmpHandler jmp_handler (
-        .branching_flag(branching_flag),
+        .rs1_data(rs1_data),
+        .rs1_data(rs1_data),
+        .com_op(com_op),
         .jmp_op(jmp_op),
         .pc_src(pc_src)
     );
