@@ -23,15 +23,9 @@ program ImmediateAssemblerTbProgram (
             format = random_format.value;
             case (random_format.value)
                 I_TYPE, S_TYPE, B_TYPE: begin
-                    // logic [11:0] random;
-                    // if (!std::randomize(random)) $fatal(3, "Unable to randomize new target value.");
-                    // imm = {8'b0, random};
                     if (!std::randomize(imm) with {imm inside {[0:2**12-1]};}) $fatal(3, "Unable to randomize new target value.");
                 end
                 U_TYPE, J_TYPE: begin
-                    // logic [19:0] random; 
-                    // if (!std::randomize(random)) $fatal(3, "Unable to randomize new target value.");
-                    // imm = random;
                     if (!std::randomize(imm)) $fatal(3, "Unable to randomize new target value.");
                 end
             endcase

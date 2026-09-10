@@ -11,12 +11,12 @@ module InstructionDecoder
     output logic [4:0]                          rs2_address         = 5'b00000,
     output logic [4:0]                          rd_address          = 5'b00000,
 
-    output logic [6:0]                          opcode              = 7'b0000000,
+    output logic [6:0]                          opcode,
     output logic [2:0]                          funct3              = 3'b000,
     output logic [6:0]                          funct7              = 7'b0000000
 );
+    assign opcode = instruction[6:0];
     always_comb begin
-        opcode = instruction[6:0];
         case (opcode)
             7'b0110011: begin
                 // R-type
@@ -41,10 +41,8 @@ module InstructionDecoder
                 funct3 = instruction[14:12];
                 funct7 = 7'b0000000;
 
-                case (funct3)
-                    3'b001, 3'b101: raw_imm_value = 20'(instruction[24:20]);
-                    default: raw_imm_value = 20'(instruction[31:20]);
-                endcase
+                if (opcode == 7'b0010011 && funct3 inside {3'b001, 3'b101}) raw_imm_value = 20'(instruction[24:20]);
+                else raw_imm_value = 20'(instruction[31:20]);
             end
             7'b0100011: begin
                 // S-type
