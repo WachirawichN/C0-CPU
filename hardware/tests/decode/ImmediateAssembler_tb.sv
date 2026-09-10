@@ -19,7 +19,6 @@ program ImmediateAssemblerTbProgram (
 
     initial begin
         repeat(1000000) begin
-
             assert (random_format.randomize()) else $fatal(2, "Unable to randomize new format type.");
             format = random_format.value;
             case (random_format.value)
