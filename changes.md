@@ -8,7 +8,7 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
     - Status: Unchecked
 4. `PCSrc` Extended the width from 1-bit to 2-bits, from the addition of the specific `jalr` jump address. This also make the PC have to go under diagram redrawn as well for mux having new input.
     - Status: Unchecked
-5. `JmpOp` Maintain the same width, but have an additional value from separating the unconditional jump into `jal` and `jalr`, and one more value from branching using immediate value as an offset to current address.
+5. `JmpOp` extended from 2-bits to 3-bits. This new addition bit makes it easier for computing the `PCSrc` by simply using `add` operation and support the new `jalr` specific signal.
     - Status: Unchecked
 6. Added dedicated comparator to Jmp Handler. Jmp handler will now handle comparison by itself. Moving this comparator to decode stage will be beneficial in long term. The address of successful branching is still ALU's result.
     - Status: Unchecked
