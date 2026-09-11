@@ -18,8 +18,12 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
     - Status: Unchecked
 9. PC's internal mux now have another input for having first 31-bits (MSB) of the jump address as a choice.
     - Status: Unchecked
-
-
+10. Memory (inst, data and peripheral) now use little-endian style (but the internal of the processor still use big-endian).
+    - Status: Unchecked
+11. Address Decoder now handles the conflict behavior from the `MEMRead` and `MEMWrite` trying to interact with the target at the same time. It is more efficient to let the Address Decoder handles this.
+    - Status: Unchecked
+13. Add new Bits Extension Unit for handling signed/unsigned extending for the `MEMRead` operation that doesn't read the full word.
+    - Status: Unchecked
 
 
 
