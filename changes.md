@@ -15,7 +15,9 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
 7. Added `ComOp` Control Signal for controlling that dedicated comparator.
     - Status: Unchecked
 8. ALU will now be purely for math and logic no more comparison.
-    - Status Unchecked
+    - Status: Unchecked
+9. PC's internal mux now have another input for having first 31-bits (MSB) of the jump address as a choice.
+    - Status: Unchecked
 
 
 
