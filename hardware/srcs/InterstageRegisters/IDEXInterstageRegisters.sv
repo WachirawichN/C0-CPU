@@ -34,7 +34,7 @@ module IDEXInterstageRegisters
     output rdWrite      rd_write_register           = NO_RD_WRITE
 );
     always_ff @(posedge clk or negedge rst_n) begin
-        if (rst_n) begin
+        if (!rst_n) begin
             extended_imm_registe        <= 0;
             rs2_data_register           <= 0;
             current_address_register    <= 0;

@@ -29,20 +29,20 @@ module DataMemory
         end
     end
     always_ff @(posedge clk or negedge rst_n) begin
-        if (rst_n) begin
-            memory_block = '{default: 0};
+        if (!rst_n) begin
+            memory_block <= '0;
         end else begin
             case (mem_write)
-                MEM_WRITE_1_BYTE: memory_block[address] = write_data[7:0];
+                MEM_WRITE_1_BYTE: memory_block[address] <= write_data[7:0];
                 MEM_WRITE_2_BYTES: begin
-                    memory_block[address] = write_data[7:0];
-                    memory_block[address + 1] = write_data[15:8];
+                    memory_block[address] <= write_data[7:0];
+                    memory_block[address + 1] <= write_data[15:8];
                 end
                 MEM_WRITE_4_BYTES: begin
-                    memory_block[address] = write_data[7:0];
-                    memory_block[address + 1] = write_data[15:8];
-                    memory_block[address + 2] = write_data[23:16];
-                    memory_block[address + 3] = write_data[31:24];
+                    memory_block[address] <= write_data[7:0];
+                    memory_block[address + 1] <= write_data[15:8];
+                    memory_block[address + 2] <= write_data[23:16];
+                    memory_block[address + 3] <= write_data[31:24];
                 end
             endcase
         end

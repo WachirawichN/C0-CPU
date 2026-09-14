@@ -6,7 +6,7 @@ module AddressDecoder
     input logic [31:0]      address,
     input logic [31:0]      write_data,
     input MEMRead           mem_read,
-    input MEMWrite          mem_write
+    input MEMWrite          mem_write,
 
     output logic [30:0]     data_memory_address     = 0,
     output logic [31:0]     data_memory_write_data  = 0,
@@ -24,7 +24,7 @@ module AddressDecoder
     MEMRead mem_read_validated;
     MEMWrite mem_write_validated;
     assign mem_read_validated = (mem_read != NO_MEM_READ && mem_write != NO_MEM_WRITE) ? NO_MEM_READ : mem_read;
-    assign mem_write_validated = (mem_read != NO_MEM_READ && mem_write != NO_MEM_WRITE) ? NO_MEM_READ : mem_read;
+    assign mem_write_validated = (mem_read != NO_MEM_READ && mem_write != NO_MEM_WRITE) ? NO_MEM_WRITE : mem_write;
 
     always_comb begin
         case (address[31])

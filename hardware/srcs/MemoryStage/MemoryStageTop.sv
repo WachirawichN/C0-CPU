@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 
-module MemoryStageTop (
+module MemoryStageTop
+    import ControlSignals_pkg::*;
+(
     input logic rst_n,
     input logic clk,
 
@@ -9,7 +11,7 @@ module MemoryStageTop (
     input MEMRead       mem_read,
     input MEMWrite      mem_write,
 
-    output logic [31:0] data,
+    output logic [31:0] data
 );
     DeviceDataSrc device_data_src;
     logic [31:0] data_memory_data;
@@ -66,9 +68,9 @@ module MemoryStageTop (
         .data(peripheral_controller_data)
     );
     BitExtender bit_extender (
-        .data(selected_data)
-        .mem_read(mem_read)
-        extended_data(data)
+        .data(selected_data),
+        .mem_read(mem_read),
+        .extended_data(data)
     );
 
     // Mux for choosing data into Bit Extender

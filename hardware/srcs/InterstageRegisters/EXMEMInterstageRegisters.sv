@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module IDEXInterstageRegisters
+module EXMEMInterstageRegisters
     import ControlSignals_pkg::*;
     import OtherSignals_pkg::*;
 (
@@ -28,7 +28,7 @@ module IDEXInterstageRegisters
     output rdWrite      rd_write_register       = NO_RD_WRITE
 );
     always_ff @(posedge clk or negedge rst_n) begin
-        if (rst_n) begin
+        if (!rst_n) begin
             pc_src_register         <= PCSRC_NEXT_ADDRESS;
             alu_result_register     <= 0;
             next_address_register   <= 0;
