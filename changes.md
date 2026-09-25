@@ -30,7 +30,7 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
     - Status: Unchecked
 16. Remove Peripheral Controller. Instead, the Address Decoder generates the chip select signal into peripheral bus.
     - Status: Unchecked
-17. `DeviceDataSrc` Control Signal now separates `PERIPHERAL` into `LCD_CONTROLLER` and `BUTTON_CONTROLLER` due to removal of the Peripheral Controller.
+17. `DeviceDataSrc` Control Signal now separates `PERIPHERAL` into `LCD_CONTROLLER` and `BUTTON_CONTROLLER` due to removal of the Peripheral Controller, and added value for none.
     - Status: Unchecked
 
 

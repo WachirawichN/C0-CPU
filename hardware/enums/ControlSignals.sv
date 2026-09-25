@@ -43,8 +43,8 @@ package ControlSignals_pkg;
         RDSRC_DEVICE_READ_DATA
     } rdSrc;
     typedef enum logic {
-        NO_RD_WRITE,
-        RD_WRITE
+        RD_WRITE,
+        NO_RD_WRITE
     } rdWrite;
 
     typedef enum logic[1:0] {
@@ -55,8 +55,9 @@ package ControlSignals_pkg;
 
     typedef enum logic {
         // Peripheral enum value must match the ID of each peripheral.
-        DATA_MEM,
-        LCD_CONTROLLER,
-        BUTTON_CONTROLLER
+        DEVICE_DATA_SRC_DATA_MEM,
+        DEVICE_DATA_SRC_LCD_CONTROLLER,
+        DEVICE_DATA_SRC_BUTTON_CONTROLLER,
+        DEVICE_DATA_SRC_NONE
     } DeviceDataSrc;
 endpackage

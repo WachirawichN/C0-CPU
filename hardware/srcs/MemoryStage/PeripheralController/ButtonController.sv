@@ -97,23 +97,21 @@ module ButtonController
         // Useful for compenstating the delay of sync stages.
         return (row_idx < 0) ? ROWS - row_idx : row_idx;
     endfunction
-    function logic [COLS-1:0] apply_invert_col_sync();
-        logic [COLS-1:0] inverted_col;
+    function logic apply_invert_col_sync(output logic inverted_col [COLS-1:0]);
         foreach (cols_sync_array[i]) inverted_col[i] = !cols_sync_array[SYNC_STAGES - 1][i];
-        return inverted_col;
     endfunction
     logic raw_input_matrix [ROWS-1:0][COLS-1:0] = '{default: 0};
     always_ff @(posedge peripheral_bus.clk or negedge peripheral_bus.rst_n) begin
         if (!peripheral_bus.rst_n) begin
             raw_input_matrix <= '{default: 0};
         end else begin
-            raw_input_matrix[calculate_row(current_row - SYNC_STAGES)] <= apply_invert_col_sync();
+            apply_invert_col_sync(raw_input_matrix[calculate_row(current_row - SYNC_STAGES)]);
         end
     end
 
 
     // Dividing the clock down to 1000Hz (1ms per cycle)
-    localparam CLOCK_PER_MS = CLOCK_RATE * 0.001;
+    localparam CLOCK_PER_MS = CLOCK_RATE / 1000;
     logic [$clog2(CLOCK_PER_MS)-1:0] clk_counter = 1; // Preventing the first clock cycle to look like the first ms is reached.
     always_ff @(posedge peripheral_bus.clk or negedge peripheral_bus.rst_n) begin
         if (!peripheral_bus.rst_n) begin

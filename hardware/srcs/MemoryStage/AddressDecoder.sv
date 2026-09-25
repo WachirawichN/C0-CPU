@@ -11,7 +11,7 @@ module AddressDecoder
     MemoryBus.master        memory_bus,
     PeripheralBus.master    peripheral_bus,
 
-    output DeviceDataSrc    device_data_src = DATA_MEM
+    output DeviceDataSrc    device_data_src = DEVICE_DATA_SRC_DATA_MEM
 );
     // Behavior of the processor try to read and write at the same time.
     MEMRead mem_read_validated;
@@ -37,6 +37,14 @@ module AddressDecoder
         set_zero_peripheral_bus();
 
         case (address[31])
+            1'b0: begin // Data Memory selected
+                memory_bus.address      = address[30:0];
+                memory_bus.write_data   = write_data;
+                memory_bus.mem_read     = mem_read_validated;
+                memory_bus.mem_write    = mem_write_validated;
+
+                device_data_src         = DEVICE_DATA_SRC_DATA_MEM;
+            end
             1'b1: begin // Peripheral selected
                 peripheral_bus.cs                   = '0;
                 peripheral_bus.cs[address[30:0]]    = 1'b1;
@@ -46,13 +54,8 @@ module AddressDecoder
 
                 device_data_src                     = DeviceDataSrc'(address[30:0]);
             end
-            default: begin // Data Memory selected
-                memory_bus.address      = address[30:0];
-                memory_bus.write_data   = write_data;
-                memory_bus.mem_read     = mem_read_validated;
-                memory_bus.mem_write    = mem_write_validated;
-
-                device_data_src         = DATA_MEM;
+            default: begin // Unknown value
+                device_data_src         = DEVICE_DATA_SRC_NONE;
             end
         endcase
     end
