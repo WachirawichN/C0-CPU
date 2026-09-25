@@ -7,7 +7,7 @@ module InstructionMemory #(
     input logic  [31:0] address,
     output logic [31:0] instruction
 );
-    // In byte, that would be INSTRUCTION_COUNTS * 4, which typically is 262KB.
+    // In byte, that would be INSTRUCTION_COUNTS * 4(bytes), which typically is 262KB.
     logic [7:0] memory_block [INSTRUCTION_COUNTS * 4 - 1:0] = '{default: 0};
 
     // Read a program from a file with the name of PROGRAM_NAME using base 16.

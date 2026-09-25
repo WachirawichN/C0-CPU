@@ -2,20 +2,12 @@
 
 module LCDController
     import ControlSignals_pkg::*;
-(
-    input logic         rst_n,
-    input logic         clk,
-
-    input logic         enable,
-    input logic [31:0]  write_data,
-    input MEMRead       mem_read,
-    input MEMWrite      mem_write,
-
-    output logic [31:0] data = 0, // Just a place holder. I will not read from the LCD to prevent 5V LCD and 3.3V FPGA incident.
-
-    output logic [7:0]  out_data,
-    output logic        rs,
-    output logic        e
+#(
+    parameter           CS_ADDRESS = 1
+) (
+    PeripheralBus.slave peripheral_bus,
+    LCDBus.master lcd_bus,
+    output logic [31:0] lcd_read_data = 0 // Just a place holder. I will not read from the LCD to prevent 5V LCD and 3.3V FPGA incident.
 );
     // The most barebone form it could be.
     // The write_data contains both data, rs and e signal for the LCD.
@@ -33,29 +25,29 @@ module LCDController
     // Originally, I've planned this to fully controls the working of LCD, but I've a lot of fun driving the LCD without I2C
     // or any libraries. So, barebone it is.
     
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            out_data <= 0;
-            rs <= 0;
-            e <= 0;
+    always_ff @(posedge peripheral_bus.clk or negedge peripheral_bus.rst_n) begin
+        if (!peripheral_bus.rst_n) begin
+            lcd_bus.write_data <= 0;
+            lcd_bus.rs <= 0;
+            lcd_bus.e <= 0;
         end else begin
-            if (enable && mem_write != NO_MEM_WRITE) begin    
-                case (mem_write)
+            if (peripheral_bus.cs[CS_ADDRESS] && peripheral_bus.mem_write != NO_MEM_WRITE) begin    
+                case (peripheral_bus.mem_write)
                     MEM_WRITE_1_BYTE: begin
-                        out_data <= unsigned'(write_data[3:0]);
-                        rs <= write_data[4];
-                        e <= write_data[5];
+                        lcd_bus.write_data <= unsigned'(peripheral_bus.write_data[3:0]);
+                        lcd_bus.rs <= peripheral_bus.write_data[4];
+                        lcd_bus.e <= peripheral_bus.write_data[5];
                     end
                     MEM_WRITE_2_BYTES, MEM_READ_4_BYTES: begin
-                        out_data <= write_data[7:0];
-                        rs <= write_data[8];
-                        e <= write_data[9];
+                        lcd_bus.write_data <= peripheral_bus.write_data[7:0];
+                        lcd_bus.rs <= peripheral_bus.write_data[8];
+                        lcd_bus.e <= peripheral_bus.write_data[9];
                     end
                 endcase
             end else begin
-                out_data <= 0;
-                rs <= 0;
-                e <= 0;
+                lcd_bus.write_data <= 0;
+                lcd_bus.rs <= 0;
+                lcd_bus.e <= 0;
             end
         end
     end

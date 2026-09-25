@@ -24,7 +24,14 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
     - Status: Unchecked
 13. Add new Bits Extension Unit for handling signed/unsigned extending for the `MEMRead` operation that doesn't read the full word.
     - Status: Unchecked
-
+14. Add new 2 units for peripheral controller for controlling LCD and Buttons.
+    - Status: Unchecked
+15. Separate the bus type used for communication between memory and peripheral due to memory bus need to contain address, while the peripheral bus use chip select signal instead.
+    - Status: Unchecked
+16. Remove Peripheral Controller. Instead, the Address Decoder generates the chip select signal into peripheral bus.
+    - Status: Unchecked
+17. `DeviceDataSrc` Control Signal now separates `PERIPHERAL` into `LCD_CONTROLLER` and `BUTTON_CONTROLLER` due to removal of the Peripheral Controller.
+    - Status: Unchecked
 
 
 High chance of having to re-evaluate most of the unit (probably all for safety lol).

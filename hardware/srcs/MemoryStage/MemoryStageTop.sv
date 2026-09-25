@@ -11,21 +11,24 @@ module MemoryStageTop
     input MEMRead       mem_read,
     input MEMWrite      mem_write,
 
-    output logic [31:0] data
+    output logic [31:0] read_data
 );
     DeviceDataSrc device_data_src;
     logic [31:0] data_memory_data;
-    logic [31:0] peripheral_controller_data;
+    logic [31:0] lcd_read_data;
+    logic [31:0] button_read_data;
     logic [31:0] selected_data;
 
-    interface AddressDecodedBus;
-        logic [30:0]    address;
-        logic [31:0]    write_data;
-        MEMRead         mem_read;
-        MEMWrite        mem_write;
-    endinterface
-    AddressDecodedBus data_memory_bus ();
-    AddressDecodedBus peripheral_controller_bus ();
+    MemoryBus memory_bus(
+        .clk(clk),
+        .rst_n(rst_n)
+    );
+    PeripheralBus peripheral_bus(
+        .clk(clk),
+        .rst_n(rst_n)
+    );
+    LCDBus lcd_bus;
+    ButtonBus button_bus;
 
     AddressDecoder address_decoder (
         .address(address),
@@ -33,51 +36,42 @@ module MemoryStageTop
         .mem_read(mem_read),
         .mem_write(mem_write),
 
-        .data_memory_address(data_memory_bus.address),
-        .data_memory_write_data(data_memory_bus.write_data),
-        .data_memory_mem_read(data_memory_bus.mem_read),
-        .data_memory_mem_write(data_memory_bus.mem_write),
-
-        .peripheral_address(peripheral_controller_bus.address),
-        .peripheral_write_data(peripheral_controller_bus.write_data),
-        .peripheral_mem_read(peripheral_controller_bus.mem_read),
-        .peripheral_mem_write(peripheral_controller_bus.mem_write),
+        .memory_bus(memory_bus.master),
+        .peripheral_bus(peripheral_bus.master),
 
         .device_data_src(device_data_src)
     );
+
+    // Devices
     DataMemory data_memory (
-        .rst_n(rst_n),
-        .clk(clk),
-
-        .address(data_memory_bus.address),
-        .write_data(data_memory_bus.write_data),
-        .mem_read(data_memory_bus.mem_read),
-        .mem_write(data_memory_bus.mem_write),
-
-        .data(data_memory_data)
+        .bus(memory_bus.slave),
+        .memory_read_data(data_memory_data)
     );
-    PeripheralController peripheral_controller (
-        .rst_n(rst_n),
-        .clk(clk),
-
-        .address(peripheral_controller_bus.address),
-        .write_data(peripheral_controller_bus.write_data),
-        .mem_read(peripheral_controller_bus.mem_read),
-        .mem_write(peripheral_controller_bus.mem_write),
-
-        .data(peripheral_controller_data)
+    LCDController lcd_controller (
+        .bus(peripheral_bus.slave),
+        .lcd_bus(lcd_bus.master),
+        .lcd_read_data(lcd_read_data)
     );
+    ButtonController button_controller (
+        .peripheral_bus(peripheral_bus.slave),
+        .button_bus(button_bus.master),
+        .button_read_data(button_read_data)
+    );
+
+
     BitExtender bit_extender (
         .data(selected_data),
         .mem_read(mem_read),
-        .extended_data(data)
+        .extended_data(read_data)
     );
 
     // Mux for choosing data into Bit Extender
     always @(device_data_src) begin
         case (device_data_src)
-            PERIPHERAL: selected_data = peripheral_controller_data;
-            default: selected_data = data_memory_data;
+            DATA_MEM: selected_data = data_memory_data;
+            LCD_CONTROLLER: selected_data = lcd_read_data;
+            BUTTON_CONTROLLER: selected_data = button_read_data;
+            default: selected_data = '0;
         endcase
     end
 

@@ -23,7 +23,7 @@ package ControlSignals_pkg;
         GEU = 3'b111
     } ComOp;
     typedef enum logic [2:0] {
-        // First bit or the MSB signify if the read is will be signed or unsigned extended
+        // First bit or the MSB signify if the read is will be signed or unsigned extended.
         MEM_READ_1_U_BYTE   = 3'b000,
         MEM_READ_2_U_BYTES  = 3'b001,
         MEM_READ_4_BYTES    = 3'b010,
@@ -54,7 +54,9 @@ package ControlSignals_pkg;
     } PCSrc;
 
     typedef enum logic {
+        // Peripheral enum value must match the ID of each peripheral.
         DATA_MEM,
-        PERIPHERAL
+        LCD_CONTROLLER,
+        BUTTON_CONTROLLER
     } DeviceDataSrc;
 endpackage
