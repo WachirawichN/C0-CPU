@@ -37,9 +37,9 @@ List for storing the changes made mid-way when writing the FPGA code. All the di
 18. Major changes to MEM and WB stage due to BRAM implementation on Data Memory Controller, which cause the read operation have a delay of 1 clock cycle. Read operation mux and bit extender for that data are now moved to WB to accommodate for the delay of the Data Memory Controller. Result of read operation from LCD, button matrix, `DeviceDataSrc` and `ReadOp` are now part of MEM/WB interstage register.
     - Status: Unchecked
 19. `BGE` and `BGEU` is greater or equal, not just greater. bruh
-    - Status: Unchecked
+    - Status: Checked
 20. `SLL`, `SRL` and `SRA` only use the lower 5-bits of the second operand.
-    - Status: Unchecked
+    - Status: Checked
 
 
 High chance of having to re-evaluate most of the unit (probably all for safety lol).

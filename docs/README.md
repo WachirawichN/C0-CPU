@@ -1,15 +1,21 @@
 # Architecture
-This section will be about the ISA, which C0 is based on. Essentially, what the CPU does.<br>
-
-C0's ISA is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions.<br>
-This architecture is more of a CPU understanding foundation for me rather than a fully functional CPU. So, I've decided to cut out most modern processor features and design techniques, resulting in only 37 instructions from rv32i's 40 unique instructions (replace `FENCE` and `SYSTEM` instruction group with `NOP`).<br>
+This section will be about the ISA, which C0 is based on. Essentially, what the CPU could do.<br>
+C0's ISA is based on RISC-V ISA, specifically [rv32i](https://docs.riscv.org/reference/isa/unpriv/rv32.html) with no extensions or custom instructions, but with a few modifications of how the CPU handles stuff (more on [Microarchitecture Section](#microarchitecture)), and some instructions are removed (`FENCE` group and `ECALL`/`EBREAK`).<br>
+So, it isn't quite ready for modern operating system like what RISC-V said for this CPU. It is intended for bare-metal testing only, but you could try running operating system on it. No one is stopping you.<br>
 
 ## Registers
-C0 have the same registers as the rv32i specification. In the rv32i, there are 32 registers, first one is constant zero register, and the other 31 are general purpose.<br>
-The following section utilizes [RISC-V ABI document](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html) to determine the purpose for each register when programming the CPU, but feel free to read the following section if you're curious to.<br>
+In the rv32i, there are 32 32-bits registers, first one is constant zero register, and the other 31 are general purpose. For modern CPU, there would be hundred of physical registers serving purpose of those 32 registers,
+but for C0, there would be only 32 physical registers, which directly ties to each register specify in rv32i document.<br>
 
 > [!NOTE]
-> ABI is like a standard convention on how to write code for RISC-V CPU specified by RISC-V.
+> Physical register is a register that actually exist in the hardware, which will be used by the CPU to serve a specific purpose under the process of register renaming.<br>
+> I don't want to get into register renaming yet, so here is the [link for more information](https://en.wikipedia.org/wiki/Register_renaming).<br>
+
+### Register Purpose
+rv32i did specify that 31 registers of those 32 are general purpose, but in the [RISC-V ABI document](https://docs.riscv.org/reference/abi/riscv-cc-register-convention.html), each register is assigned to one specific purpose which are the following.<br>
+
+> [!NOTE]
+> ABI is like a standard convention on how to write code for RISC-V CPU specified by RISC-V.<br>
 
 | Register  | ABI Mnemonic  | Description                               | Saved by  |
 |-----------|---------------|-------------------------------------------|-----------|
@@ -24,29 +30,32 @@ The following section utilizes [RISC-V ABI document](https://docs.riscv.org/refe
 | x10 - x17 | a0 - a7       | Argument registers                        | Caller    |
 | x18 - x27 | s2 - s11      | Callee-saved registers                    | Callee    |
 | x28 - x31 | t3 - t6       | Temporaries registers                     | Caller    |
+The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets).<br>
 
-The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets). <br>
-
-### Register types
-1. Constant Zero Register
-    - This type of register have it value always set to 0. This might sound useless, but this register enabled the functionality of `NOP` psuedoinstruction, which add 0 to 0 into register 0.
+1. Constant Zero register
+    - This register have it value always set to 0. This might sound useless, but this register enabled the functionality of `NOP` psuedoinstruction, which add 0 to 0 into register 0. Or, `mv` instruction.
 2. Return Address Register
-    - This register hold the value of address to jump to after finish executing current function.
+    - This register hold the value of the address to jump to after finish executing current function.
 3. Stack Pointer Register
     - This register points to the very top of the stack.
+    - Stack in RISC-V grow down from the top by 16 address each time it was push.
 4. Global Pointer Register
-    - Global pointer points to the middle of all global variables live. The reason for pointing to the middle is so that there is no need to store full 32-bits address, instead it can access specific variable with a little bit of offset to global pointer.
+    - Global pointer points to the middle of where all global variables live. The reason for pointing to the middle is so that there is no need to store full 32-bits address, instead it can access specific variable with a little bit of offset to global pointer.
 5. Thread Pointer Register
     - Thread pointer points to current thread's thread-local storage. This register act as that pointer.
+    - I don't see use for this register in C0, so might as well use it for what ever you want.
 6. Frame Pointer Register
-    - This register points to a specific place inside the stack. It always points to the very bottom of current function's frame.
+    - This register points to the top of current function's frame inside the stack.
+    - The frame pointer changes when the program goes into new function.
+    - This register could be used as another Callee-Saved Register instead.
 7. Temporary Register
-    - These register is free to use for anything, the only catch to these registers is that caller must save data from these registers to somewhere before calling a function.
+    - These register is free to use for anything, the only catch to these registers is that caller must save data from these registers to somewhere before calling a function, or the data might be overwritten by the function it is calling.
 8. Callee-Saved Register
-    - This is similar to Temporary Register, but as the name imply, callee is now responsible for saving and restoring the original data on these register before jumping back to the parent function that called this function.
+    - This is similar to Temporary Register, but as the name imply, the callee (the function that is getting called) is now responsible for saving and restoring the original data on these register before jumping back to the parent function that called this function.
 9. Argument Register
     - Argument Registers are used to pass function arguments, but sometimes, these registers are also used to pass return values from a function back to it caller.
-### Saved by types
+    - If there is more than 8 arguments, then the extra arguments will be passed by the stack instead. The same apply to the return values.
+#### Saved by types
 `Saved by` column referred to which part of the code is responsible for storing data from those register to somewhere else (usually the stack) before calling a function.<br>
 1. Saved by Caller
     - This means the code that called a function is responsible for storing data from registers before calling a function.
@@ -55,33 +64,30 @@ The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/
 
 ## Instruction Formats
 There are a total of 6 instruction formats specified by RISC-V, the table below contains all those formats.<br>
-
-> [!NOTE]
-> If you're new to CPU architecture (just like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it needs to jump to, etc...
-
 ![Instruction formats](./imgs/architecture/instruction_formats.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
 
-The following are the full name of each format.
-- R-type: Register / Register
-- I-type: Immediate
-- S-type: Store
-- B-type: Branch
-- U-type: Upper immediate
-- J-type: Jump
+> [!NOTE]
+> If you're new to CPU architecture (like me), instruction formats tell the CPU about where to find the operand, value it needs to use, what address it needs to jump to, etc...
 
-### Opcode field
-`opcode` field is use determine the instruction group or whether the instruction is immediate or not, while the `funct3` and `funct7` are used to determine the specific function inside the group.<br>
+### Opcode and funct3/7 field
+`opcode` field is used to determine the instruction group of current instruction. This field can also be used to determine the format of the instruction.<br>
+Some `opcode` maybe directly tie to an instruction, but for most, `funct3` (some with `funct7`) must be used to determine the exact instruction.
+
+In the [I-Type form of Arithmetic and Logic instruction group](#i-type), some instruction may use `imm` field as `funct7` instead.
 
 ### Register field
-`rs1` and `rs2` (source) is the register where the operand are located, while `rd` (destination) are used to specify the register where the output of that instruction will be saved to.<br>
+There are two type of the register field. One is for specifying the source register for computer, and the other for destination register where result of the instruction will be save into.
+`rs1` and `rs2` are the source register, while `rd` is the destination register.
 
 ### Immediate field
-For the `imm` field, value from this field is used directly for computation instead of value from a register. In the table, the `imm` is always followed by [...], this is to indicate the position in the final value that will be used by the processor.
+For the `imm` field, value from this field is used directly for computation instead of value from a register.<br>
+In the instruction format table, the `imm` is always followed by [...:...], this is to indicate each immediate field bit's position in the final 32-bits value that will be used by the processor.
 After all the bits are in their position, the processor will automatically sign-extended the immediate value into 32-bits value.<br>
+
 Some format with some instruction might do something before extending to 32-bits, like B-type which add 0 to the end before extending. This type of stuff will be explained in the next section of some instruction group.<br>
 
-The table below shows how the processor position each immediate bit. imm[11] of I-type in the table is as the same as in the instruction format above, this also apply to all other imm[...]<br>
+The table below shows how the processor position each immediate field bit.
 <table>
   <tr>
     <th rowspan="2">Instruction Format</th>
@@ -169,48 +175,73 @@ The table below shows how the processor position each immediate bit. imm[11] of 
 </table>
 
 > [!NOTE]
-> By the way, when programming on RISC-V, the assembler should handle the bit positioning for you, so don't worry about this stuff too much.
+> When programming on RISC-V, the assembler/compiler should handle the bit positioning for you, so don't worry about this stuff too much.
 
-For example, let's say there is a B-type instruction, with this as their immediate field<br>
-| 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | ... | ... | 8 | 9 | 0 | a | b | ... |
-|---|---|---|---|---|---|---|-----|-----|-----|---|---|---|---|---|-----|
+Suppose we have this B-type instruction, with this as their immediate field<br>
+<table>
+  <tr>
+    <th colspan="7">imm[12|10:5]</th>
+    <th colspan="1">rs2</th>
+    <th colspan="1">rs1</th>
+    <th colspan="1">funct3</th>
+    <th colspan="5">imm[4:1|11]</th>
+    <th colspan="1">opcode</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>4</td>
+    <td>5</td>
+    <td>6</td>
+    <td>7</td>
+    <td>?</td>
+    <td>?</td>
+    <td>?</td>
+    <td>8</td>
+    <td>9</td>
+    <td>0</td>
+    <td>a</td>
+    <td>b</td>
+    <td>?</td>
+  </tr>
+</table>
 
-(`1` and `0` in this situation really means it in binary in this situation, but other value can be anything that is `1` or `0`. I just want to make it easier to identify each bit.)<br>
+`1` and `0` in this situation really means `1` and `0` in binary, but other value can be anything that is `1` or `0`. I just want to make it easier to identify each bit.<br>
 
 The product of swapping each bit to its correspond position would be `1b234567890a`.<br>
 Next, because this is B-type format, 0 would be added to the back, resulting in `1b234567890a0` as a product.<br>
 Finally, the sign will be extended to 32-bits, the final value will be `11111111111111111111b234567890a0`, because this is sign-extended the remainings 19-bits would be 1.<br>
 
 ## Instruction Groups
-C0 instructions are grouped into multiple groups sorted by their function. This section will be going over all of them.<br>
-Some groups may have multiple forms of the same instruction depend on the instruction format, or may have multiple subgroup that do completely difference thing with difference instruction format. But all in all, the `opcode` would be different, even though they belong to the same group<br>
 ### Arithmetic and Logic
+#### R-type
+The `opcode` for these instructions is `0110011`<br>
+| `funct7`  | `funct3`  | mnemonic  | operation                                 | description                                           |
+|-----------|-----------|-----------|-------------------------------------------|-------------------------------------------------------|
+| 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                        | add `rs2` to `rs1`                                    |
+| 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                        | subtract `rs2` from `rs1`                             |
+| -         | 001       | SLL       | rd = `rs1` << `rs2` [4:0]                 | logical shift `rs1` left by `rs2` (lower 5-bits)      |
+| -         | 010       | SLT       | rd = `rs1` < `rs2` (signed)               | is `rs1` less than `rs2` (compare signed version)     |
+| -         | 011       | SLTU      | rd = `rs1` < `rs2` (unsigned)             | is `rs1` less than `rs2` (compare unsigned version)   |
+| -         | 100       | XOR       | rd = `rs1` ^ `rs2`                        | bitwise xor                                           |
+| 0000000   | 101       | SRL       | rd = `rs1` >> `rs2` [4:0] (logical)       | logical shift `rs1` right by `rs2` (lower 5-bits)     |
+| 0100000   | 101       | SRA       | rd = `rs1` >>> `rs2` [4:0] (arithmetic)   | arithmetic shift `rs1` right by `rs2` (lower 5-bits)  |
+| -         | 110       | OR        | rd = `rs1` \| `rs2`                       | bitwise or                                            |
+| -         | 111       | AND       | rd = `rs1` & `rs2`                        | bitwise and                                           |
+
 > [!NOTE]
 > The difference between logical and arithmetic shift is that arithmetic will shift, while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
-#### R-type
-The `opcode` for these instructions would be `0110011`<br>
-| `funct7`  | `funct3`  | mnemonic  | operation                         | description                                           |
-|-----------|-----------|-----------|-----------------------------------|-------------------------------------------------------|
-| 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                | add `rs2` to `rs1`                                    |
-| 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                | subtract `rs2` from `rs1`                             |
-| -         | 001       | SLL       | rd = `rs1` << `rs2`               | logical shift `rs1` left by `rs2`                     |
-| -         | 010       | SLT       | rd = `rs1` < `rs2` (signed)       | is `rs1` less than `rs2` (compare signed version)     |
-| -         | 011       | SLTU      | rd = `rs1` < `rs2` (unsigned)     | is `rs1` less than `rs2` (compare unsigned version)   |
-| -         | 100       | XOR       | rd = `rs1` ^ `rs2`                | bitwise xor                                           |
-| 0000000   | 101       | SRL       | rd = `rs1` >> `rs2` (logical)     | logical shift `rs1` right by `rs2`                    |
-| 0100000   | 101       | SRA       | rd = `rs1` >>> `rs2` (arithmetic) | arithmetic shift `rs1` right by `rs2`                 |
-| -         | 110       | OR        | rd = `rs1` \| `rs2`               | bitwise or                                            |
-| -         | 111       | AND       | rd = `rs1` & `rs2`                | bitwise and                                           |
 #### I-type
-The `opcode` for these instructions would be `0010011`<br>
+The `opcode` for these instructions is `0010011`<br>
 
-For SLLI, SRLI and SRAI, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
+For `SLLI`, `SRLI` and `SRAI`, the encoding of the I-type format is a little bit different from the normal I-type. The image below is how the "special" I-type format are encoded.<br>
 ![Special I-type format](./imgs/architecture/special_i-type_format.png)<br>
 Image taken from [RISC-V specification document](https://docs.riscv.org/reference/isa/_attachments/riscv-unprivileged.pdf).<br>
-I love to think that immediate field ranging from bit 31 down to bit 25 in the special format are used like `funct7` field, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
+I love to think that immediate field ranging from bit 31 down to bit 25 in the special format instruction are used like `funct7` field for some instructions, while bit 20 up to bit 24 are use as normal immediate field for shifting values.<br>
 
-In the table below, there would be either "imm" or "shamt" as a second operand.
-"imm" implys that the instruction use full 12-bits immediate value as the second operand, while "shamt" means that the processor use only last 5-bits from the immediate value of the "special" I-type format as the second operand.<br>
+In the table below, there would be either `imm` or `shamt` as a second operand.
+`imm` implies that the instruction use the full 32-bits extended of the 12-bits immediate value as the second operand, while `shamt` means that the processor use only the last 5-bits from the immediate value (bit 20 to bit 24) of the "special" I-type format as the second operand.<br>
 
 | `funct7` (bit 31 - 25)| `funct3`  | mnemonic  | operation                         | description                                       |
 |-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
@@ -226,9 +257,8 @@ In the table below, there would be either "imm" or "shamt" as a second operand.
 
 ### Load and Store
 #### Load (I-type)
-For these operations, they're used for loading some amount of bits from memory to `rd`.<br>
-The effective address of that memory is calculated by adding value from `rs1` to immediate field that have been sign-extended, giving it an ability to offset ±2K addresses from `rs1`.<br>
-
+For these operations, they're used for loading some amount of bits from memory or any peripheral to `rd`.<br>
+The effective address of the target is calculated by adding value from `rs1` to immediate field that have been sign-extended, giving it an ability to offset ±2K addresses from `rs1`.<br>
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
 
 `opcode` for these instructions would be `0000011`.<br>
@@ -239,30 +269,33 @@ For specific amount of bits that would be loaded, there will be a column for tha
 | 010       | LW        | 32        | -                                       |
 | 100       | LBU       | 8         | loaded data is zero extended to 32-bits |
 | 101       | LHU       | 16        | loaded data is zero extended to 32-bits |
+
+> [!NOTE]
+> I'll be using MMIO for C0. This make all the memory and peripheral live on the same address space making all devices accessible by the load and store operation.
 #### Store (S-type)
-For store group, these instructions copy the last ... bits (specify in `store size` column) from `rs2` to memory.<br>
-The effective address of the memory for these instructions use the same way of calculating as the load group, also giving it an ability to offset the address from `rs1` for ±2K addresses. The immediate field of S-type format mights be a bit wonky to look at, but it is the same as 12-bits field of I-type format, just placing differently.<br>
+For store group, these instructions copy the last few bits (specify in store size column) from `rs2` to memory.<br>
+The effective address of the target for these instructions use the same way of calculating as the load group, also giving it an ability to offset the address from `rs1` by ±2K addresses. The immediate field of S-type format mights be a bit wonky to look at, but it is the same as 12-bits field of I-type format, just placing differently.<br>
 
 `opcode` for these instructions would be `0100011`.<br>
-| `funct3`  | mnemonic  | store size |
-|-----------|-----------|-----------|
-| 000       | SB        | 8         |
-| 001       | SH        | 16        |
-| 010       | SW        | 32        |
+| `funct3`  | mnemonic  | store size (bits) |
+|-----------|-----------|-------------------|
+| 000       | SB        | 8                 |
+| 001       | SH        | 16                |
+| 010       | SW        | 32                |
 ### Jump
-#### Conditional Jump (Branch, B-type)
-This group of instructions will add specific number to the program counter of the processor to jump to new instruction address, when a condition of instruction is met. Effectively, an if-else instruction.<br>
-Number of offset that would be added to program counter is within the range of ±4KiB. This offset is encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
+#### Branch / Conditional Jump (B-type)
+This group of instructions will add specific number to the program counter of the processor to jump to new instruction address when a condition of instruction is met. Effectively, an if-else instruction.<br>
+Number of offset that would be added to program counter is within the range of ±4KiB encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
 The `opcode` for this instruction group would be `1100011`.<br>
-| `funct3`  | mnemonic  | description                                               |
-|-----------|-----------|-----------------------------------------------------------|
-| 000       | BEQ       | branch if `rs1` and `rs2` are equal                       |
-| 001       | BNE       | branch if `rs1` and `rs2` are not equal                   |
-| 100       | BLT       | branch if `rs1` is less than `rs2` (signed version)       |
-| 101       | BGE       | branch if `rs1` is greater than `rs2` (signed version)    |
-| 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)     |
-| 111       | BGEU      | branch if `rs1` is greater than `rs2` (unsigned version)  |
+| `funct3`  | mnemonic  | description                                                           |
+|-----------|-----------|-----------------------------------------------------------------------|
+| 000       | BEQ       | branch if `rs1` and `rs2` are equal                                   |
+| 001       | BNE       | branch if `rs1` and `rs2` are not equal                               |
+| 100       | BLT       | branch if `rs1` is less than `rs2` (signed version)                   |
+| 101       | BGE       | branch if `rs1` is greater than or equal to `rs2` (signed version)    |
+| 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)                 |
+| 111       | BGEU      | branch if `rs1` is greater than or equal to `rs2` (unsigned version)  |
 #### Unconditional Jump
 This type of jump will also add specific number to the program counter, to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
 This group of instructions contains two instructions, both use difference `opcode` and instruction format. They are listed down below.
