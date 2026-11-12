@@ -17,22 +17,83 @@ rv32i did specify that 31 registers of those 32 are general purpose, but in the 
 > [!NOTE]
 > ABI is like a standard convention on how to write code for RISC-V CPU specified by RISC-V.<br>
 
-| Register  | ABI Mnemonic  | Description                               | Saved by  |
-|-----------|---------------|-------------------------------------------|-----------|
-| x0        | zero          | Constant zero                             | na        |
-| x1        | ra            | Return address                            | Caller    |
-| x2        | sp            | Stack pointer                             | Callee    |
-| x3        | gp            | Global pointer                            | na        |
-| x4        | tp            | Thread pointer                            | na        |
-| x5 - x7   | t0 - t2       | Temporaries registers                     | Caller    |
-| x8        | s0 / fp       | Callee-saved registers / Frame Pointer    | Callee    |
-| x9        | s1            | Callee-saved register                     | Callee    |
-| x10 - x17 | a0 - a7       | Argument registers                        | Caller    |
-| x18 - x27 | s2 - s11      | Callee-saved registers                    | Callee    |
-| x28 - x31 | t3 - t6       | Temporaries registers                     | Caller    |
+<table>
+    <tr>
+        <th colspan="1">Register</th>
+        <th colspan="1">ABI Mnemonic</th>
+        <th colspan="1">Description</th>
+        <th colspan="1">Saved by</th>
+    </tr>
+    <tr>
+        <td>x0</td>
+        <td>zero</td>
+        <td>Constant Zero</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td>x1</td>
+        <td>ra</td>
+        <td>Return Address</td>
+        <td>Caller</td>
+    </tr>
+    <tr>
+        <td>x2</td>
+        <td>sp</td>
+        <td>Stack Pointer</td>
+        <td>Callee</td>
+    </tr>
+    <tr>
+        <td>x3</td>
+        <td>gp</td>
+        <td>Global Pointer</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td>x4</td>
+        <td>tp</td>
+        <td>Thread Pointer</td>
+        <td>N/A</td>
+    </tr>
+    <tr>
+        <td>x5 - x7</td>
+        <td>t0 - t2</td>
+        <td>Temporary Register</td>
+        <td>Caller</td>
+    </tr>
+    <tr>
+        <td>x8</td>
+        <td>s0 / fp</td>
+        <td>Callee-Saved Register / Frame Pointer</td>
+        <td>Callee</td>
+    </tr>
+    <tr>
+        <td>x9</td>
+        <td>s1</td>
+        <td>Callee-Saved Register</td>
+        <td>Callee</td>
+    </tr>
+    <tr>
+        <td>x10 - x17</td>
+        <td>a0 - a7</td>
+        <td>Argument Register</td>
+        <td>Caller</td>
+    </tr>
+    <tr>
+        <td>x18 - x27</td>
+        <td>s2 - s11</td>
+        <td>Callee-Saved Register</td>
+        <td>Callee</td>
+    </tr>
+    <tr>
+        <td>x28 - x31</td>
+        <td>t3 - t6</td>
+        <td>Temporary Register</td>
+        <td>Caller</td>
+    </tr>
+</table>
 The `Saved by` column have been taken from [Wikipedia](https://en.wikipedia.org/wiki/RISC-V#Register_sets).<br>
 
-1. Constant Zero register
+1. Constant Zero Register
     - This register have it value always set to 0. This might sound useless, but this register enabled the functionality of `NOP` psuedoinstruction, which add 0 to 0 into register 0. Or, `mv` instruction.
 2. Return Address Register
     - This register hold the value of the address to jump to after finish executing current function.
@@ -89,89 +150,89 @@ Some format with some instruction might do something before extending to 32-bits
 
 The table below shows how the processor position each immediate field bit.
 <table>
-  <tr>
-    <th rowspan="2">Instruction Format</th>
-    <th colspan="32">Bit no.</th>
-  </tr>
-  <tr>
-    <th>31</th>
-    <th>30</th>
-    <th>29</th>
-    <th>28</th>
-    <th>27</th>
-    <th>26</th>
-    <th>25</th>
-    <th>24</th>
-    <th>23</th>
-    <th>22</th>
-    <th>21</th>
-    <th>20</th>
-    <th>19</th>
-    <th>18</th>
-    <th>17</th>
-    <th>16</th>
-    <th>15</th>
-    <th>14</th>
-    <th>13</th>
-    <th>12</th>
-    <th>11</th>
-    <th>10</th>
-    <th>9</th>
-    <th>8</th>
-    <th>7</th>
-    <th>6</th>
-    <th>5</th>
-    <th>4</th>
-    <th>3</th>
-    <th>2</th>
-    <th>1</th>
-    <th>0</th>
-  </tr>
-  <tr>
-    <td>I-type</td>
-    <td colspan="20">Signed-extended into 32-bits</td>
-    <td colspan="12">imm[11:0]</td>
-  </tr>
-  <tr>
-    <td>S-type</td>
-    <td colspan="20">Signed-extended into 32-bits</td>
-    <td colspan="7">imm[11:5]</td>
-    <td colspan="5">imm[4:0]</td>
-  </tr>
-  <tr>
-    <td>B-type</td>
-    <td colspan="19">Signed-extended into 32-bits</td>
-    <td>imm[12]</td>
-    <td>imm[11]</td>
-    <td colspan="6">imm[10:5]</td>
-    <td colspan="4">imm[4:1]</td>
-    <td>0</td>
-  </tr>
-  <tr>
-    <td>U-type</td>
-    <td colspan="20">imm[31:12]</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-    <td>0</td>
-  </tr>
-  <tr>
-    <td>J-type</td>
-    <td colspan="11">Signed-extended into 32-bits</td>
-    <td>imm[20]</td>
-    <td colspan="8">imm[19:12]</td>
-    <td>imm[11]</td>
-    <td colspan="10">imm[10:1]</td>
-    <td>0</td>
-  </tr>
+    <tr>
+        <th rowspan="2">Instruction Format</th>
+        <th colspan="32">Bit no.</th>
+    </tr>
+    <tr>
+        <th>31</th>
+        <th>30</th>
+        <th>29</th>
+        <th>28</th>
+        <th>27</th>
+        <th>26</th>
+        <th>25</th>
+        <th>24</th>
+        <th>23</th>
+        <th>22</th>
+        <th>21</th>
+        <th>20</th>
+        <th>19</th>
+        <th>18</th>
+        <th>17</th>
+        <th>16</th>
+        <th>15</th>
+        <th>14</th>
+        <th>13</th>
+        <th>12</th>
+        <th>11</th>
+        <th>10</th>
+        <th>9</th>
+        <th>8</th>
+        <th>7</th>
+        <th>6</th>
+        <th>5</th>
+        <th>4</th>
+        <th>3</th>
+        <th>2</th>
+        <th>1</th>
+        <th>0</th>
+    </tr>
+    <tr>
+        <td>I-type</td>
+        <td colspan="20">Signed-extended into 32-bits</td>
+        <td colspan="12">imm[11:0]</td>
+    </tr>
+    <tr>
+        <td>S-type</td>
+        <td colspan="20">Signed-extended into 32-bits</td>
+        <td colspan="7">imm[11:5]</td>
+        <td colspan="5">imm[4:0]</td>
+    </tr>
+    <tr>
+        <td>B-type</td>
+        <td colspan="19">Signed-extended into 32-bits</td>
+        <td>imm[12]</td>
+        <td>imm[11]</td>
+        <td colspan="6">imm[10:5]</td>
+        <td colspan="4">imm[4:1]</td>
+        <td>0</td>
+    </tr>
+    <tr>
+        <td>U-type</td>
+        <td colspan="20">imm[31:12]</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+    </tr>
+    <tr>
+        <td>J-type</td>
+        <td colspan="11">Signed-extended into 32-bits</td>
+        <td>imm[20]</td>
+        <td colspan="8">imm[19:12]</td>
+        <td>imm[11]</td>
+        <td colspan="10">imm[10:1]</td>
+        <td>0</td>
+    </tr>
 </table>
 
 > [!NOTE]
@@ -179,32 +240,32 @@ The table below shows how the processor position each immediate field bit.
 
 Suppose we have this B-type instruction, with this as their immediate field<br>
 <table>
-  <tr>
-    <th colspan="7">imm[12|10:5]</th>
-    <th colspan="1">rs2</th>
-    <th colspan="1">rs1</th>
-    <th colspan="1">funct3</th>
-    <th colspan="5">imm[4:1|11]</th>
-    <th colspan="1">opcode</th>
-  </tr>
-  <tr>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>6</td>
-    <td>7</td>
-    <td>?</td>
-    <td>?</td>
-    <td>?</td>
-    <td>8</td>
-    <td>9</td>
-    <td>0</td>
-    <td>a</td>
-    <td>b</td>
-    <td>?</td>
-  </tr>
+    <tr>
+        <th colspan="7">imm[12|10:5]</th>
+        <th colspan="1">rs2</th>
+        <th colspan="1">rs1</th>
+        <th colspan="1">funct3</th>
+        <th colspan="5">imm[4:1|11]</th>
+        <th colspan="1">opcode</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>?</td>
+        <td>?</td>
+        <td>?</td>
+        <td>8</td>
+        <td>9</td>
+        <td>0</td>
+        <td>a</td>
+        <td>b</td>
+        <td>?</td>
+    </tr>
 </table>
 
 `1` and `0` in this situation really means `1` and `0` in binary, but other value can be anything that is `1` or `0`. I just want to make it easier to identify each bit.<br>
@@ -217,21 +278,88 @@ Finally, the sign will be extended to 32-bits, the final value will be `11111111
 ### Arithmetic and Logic
 #### R-type
 The `opcode` for these instructions is `0110011`<br>
-| `funct7`  | `funct3`  | mnemonic  | operation                                 | description                                           |
-|-----------|-----------|-----------|-------------------------------------------|-------------------------------------------------------|
-| 0000000   | 000       | ADD       | rd = `rs1` + `rs2`                        | add `rs2` to `rs1`                                    |
-| 0100000   | 000       | SUB       | rd = `rs1` - `rs2`                        | subtract `rs2` from `rs1`                             |
-| -         | 001       | SLL       | rd = `rs1` << `rs2` [4:0]                 | logical shift `rs1` left by `rs2` (lower 5-bits)      |
-| -         | 010       | SLT       | rd = `rs1` < `rs2` (signed)               | is `rs1` less than `rs2` (compare signed version)     |
-| -         | 011       | SLTU      | rd = `rs1` < `rs2` (unsigned)             | is `rs1` less than `rs2` (compare unsigned version)   |
-| -         | 100       | XOR       | rd = `rs1` ^ `rs2`                        | bitwise xor                                           |
-| 0000000   | 101       | SRL       | rd = `rs1` >> `rs2` [4:0] (logical)       | logical shift `rs1` right by `rs2` (lower 5-bits)     |
-| 0100000   | 101       | SRA       | rd = `rs1` >>> `rs2` [4:0] (arithmetic)   | arithmetic shift `rs1` right by `rs2` (lower 5-bits)  |
-| -         | 110       | OR        | rd = `rs1` \| `rs2`                       | bitwise or                                            |
-| -         | 111       | AND       | rd = `rs1` & `rs2`                        | bitwise and                                           |
+<table>
+    <tr>
+        <th colspan="1">funct7</th>
+        <th colspan="1">funct3</th>
+        <th colspan="1">Mnemonic</th>
+        <th colspan="1">Operation</th>
+        <th colspan="1">Description</th>
+    </tr>
+    <tr>
+        <td>0000000</td>
+        <td>000</td>
+        <td>ADD</td>
+        <td>rd = rs1 + rs2</td>
+        <td>Add rs2 to rs1</td>
+    </tr>
+    <tr>
+        <td>0100000</td>
+        <td>000</td>
+        <td>SUB</td>
+        <td>rd = rs1 - rs2</td>
+        <td>Subtract rs2 from rs1</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>001</td>
+        <td>SLL</td>
+        <td>rd = rs1 << rs2</td>
+        <td>Left shift the rs1 by the lower 5-bits of rs2</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>010</td>
+        <td>SLT</td>
+        <td>rd = rs1 < rs2</td>
+        <td>Is rs1 less than rs2 (signed version)</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>011</td>
+        <td>SLTU</td>
+        <td>rd = rs1 < rs2 (unsigned)</td>
+        <td>Is rs1 less than rs2 (unsigned version)</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>100</td>
+        <td>XOR</td>
+        <td>rd = rs1 ^ rs2</td>
+        <td>rs1 bitwise xor with rs2</td>
+    </tr>
+    <tr>
+        <td>0000000</td>
+        <td>101</td>
+        <td>SRL</td>
+        <td>rd = rs1 >> rs2</td>
+        <td>Logical right shift the rs1 by the lower 5-bits of rs2</td>
+    </tr>
+    <tr>
+        <td>0100000</td>
+        <td>101</td>
+        <td>SRA</td>
+        <td>rd = rs1 >>> rs2</td>
+        <td>Arithmetic right shift the rs1 by the lower 5-bits of rs2</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>110</td>
+        <td>OR</td>
+        <td>rd = rs1 | rs2</td>
+        <td>rs1 bitwise or with rs2</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>111</td>
+        <td>AND</td>
+        <td>rd = rs1 & rs2</td>
+        <td>rs1 bitwise and with rs2</td>
+    </tr>
+</table>
 
 > [!NOTE]
-> The difference between logical and arithmetic shift is that arithmetic will shift, while preserving the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
+> The difference between logical and arithmetic shift is that arithmetic will preserve the signed status, essentially just a true divided by 2^n instead of just divided by 2^n without caring about being signed or not.
 #### I-type
 The `opcode` for these instructions is `0010011`<br>
 
@@ -243,17 +371,78 @@ I love to think that immediate field ranging from bit 31 down to bit 25 in the s
 In the table below, there would be either `imm` or `shamt` as a second operand.
 `imm` implies that the instruction use the full 32-bits extended of the 12-bits immediate value as the second operand, while `shamt` means that the processor use only the last 5-bits from the immediate value (bit 20 to bit 24) of the "special" I-type format as the second operand.<br>
 
-| `funct7` (bit 31 - 25)| `funct3`  | mnemonic  | operation                         | description                                       |
-|-----------------------|-----------|-----------|-----------------------------------|---------------------------------------------------|
-| -                     | 000       | ADDI      | rd = `rs1` + imm                  | add imm to `rs1`                                  |
-| 0000000               | 001       | SLLI      | rd = `rs1` << shamt               | logical shift `rs1` left by shamt                 |
-| -                     | 010       | SLTI      | rd = `rs1` < imm (signed)         | is `rs1` less than imm (compare signed version)   |
-| -                     | 011       | SLTUI     | rd = `rs1` < imm (unsigned)       | is `rs1` less than imm (compare unsigned version) |
-| -                     | 100       | XORI      | rd = `rs1` ^ imm                  | bitwise xor                                       |
-| 0000000               | 101       | SRLI      | rd = `rs1` >> shamt (logical)     | logical shift `rs1` right by shamt                |
-| 0100000               | 101       | SRAI      | rd = `rs1` >>> shamt (arithmetic) | arithmetic shift `rs1` right by shamt             |
-| -                     | 110       | ORI       | rd = `rs1` \| imm                 | bitwise or                                        |
-| -                     | 111       | ANDI      | rd = `rs1` & imm                  | bitwise and                                       |
+<table>
+    <tr>
+        <th colspan="1">funct7 (bit 31 - bit 25)</th>
+        <th colspan="1">funct3</th>
+        <th colspan="1">Mnemonic</th>
+        <th colspan="1">Operation</th>
+        <th colspan="1">Description</th>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>000</td>
+        <td>ADDI</td>
+        <td>rd = rs1 + imm</td>
+        <td>Add imm to rs1</td>
+    </tr>
+    <tr>
+        <td>0000000</td>
+        <td>001</td>
+        <td>SLLI</td>
+        <td>rd = rs1 << shamt</td>
+        <td>Left shift the rs1 by shamt amount</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>010</td>
+        <td>SLTI</td>
+        <td>rd = rs1 < imm</td>
+        <td>Is rs1 less than imm (signed version)</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>011</td>
+        <td>SLTUI</td>
+        <td>rd = rs1 < imm (unsigned)</td>
+        <td>Is rs1 less than imm (unsigned version)</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>100</td>
+        <td>XORI</td>
+        <td>rd = rs1 ^ imm</td>
+        <td>rs1 bitwise xor with imm</td>
+    </tr>
+    <tr>
+        <td>0000000</td>
+        <td>101</td>
+        <td>SRLI</td>
+        <td>rd = rs1 >> shamt</td>
+        <td>Logical right shift the rs1 by shamt amount</td>
+    </tr>
+    <tr>
+        <td>0100000</td>
+        <td>101</td>
+        <td>SRAI</td>
+        <td>rd = rs1 >>> shamt</td>
+        <td>Arithmetic right shift the rs1 by shamt amount</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>110</td>
+        <td>ORI</td>
+        <td>rd = rs1 | imm</td>
+        <td>rs1 bitwise or with imm</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>111</td>
+        <td>ANDI</td>
+        <td>rd = rs1 & imm</td>
+        <td>rs1 bitwise and with imm</td>
+    </tr>
+</table>
 
 ### Load and Store
 #### Load (I-type)
@@ -262,6 +451,46 @@ The effective address of the target is calculated by adding value from `rs1` to 
 For specific amount of bits that would be loaded, there will be a column for that in the table below called `load size` column.<br>
 
 `opcode` for these instructions would be `0000011`.<br>
+
+<table>
+    <tr>
+        <th colspan="1">funct3</th>
+        <th colspan="1">Mnemonic</th>
+        <th colspan="1">Load Size</th>
+        <th colspan="1">Note</th>
+    </tr>
+    <tr>
+        <td>000</td>
+        <td>ADDI</td>
+        <td>rd = rs1 + imm</td>
+        <td>Add imm to rs1</td>
+    </tr>
+    <tr>
+        <td>001</td>
+        <td>SLLI</td>
+        <td>rd = rs1 << shamt</td>
+        <td>Left shift the rs1 by shamt amount</td>
+    </tr>
+    <tr>
+        <td>010</td>
+        <td>SLTI</td>
+        <td>rd = rs1 < imm</td>
+        <td>Is rs1 less than imm (signed version)</td>
+    </tr>
+    <tr>
+        <td>100</td>
+        <td>SLTUI</td>
+        <td>rd = rs1 < imm (unsigned)</td>
+        <td>Is rs1 less than imm (unsigned version)</td>
+    </tr>
+    <tr>
+        <td>101</td>
+        <td>XORI</td>
+        <td>rd = rs1 ^ imm</td>
+        <td>rs1 bitwise xor with imm</td>
+    </tr>
+</table>
+
 | `funct3`  | mnemonic  | load size | note                                    |
 |-----------|-----------|-----------|-----------------------------------------|
 | 000       | LB        | 8         | loaded data is sign-extended to 32-bits |
@@ -339,127 +568,127 @@ Instruction pipeline is a technique use to increase execution speed of a process
 
 Two tables below is the comparison between processor that didn't implement instruction pipeline and one that did.<br>
 <table>
-  <tr>
-    <th rowspan="2">Instruction</th>
-    <th colspan="15">Clock cycle no.</th>
-  </tr>
-  <tr>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-    <th>8</th>
-    <th>9</th>
-    <th>10</th>
-    <th>11</th>
-    <th>12</th>
-    <th>13</th>
-    <th>14</th>
-    <th>15</th>
-  </tr>
-  <tr>
-    <td>Instruction 1</td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Instruction 2</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Instruction 3</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-  </tr>
+    <tr>
+        <th rowspan="2">Instruction</th>
+        <th colspan="15">Clock cycle no.</th>
+    </tr>
+    <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+        <th>7</th>
+        <th>8</th>
+        <th>9</th>
+        <th>10</th>
+        <th>11</th>
+        <th>12</th>
+        <th>13</th>
+        <th>14</th>
+        <th>15</th>
+    </tr>
+    <tr>
+        <td>Instruction 1</td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Instruction 2</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Instruction 3</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+    </tr>
 </table>
 Processor that didn't implement instruction pipeline.<br>
 <table>
-  <tr>
-    <th rowspan="2">Instruction</th>
-    <th colspan="7">Clock cycle no.</th>
-  </tr>
-  <tr>
-    <th>1</th>
-    <th>2</th>
-    <th>3</th>
-    <th>4</th>
-    <th>5</th>
-    <th>6</th>
-    <th>7</th>
-  </tr>
-  <tr>
-    <td>Instruction 1</td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Instruction 2</td>
-    <td></td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Instruction 3</td>
-    <td></td>
-    <td></td>
-    <td>IF</td>
-    <td>ID</td>
-    <td>EX</td>
-    <td>MEM</td>
-    <td>WB</td>
-  </tr>
+    <tr>
+        <th rowspan="2">Instruction</th>
+        <th colspan="7">Clock cycle no.</th>
+    </tr>
+    <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+        <th>7</th>
+    </tr>
+    <tr>
+        <td>Instruction 1</td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Instruction 2</td>
+        <td></td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Instruction 3</td>
+        <td></td>
+        <td></td>
+        <td>IF</td>
+        <td>ID</td>
+        <td>EX</td>
+        <td>MEM</td>
+        <td>WB</td>
+    </tr>
 </table>
 Processor that did implement instruction pipeline.<br>
 
