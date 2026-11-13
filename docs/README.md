@@ -566,17 +566,18 @@ The `opcode` for this instruction group would be `1100011`.<br>
 </table>
 
 #### Unconditional Jump
-This type of jump will also add specific number to the program counter, to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
+This type of jump will also add specific number to the program counter to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
 This group of instructions contains two instructions, both use difference `opcode` and instruction format. They are listed down below.
 ##### JAL (J-type)
 This instruction use J-type instruction format. Like the B-type instruction format, 0 is also added to the end of the immediate value and signed-extended.<br>
-This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also saves next instruction address (current + 4 bytes) to any register specify in `rd`, but following ABI specification this should be x1 or return address register, or you can use x0 which is constant zero register if you want to discard the address.<br>
+This immediate value is use as an offset to jump to from current address by adding the offset to the program counter. The range for the offset is ±1MiB. This instruction also saves next instruction address (current + 4 bytes) to any register specify in `rd`, but following ABI specification this should be x1 or the ra register, or you can use x0 which is constant zero register if you want to discard the address.<br>
 `opcode` for `JAL` instruction is `1101111`.<br>
 ##### JALR (I-type)
-`JALR` is I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0 (not 0 added to the back). The program counter is then set to this value. The x1 register is also used by the instruction to save the next instruction address (current + 4 bytes), just like `JAL`.<br>
+`JALR` is an I-type instruction format instead of J-type, and instead of using an offset to jump to specific instruction address, this instruction use fixed address obtain by adding the value from the immediate field that have been sign-extended to 32-bits to value from `rs1`, then the last bit's value will be set to 0 (not 0 added to the back). The program counter is then set to this value. `rd` is also used by this instruction to save the next instruction address (current + 4 bytes), just like `JAL`.<br>
 `opcode` for `JALR` instruction is `1100111`, and it uses I-type instruction format.
+
 ### Upper Immediate
-This group contains two instructions just like Unconditional Jump group. Job of this group's instructions is to load upper 20-bits of immediate value to target register.<br>
+This group also contains two instructions. Job of this group's instructions is to load the upper 20-bits of immediate value to target register.<br>
 This instruction group use U-type format, but there are two difference opcodes for each of the instruction.<br>
 #### LUI
 `LUI` loads first 20-bits then left shift those 20-bits into 32-bits into `rd`. When shifting, zero will be added to the right.<br>
