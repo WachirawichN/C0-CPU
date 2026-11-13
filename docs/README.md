@@ -456,48 +456,40 @@ For specific amount of bits that would be loaded, there will be a column for tha
     <tr>
         <th colspan="1">funct3</th>
         <th colspan="1">Mnemonic</th>
-        <th colspan="1">Load Size</th>
-        <th colspan="1">Note</th>
+        <th colspan="1">Load Size (bits)</th>
+        <th colspan="1">Extend Mode</th>
     </tr>
     <tr>
         <td>000</td>
-        <td>ADDI</td>
-        <td>rd = rs1 + imm</td>
-        <td>Add imm to rs1</td>
+        <td>LB</td>
+        <td>8</td>
+        <td>Sign-Extended</td>
     </tr>
     <tr>
         <td>001</td>
-        <td>SLLI</td>
-        <td>rd = rs1 << shamt</td>
-        <td>Left shift the rs1 by shamt amount</td>
+        <td>LH</td>
+        <td>16</td>
+        <td>Sign-Extended</td>
     </tr>
     <tr>
         <td>010</td>
-        <td>SLTI</td>
-        <td>rd = rs1 < imm</td>
-        <td>Is rs1 less than imm (signed version)</td>
+        <td>LW</td>
+        <td>32</td>
+        <td>-</td>
     </tr>
     <tr>
         <td>100</td>
-        <td>SLTUI</td>
-        <td>rd = rs1 < imm (unsigned)</td>
-        <td>Is rs1 less than imm (unsigned version)</td>
+        <td>LBU</td>
+        <td>8</td>
+        <td>Zero-Extended</td>
     </tr>
     <tr>
         <td>101</td>
-        <td>XORI</td>
-        <td>rd = rs1 ^ imm</td>
-        <td>rs1 bitwise xor with imm</td>
+        <td>LHU</td>
+        <td>16</td>
+        <td>Zero-Extended</td>
     </tr>
 </table>
-
-| `funct3`  | mnemonic  | load size | note                                    |
-|-----------|-----------|-----------|-----------------------------------------|
-| 000       | LB        | 8         | loaded data is sign-extended to 32-bits |
-| 001       | LH        | 16        | loaded data is sign-extended to 32-bits |
-| 010       | LW        | 32        | -                                       |
-| 100       | LBU       | 8         | loaded data is zero extended to 32-bits |
-| 101       | LHU       | 16        | loaded data is zero extended to 32-bits |
 
 > [!NOTE]
 > I'll be using MMIO for C0. This make all the memory and peripheral live on the same address space making all devices accessible by the load and store operation.
@@ -506,25 +498,73 @@ For store group, these instructions copy the last few bits (specify in store siz
 The effective address of the target for these instructions use the same way of calculating as the load group, also giving it an ability to offset the address from `rs1` by ±2K addresses. The immediate field of S-type format mights be a bit wonky to look at, but it is the same as 12-bits field of I-type format, just placing differently.<br>
 
 `opcode` for these instructions would be `0100011`.<br>
-| `funct3`  | mnemonic  | store size (bits) |
-|-----------|-----------|-------------------|
-| 000       | SB        | 8                 |
-| 001       | SH        | 16                |
-| 010       | SW        | 32                |
+<table>
+    <tr>
+        <th colspan="1">funct3</th>
+        <th colspan="1">Mnemonic</th>
+        <th colspan="1">Store Size (bits)</th>
+    </tr>
+    <tr>
+        <td>000</td>
+        <td>SB</td>
+        <td>8</td>
+    </tr>
+    <tr>
+        <td>001</td>
+        <td>SH</td>
+        <td>16</td>
+    </tr>
+    <tr>
+        <td>010</td>
+        <td>SW</td>
+        <td>32</td>
+    </tr>
+</table>
+
 ### Jump
 #### Branch / Conditional Jump (B-type)
 This group of instructions will add specific number to the program counter of the processor to jump to new instruction address when a condition of instruction is met. Effectively, an if-else instruction.<br>
 Number of offset that would be added to program counter is within the range of ±4KiB encoded in the 12-bits immediate field of B-type format. The reason for the 12-bits field to have a range of ±4KiB is that the immediate field will be left shift then sign-extended to 32-bits. This satisfied RISC-V's requirement for the offset to be multiples of 2.<br>
 
 The `opcode` for this instruction group would be `1100011`.<br>
-| `funct3`  | mnemonic  | description                                                           |
-|-----------|-----------|-----------------------------------------------------------------------|
-| 000       | BEQ       | branch if `rs1` and `rs2` are equal                                   |
-| 001       | BNE       | branch if `rs1` and `rs2` are not equal                               |
-| 100       | BLT       | branch if `rs1` is less than `rs2` (signed version)                   |
-| 101       | BGE       | branch if `rs1` is greater than or equal to `rs2` (signed version)    |
-| 110       | BLTU      | branch if `rs1` is less than `rs2` (unsigned version)                 |
-| 111       | BGEU      | branch if `rs1` is greater than or equal to `rs2` (unsigned version)  |
+<table>
+    <tr>
+        <th colspan="1">funct3</th>
+        <th colspan="1">Mnemonic</th>
+        <th colspan="1">Description</th>
+    </tr>
+    <tr>
+        <td>000</td>
+        <td>BEQ</td>
+        <td>Branch if rs1 and rs2 are equal</td>
+    </tr>
+    <tr>
+        <td>001</td>
+        <td>BNE</td>
+        <td>Branch if rs1 and rs2 are not equal</td>
+    </tr>
+    <tr>
+        <td>100</td>
+        <td>BLT</td>
+        <td>Branch if rs1 is less than rs2</td>
+    </tr>
+    <tr>
+        <td>101</td>
+        <td>BGE</td>
+        <td>Branch if rs1 is greater than or equal to rs2</td>
+    </tr>
+    <tr>
+        <td>110</td>
+        <td>BLTU</td>
+        <td>Branch if rs1 is less than rs2 (unsigned)</td>
+    </tr>
+    <tr>
+        <td>111</td>
+        <td>BGEU</td>
+        <td>Branch if rs1 is greater than or equal to rs2 (unsigned)</td>
+    </tr>
+</table>
+
 #### Unconditional Jump
 This type of jump will also add specific number to the program counter, to jump to specific instruction. But, this type of jump will always occur, there is no check if a condition is met. This is use for something like returning from a function.<br>
 This group of instructions contains two instructions, both use difference `opcode` and instruction format. They are listed down below.
