@@ -775,7 +775,7 @@ Some of the register at the end of some stage is not really a register but a wir
 In the diagram, each stage is separated by a green dotted line.<br>
 
 ### Fetch Stage (IF)
-![Fetch Stage Diagram](./imgs/microarchitecture/stages/fetch_stage.png)<br>
+<!-- ![Fetch Stage Diagram](./imgs/microarchitecture/stages/fetch_stage.png)<br> -->
 There are two jobs for this stage. One is keeping track of current instruction's address and choosing the next address, and the second job is to fetch an instruction using the current address.<br>
 
 There is no register for this stage due to all the components being synchronous read.<br>
@@ -947,7 +947,7 @@ Yeah, there is a flag for GNU Toolchain to compile to big endian, but little end
 <b>This memory is not accessible by the System Bus meaning that any initialized data inside a program is not accessible by the processor</b>.<br>
 
 ### Decode Stage (ID)
-![Decode Stage Diagram](./imgs/microarchitecture/stages/decode_stage.png)<br>
+<!-- ![Decode Stage Diagram](./imgs/microarchitecture/stages/decode_stage.png)<br> -->
 This stage is all about preparing all the required data for processing in the further stages.<br>
 
 #### Control Unit
@@ -993,14 +993,14 @@ On the same clock cycle, if both read and write operation target the same regist
 Inside this stage's registers block, there are register for Control Signals from Control Unit and extended immediate value. The data from Register File are already a synchronous read.<br>
 
 ### Execute Stage (EX)
-![Execute Stage Diagram](./imgs/microarchitecture/stages/execute_stage.png)<br>
+<!-- ![Execute Stage Diagram](./imgs/microarchitecture/stages/execute_stage.png)<br> -->
 All the math and logic stuffs happen in this stage.<br>
 
 #### Execution Unit
-![Execution Unit Diagram](./imgs/microarchitecture/components/eu.png)<br>
+![Execution Unit Diagram](./imgs/microarchitecture/components/microarchitecture-EU.drawio.png)<br>
 The Execution Unit is the sole unit for this stage. It does three things simultaneously. First, it computes the address for next instruction. Second, it does ALU's usual stuff. Third, it handles jumping logic for both conditional and unconditional jumping.<br>
 
-![Jmp Handler Diagram](./imgs/microarchitecture/components/jmp_handler.png)<br>
+![Jmp Handler Diagram](./imgs/microarchitecture/components/microarchitecture-Jmp_Handler.drawio.png)<br>
 Jmp Handler (it used to be a typo, but I think it's cool, so I kept the typo version.) handle any jumping logic and give out the result as a Control Signal for controlling the PC.<br>
 In the final Control Signal, there are three possible values for the `PCSrc` Control Signal, which are next address, jump address and `JALR` jump address, the last two are jump difference form of ALU's result. And, if you look at the possible value for `JmpOp` signal, you might notice that value of `PCSrc` is `JmpOp` + the result of logic condition (for branch operation), which could only be `1` or `0`, and extract out the only first two MSB bits. This is all what Jmp Handler does, compare, add, extract.<br>
 
@@ -1010,27 +1010,33 @@ In the final Control Signal, there are three possible values for the `PCSrc` Con
 After all that, all result from this stage must go through stage's registers block due to all the component being combinational logic.<br>
 
 ### Memory Stage (MEM)
-![Memory Stage Diagram](./imgs/microarchitecture/stages/memory_stage.png)<br>
+<!-- ![Memory Stage Diagram](./imgs/microarchitecture/stages/memory_stage.png)<br> -->
 This stage of pipeline is specifically for interaction with any memory or peripheral connected to the CPU.<br>
 When you think about it, any peripheral could be either write to or read from just like a memory device there is no special instruction for specific device, which is why C0 use MMIO. MMIO is a trick where every memory device addresses and peripheral addresses are assigned under the same memory space, making everything accessible by the CPU under the same address space under the same set of instructions.<br>
 
 #### System Bus
-![System Bus Diagram](./imgs/microarchitecture/components/system_bus.png)<br>
+![System Bus Diagram](./imgs/microarchitecture/components/microarchitecture-System_Bus.drawio.png)<br>
 System Bus is where all the controller of each device lives on. It makes all devices connected to it accessible by the processor.<br>
 
+##### Address Decoder
 Address Decoder is the first thing to occur in the System Bus.<br>
 The first thing it does is checking if `WriteOp` and `ReadOp` is conflicting with each other to prevent the same instruction trying to both read and write to the same device, which should be impossible to do. If there is a conflict, the Address Decoder will set the output of itself for those signals to no read and no write. Otherwise, it will let the input signals pass through to the output directly. The validated `ReadOp` Control Signals is also pass through outside of System Bus also for [Write Back Stage](#write-back-stage-wb).<br>
 The second thing it does is finding the device that correspond to the address it received. The first few MSB bit is what Address Decoder use to determine the target device, while the remaining is used for selecting those devices internal address like Data Memory's address. After finding out what the device is, the Address Decoder generates a device enable for enabling that device and disable the other. It also generates Control Signal for telling the other part CPU which device have been read from. This signal is called `DeviceDataSrc`.<br>
 
+##### Data Memory Controller
 ![Data Memory Controller Diagram](./imgs/microarchitecture/components/microarchitecture-Data_Mem_Controller.drawio.png)<br>
-Data Memory is the only memory device that is accessible by the System Bus (Instruction Memory can only be access by the PC, with it data being instruction only). It is byte addressable and have a structure similar to Instruction Memory. 4 Blocks of memory each hold one byte per address, with each block correspond to address mod by n just like Instruction Memory. The only difference between the two is Data Memory could be written to. It uses a mask for write enable for each block of memory. If the bit of a mask at specific index match block index then that memory block will be written to at that clock cycle.<br>
+Similar to Instruction Memory, the Data Memory is also constructed from 4 byte addressable memory blocks, but the blocks are writable.<br>
+There is also a major difference in the Controller part of the memory. Due to being writable, the Controller must now also handle write enable signals (WE), and the position of each byte that will be written into the block itself. The process is similar to the data combining part with written byte amount being one of the factor.<br>
+For being writable, when the processor reset, the memory must be reset also. But, the BRAM doesn't have built in reset input, and being only able to access one byte at a time meaning that there must be a logic for controlling the reset sequence of the BRAM. The reset could only be triggered by having `rst_n` input pulling down low on the next rising clock edge. This will force the controller logic to not accept any input no matter if it was a read or write request. The controller will reset the memory blocks by writing 0 into the same address of all 4 memory blocks. This will repeat until all address of the memory block is reached.<br>
 
+##### LCD Controller
 LCD Controller is a controller for LCD device (1602 and 2004 with no I2C). Even though there is a "Controller" inside its name, the only thing it does is wire the write data to an output register that have been wired to the outside world. The signal timing must be controls by the program.<br>
 In 1 byte write instruction, for LCD Controller the only possible mode is 4-bits mode instead of full 8-bits mode, and it will assume that the LCD is already in 4-bits mode. The last 4 LSB bits of write data will go into d0 - d3 pins, and fifth and sixth bit will be rs and e signal respectively.<br>
 In 2 or 4 bytes write instruction, the controller will assume that the LCD is already set to 8-bits mode. The last 1 byte of write data will go directly to d0 - d7 of the LCD, and ninth and tenth bit will be rs and e signal respectively.<br>
 If the LCD Controller is selected, but the validated `WriteOp` is unknown then the output register will be reset back to 0.<br>
 For reading operation, the LCD itself could be read from, but it required a 5V converter, so what I do is tied the read data from the controller to 0.<br>
 
+##### Button Controller
 Button Controller is a controller for a button matrix. This time the controller does more than wiring input and output for program, it now handles debouncing for each button, and outputting the button that has been pressed.<br>
 For reading operation, it'll give out the index of a button that has the most index on both row and column line. For my case, the button with the highest priority will be at index 20, which is on row 5 and column 4 (most right and bottom switch inside the matrix).<br>
 The Button Controller doesn't support writing operation, so nothing will happen.<br>
@@ -1038,13 +1044,13 @@ The Button Controller doesn't support writing operation, so nothing will happen.
 <b>For any read operation of any device, the processor will read the full 32-bits data first then later slice out the requested size then extend into 32-bits form using validated `ReadOp`.</b><br>
 
 > [!NOTE]
-> If you wanted to, you can add more device to the processor as many as you want, but do keep in mind that more devices = less address space for all device including the new one.
+> If you wanted to, you can add more device to the processor as many as you want, but do keep in mind that more devices = less address space for all device including the new one.<br>
 > My friend have tried adding VGA Controller on a CPU based on this one. It was very fun.
 
 There is no register for data read from any devices due to all of them being synchronous read, but for validated `ReadOp`, `DeviceDataSrc` and other signal from previous stage, there will be a set of register for that.<br>
 
 ### Write Back Stage (WB)
-![Write Back Stage Diagram](./imgs/microarchitecture/stages/write_back_stage.png)<br>
+<!-- ![Write Back Stage Diagram](./imgs/microarchitecture/stages/write_back_stage.png)<br> -->
 Write Back Stage is a stage for putting everything back to the designated registers.<br>
 
 Before writing any data, the read data from all the devices must be first passed through a Device Data MUX, which chooses what device the CPU is trying to read from using `DeviceDataSrc` Control Signal. After choosing, the selected data goes into a Bit Extender for extending the data into correct 32-bits form. It's done by using the validated `ReadOp` Control Signal to slice out the requested size then extend that sliced data into 32-bits form of signed/unsigned type.<br>
@@ -1053,7 +1059,7 @@ With extended device data, ALU's result and next instruction address, The Regist
 
 For jump operation, the `PCSrc` and ALU's result will be passed to the Program Counter, and let its internal MUX does it thing.<br>
 
-# Hardware Design
+<!-- # Hardware Design
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit that make the [Microarchitecture](#microarchitecture) possible, rather than how data flow through them.<br>
 
 ![Processor Diagram](./imgs/hardware_design/processor.png)<br>
@@ -1324,4 +1330,4 @@ This also have a reset input for resetting all register's values back to 0.<br>
 
 ## Destination Register Multiplexer
 This one is a simple 3 inputs multiplexer, it's for choosing between [ALU](#arithmetic-and-logic-unit-alu)'s result, [+ 4 Adder](#-4-adder)'s result, or read data that have been given by [Device Data Read Multiplexer](#device-data-read-multiplexer).<br>
-This multiplexer is controlled by a 2-bits Control Signal called [`rdSrc`](#operation-decoder).<br>
+This multiplexer is controlled by a 2-bits Control Signal called [`rdSrc`](#operation-decoder).<br> -->
