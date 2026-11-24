@@ -105,7 +105,7 @@ module Top
     RegAddr         rd_addr_ex_mem_reg;
     rdWrite         rd_write_ex_mem_reg;
 
-    // Writeback
+    // Write Back
     Word            data_mem_read_data_mem_wb_reg;
     Word            lcd_read_data_mem_wb_reg;
     Word            button_read_data_mem_wb_reg;
@@ -239,7 +239,7 @@ module Top
     );
 
     // ===================
-    // Writeback Stage
+    // Write Back Stage
     // ===================
     DeviceDataMux device_data_mux (
         .data_mem_read_data(data_mem_read_data_mem_wb_reg),

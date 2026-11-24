@@ -588,26 +588,40 @@ This instruction use `0010111` as its `opcode`.<br>
 
 
 # Microarchitecture
-For this section, I'll be talking a little bit more about the hardware now. It's now, how will the CPU do it.<br>
-As I said in the first section, I've cut out most modern processor design feature and technique. This also includes hardware stuff, like I/O, interrupts, cache, being in-order execution and superscalar design. This will result in 1 instruction per clock cycles (and it should stuck at 1 instruction per cycle) from no instruction level parallelism, but this is why there is 0 in C0.<br>
+For this section, it is now how will the CPU do it.<br>
+
+## Limitation
+As I said in the first section, I've cut out most modern processor design feature and technique, and a few very bad design choice, which are the following.
+1. No interrupts.
+2. No cache.
+3. No pipeline interlocking.
+4. No MMU.
+5. Instruction Memory is not accessible by the System Bus (No initialized data when writing code running on the processor).
+6. Very limited I/O.
+7. Being in-order execution.
+8. Not a superscalar design.
+9. A lot more lol.
+
+On the bright side, these give a very predictable performance for the CPU, which is 1 instruction per cycle, and very making the design very simple to understand, which is my goal.<br>
+But, on the "dark" side, some of those violate RISC-V specification making this CPU not quite a RISC-V CPU.<br>
 
 ## Instruction Cycle
 Instruction cycle are processes the CPU have to take to complete the execution of an instruction. In C0, there are 5 stages of instruction cycle. They follow classic RISC style instruction cycle, there are<br>
 1. Fetch (IF)
-    * The processor fetches an instruction from a memory, the address of an instruction is taken from processor's [Program Counter](#program-counter-pc).
+    * The processor fetches an instruction from a memory, the address of an instruction is taken from the [Program Counter](#program-counter-pc).
 2. Decode (ID)
-    * The instruction is decoded by the CPU. This process tells the CPU what is the instruction wanted to do to which part of the processor. After decoding the instruction, the processor will receive `opcode` and `funct3/7`, this is then used to generate the signal for controlling the flow of the data throughout the cycles.
+    * The instruction is decoded by the Control unit. This process tells the CPU what the instruction wanted to do. After decoding the instruction, the processor is then generated the signal for controlling the flow of the data throughout the cycles.
 3. Execute (EX)
     * Every math and logic related operations happen in this stage (including calculating the jump address or memory address). The Control Signal for controlling the [ALU](#arithmetic-and-logic-unit-alu) is sent from the previous stage. This stage also generates new Control Signal that decided whether the processor wanted to jump or not.
 4. Memory (MEM)
     * This stage is exclusively made for Load and Store group. After address calculation have been done by the execution stage, this stage took that address to interact with the memory (if the operation is memory interaction).
-5. Writeback (WB)
-    * If required, the result will be written back to the designated register at this stage.
+5. Write Back (WB)
+    * The result of the instruction will be written back to the designated register at this stage.
 
-## Instruction Pipeline
-Instruction pipeline is a technique use to increase execution speed of a processor, it is done by taking instruction cycle from section above then stack multiple instruction cycles on top of each other with an offset of 1 clock cycle. Doing this make every stage of the cycle (almost) always busy making performance much higher.<br>
+## Instruction Pipelining
+Instruction pipelining is a technique that improve the throughput of instruction execution. It is done by stacking multiple instructions at difference instruction cycle at an offset of 1 clock cycle. Doing this make every stage of the cycle always busy making performance much higher than waiting for each instruction to finish its execution before issuing a new instruction.<br>
 
-Two tables below is the comparison between processor that didn't implement instruction pipeline and one that did.<br>
+Two tables below compare the difference between processor that didn't implement instruction pipeline and one that did.<br>
 <table>
     <tr>
         <th rowspan="2">Instruction</th>
@@ -686,6 +700,7 @@ Two tables below is the comparison between processor that didn't implement instr
     </tr>
 </table>
 Processor that didn't implement instruction pipeline.<br>
+
 <table>
     <tr>
         <th rowspan="2">Instruction</th>
@@ -733,100 +748,310 @@ Processor that didn't implement instruction pipeline.<br>
 </table>
 Processor that did implement instruction pipeline.<br>
 
-As you can see, processor with instruction pipeline complete all instruction execution in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
-### Hazards
-But instruction pipeline comes with a catch, because pipeline fetch a new instruction before knowing the outcome of the instruction before this one. These type of situations are called "Hazard".<br>
-Usually hazards are handled by dedicated hardware unit like branch predictor, or design technique like superscalar design. But, in my design, I've decided to push all the responsibility to the programmer to switch the execution to instruction that aren't data dependent on other instruction, or to just call multiple `NOP` instructions before continuing the execution to keep the design simple.<br>
+As you can see, processor with instruction pipelining complete all executions in just 7 clock cycles, while the one that didn't need 15 clock cycles.<br>
 
-There are multiple types of hazards. I've written a brief description about them down below, if you're interested.<br>
-#### Structural Hazards
-This type of hazard occur when there are multiple instructions tried to use the same component, this won't occur in C0 though. This hazard can be fixed by implement same component multiple times which is called superscalar design.<br>
-#### Data Hazards
-Data hazard occur when one instruction depend on the result of another instruction that hasn't finished execute yet.<br>
-#### Control Hazards
-Control hazard occur for every jump/branch instruction, this is due to new instructions are being fetched with old address before the instruction finally having an effect on the program counter.<br>
+## Hazards
+Hazards are problems that result in next instruction cannot be executed in the following clock cycle. Basically, hazards will make the processor fetch the wrong instruction/data or multiple instructions trying to use the same component at the same time. There are 3 types of hazards, but C0 already avoid one of them (Structural Hazards). The remaining two hazards that C0 will suffer from are the following.<br>
+
+### Control Hazards
+This occurs every time the processor jump or branch. This is due to the delay of program counter updating the address after issuing jump/branch instruction. A few instructions after issuing jump/branch instruction will be fetched from the wrong address because of this.<br>
+There are a few way to fix or mitigate this problem, but one of them is pipeline interlocking, which will stall the pipeline immediately if any hazards are detected. Locking the pipeline until the hazard instruction finished executing before letting the pipeline continue on with other instruction.<br>
+### Data Hazards
+Data Hazards occur when the following instruction depends on the result of current instruction that hasn't been finished executing yet. This has similar effect to the Control Hazards, but instead of wrong instruction, it is wrong data instead.<br>
+One of the way to resolve this issue is also pipeline interlocking, which C0 doesn't have.<br>
 
 ## Datapath
-Datapath is an implementation of [Instruction Cycle](#instruction-cycle). The datapath is divided into 5 stages correspond for the stages specified in [Instruction Cycle](#instruction-cycle). As said before, the datapath is pipelined, meaning that, at every ending part of each stage (except the writeback stage) will have a set of registers to hold the data from that stage and forward those to the next at the edge of the next clock cycle, to give the capability of handling multiple stages at a time to the processor.<br>
+Datapath is a diagram showing how data are flow through the CPU. It could give you a broad idea on how the CPU works.
 
-![Entire datapath](./imgs/microarchitecture/entire_datapath.png)<br>
-Image of entire datapath.<br>
+> [!NOTE]
+> There is also a thing called Control Path. To put it shortly, it is a path for Control Signals that control datapath.
+
+As said before, this processor is pipelined meaning that there must be a set of registers at the end of every stage (except WB stage) to synchronize each stage's output. This also include Control Signals, which there will be a register for those until it arrive at their target.<br>
+Some of the register at the end of some stage is not really a register but a wire due to some component being synchronous read (there is already a register at the output of that component), so keep that in mind.<br>
+
+![Diagram of the entire datapath](./imgs/microarchitecture/microarchitecture-Entire_Datapath.drawio.png)<br>
+"Extremely" simplified image of entire datapath.<br>
+
+In the diagram, each stage is separated by a green dotted line.<br>
 
 ### Fetch Stage (IF)
-![Entire datapath of fetch Stage](./imgs/microarchitecture/fetch_stage.png)<br>
-In this stage, [Program Counter](#program-counter-pc) (PC) do the job of remembering the current instruction address, that address is then used for accessing the instruction from the [Instruction Memory](#instruction-memory). The fetched instruction is then passed to [Instruction Register](#ifid-stage-registers) to be then decoded by the next stage.<br>
+![Fetch Stage Diagram](./imgs/microarchitecture/stages/fetch_stage.png)<br>
+There are two jobs for this stage. One is keeping track of current instruction's address and choosing the next address, and the second job is to fetch an instruction using the current address.<br>
 
-Every clock cycle, [Program Counter](#program-counter-pc) either go up by 4 bytes which is the next instruction (because one instruction is 32-bits or 4 bytes long), or could use the target address and jump signal coming from [Writeback Stage](#writeback-stage-wb) to jump to whole new address.<br>
+There is no register for this stage due to all the components being synchronous read.<br>
 
-The [Program Counter](#program-counter-pc)'s value is also pass to [Program Counter](#program-counter-pc) register, in case the processor need to compute a jump address with an offset to current address, or remembering the return address.<br>
+#### Program Counter
+![Program Counter Diagram](./imgs/microarchitecture/components/microarchitecture-PC.drawio.png)<br>
+The Program Counter (PC) do the job of keeping track of the current instruction address, and choosing the new address.<br>
+It chooses the new address by using a MUX that choose between next address (compute locally inside the PC itself), jump address or jump address with the last bit set to zero. The MUX use a flag that have been passed from WB stage, which also pass the jump address.<br>
+The address chosen by the MUX is then output directly into one of the PC's output and into read register, which make it synchronous read and prevent it from stuck inside calculating next address loop.<br>
+
+#### Instruction Memory Controller
+![Instruction Memory Controller Diagram](./imgs/microarchitecture/components/microarchitecture-Inst_Mem_Controller.drawio.png)<br>
+Instruction Memory Controller is a unit that handles the access of Instruction Memory. Inside of it consist of a few subunits.<br>
+The memory itself is build up from 4 memory blocks (BRAM on FPGA), each block is a byte addressable read-only memory. The byte addressable part is what make this memory compliant with RISC-V's specification, but it also raised a problem. Being byte addressable means that only 1 address can be read at a time, while we need 4 bytes per cycle to construct one instruction. This is why there are 4 blocks of memory each correspond to one address.<br>
+
+For normal operation, the Controller should not be doing much except give the memory blocks the address of the data then combine those data, which is in little endian order into one instruction that is in big endian ordering, but in "unusual" case where the address is unable to be perfectly divided by four, the controller must handle this misalignment by giving each block difference address and combining the data back in difference order, so that the final output is sorted from the lowest address to the highest address.<br>
+
+> [!NOTE]
+> For instruction accessing, the "unusual" case show not be occurred at all due to each instruction address must have an alignment of 4 bytes.
+
+For example, this is a visualized of the memory blocks, and their contents.
+<table>
+    <tr>
+        <th colspan="2">Memory Blocks</th>
+        <th colspan="7">Block's content at block's address</th>
+    </tr>
+    <tr>
+        <th>Block No.</th>
+        <th>Responsible Address</th>
+        <th>0</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+    </tr>
+    <tr>
+        <td>Block 1</td>
+        <td>(...00)</td>
+        <td>Data 1.1</td>
+        <td>Data 2.1</td>
+        <td>Data 3.1</td>
+        <td>Data 4.1</td>
+        <td>Data 5.1</td>
+    </tr>
+    <tr>
+        <td>Block 2</td>
+        <td>(...01)</td>
+        <td>Data 1.2</td>
+        <td>Data 2.2</td>
+        <td>Data 3.2</td>
+        <td>Data 4.2</td>
+        <td>Data 5.2</td>
+    </tr>
+    <tr>
+        <td>Block 3</td>
+        <td>(...10)</td>
+        <td>Data 1.3</td>
+        <td>Data 2.3</td>
+        <td>Data 3.3</td>
+        <td>Data 4.3</td>
+        <td>Data 5.3</td>
+    </tr>
+    <tr>
+        <td>Block 4</td>
+        <td>(...11)</td>
+        <td>Data 1.4</td>
+        <td>Data 2.4</td>
+        <td>Data 3.4</td>
+        <td>Data 4.4</td>
+        <td>Data 5.4</td>
+    </tr>
+</table>
+
+For address that is perfectly dividable by 4, all 4 blocks of memory will receive the same address from the controller resulting in this table as the output of the controller (each column is the output of the controller at difference address).
+<table>
+    <tr>
+        <th rowspan="2">Output's byte No.</th>
+        <th colspan="5">Address</th>
+    </tr>
+    <tr>
+        <th>0</th>
+        <th>4</th>
+        <th>8</th>
+        <th>12</th>
+        <th>16</th>
+    </tr>
+    <tr>
+        <td>Byte 0</td>
+        <td>Data 1.1</td>
+        <td>Data 2.1</td>
+        <td>Data 3.1</td>
+        <td>Data 4.1</td>
+        <td>Data 5.1</td>
+    </tr>
+    <tr>
+        <td>Byte 1</td>
+        <td>Data 1.2</td>
+        <td>Data 2.2</td>
+        <td>Data 3.2</td>
+        <td>Data 4.2</td>
+        <td>Data 5.2</td>
+    </tr>
+    <tr>
+        <td>Byte 2</td>
+        <td>Data 1.3</td>
+        <td>Data 2.3</td>
+        <td>Data 3.3</td>
+        <td>Data 4.3</td>
+        <td>Data 5.3</td>
+    </tr>
+    <tr>
+        <td>Byte 3</td>
+        <td>Data 1.4</td>
+        <td>Data 2.4</td>
+        <td>Data 3.4</td>
+        <td>Data 4.4</td>
+        <td>Data 5.4</td>
+    </tr>
+</table>
+
+But, let's say we give the controller an address that have remainder of 1 instead of perfectly dividable by 4. This is now the output of the controller at each address.
+<table>
+    <tr>
+        <th rowspan="2">Output's byte No.</th>
+        <th colspan="4">Address</th>
+    </tr>
+    <tr>
+        <th>1</th>
+        <th>5</th>
+        <th>9</th>
+        <th>13</th>
+    </tr>
+    <tr>
+        <td>Byte 0</td>
+        <td>Data 1.2</td>
+        <td>Data 2.2</td>
+        <td>Data 3.2</td>
+        <td>Data 4.2</td>
+    </tr>
+    <tr>
+        <td>Byte 1</td>
+        <td>Data 1.3</td>
+        <td>Data 2.3</td>
+        <td>Data 3.3</td>
+        <td>Data 4.3</td>
+    </tr>
+    <tr>
+        <td>Byte 2</td>
+        <td>Data 1.4</td>
+        <td>Data 2.4</td>
+        <td>Data 3.4</td>
+        <td>Data 4.4</td>
+    </tr>
+    <tr>
+        <td>Byte 3</td>
+        <td>Data 2.1</td>
+        <td>Data 3.1</td>
+        <td>Data 4.1</td>
+        <td>Data 5.1</td>
+    </tr>
+</table>
+
+As you can see, the first memory block in this situation should now have access address 1 more than the other block, and instead of being the LSB byte, it is now the MSB byte.<br>
+Similar situation happen with the address that have remainder of 2 and 3, but with difference ordering of each memory block's output, and their access data.<br>
+
+There is a little bit of oopsie I made when designing this processor. According to RISC-V's specification, data stored inside memory is in little endian format, but by the time I realized this I've already designed most of my CPU to operate on big endian format, so the combining logic must reverse the ordering to big endian as I said before.<br>
+Yeah, there is a flag for GNU Toolchain to compile to big endian, but little endian is the default so might as well go for little endian.<br>
+
+<b>This memory is not accessible by the System Bus meaning that any initialized data inside a program is not accessible by the processor</b>.<br>
 
 ### Decode Stage (ID)
-![Entire datapath of decode Stage](./imgs/microarchitecture/decode_stage.png)<br>
+![Decode Stage Diagram](./imgs/microarchitecture/stages/decode_stage.png)<br>
 This stage is all about preparing all the required data for processing in the further stages.<br>
-The instruction inside the [Instruction Register](#ifid-stage-registers) is decoded by [Instruction Decoder](#instruction-decoder) into multiple part, which is then processed further to generate their usable form.<br>
-The processed values are listed down below.<br>
-1. 32-bits Immediate value
-    - As specified in the instruction format, all format's `imm` field is not 32-bits long. The [Immediate Assembler](#immediate-assembler) took `imm` field value and the format of the instruction for calculating the 32-bits form of immediate value.
-2. Source Register Data
-    - The [Instruction Decoder](#instruction-decoder) extract the address of `rs1` and `rs2`, these addresses are then plugged into [Register File](#register-file) for retrieving the two's data.
-3. `rd` Address
-    - The [Instruction Decoder](#instruction-decoder) extract the address of `rd`, but instead of processing further, the processor pushes the address directly to the next stage. This will later be used by the [Writeback Stage](#writeback-stage-wb).
-3. Operation Values
-    - Operation Values are generated by [Operation Decoder](#operation-decoder). They're used for both controlling the behavior of their destination unit, this type is called Control Signal, or for further processing by their destination unit. Most are Control Signals, only `JmpOp` will be process further.<br>
-    There are following Operation Values generated in this stage.
-      1. `ALUOperand`
-          - Signifies the [ALU](#arithmetic-and-logic-unit-alu)'s multiplexer to choose the correct data as operands for the [ALU](#arithmetic-and-logic-unit-alu).
-      2. `ALUOp`
-          - Signifies which operation [ALU](#arithmetic-and-logic-unit-alu) have to choose. This Control Signal also required `imm` field value for processing the [I-type arithmetic and logic instruction](#i-type).
-      3. `JmpOp`
-          - This value signifies the type of jump operation the instruction is trying to do. This is not a Control Signal, but it is for further processing inside [EX Stage](#execute-stage-ex).
-      4. `MEMRead`
-          - Signifies how many byte(s) the processor wanted to read from the [Data Memory](#data-memory) or any peripheral, and how to extend that value.
-      5. `MEMWrite`
-          - This is like `MEMRead`, but instead it signifies write operation.
-      6. `rdSrc`
-          - This signifies which data is chosen to write to the `rd`. (More information in [WB Stage](#writeback-stage-wb)).
-      7. `rdWrite`
-          - This signifies if the processor really wants to write to `rd`.
+
+#### Control Unit
+![Control Unit Diagram](./imgs/microarchitecture/components/microarchitecture-CU.drawio.png)<br>
+Control Unit is a combinational logic that handles the job of extracting data from a given instruction and generating control signals that are corresponded to that instruction.<br>
 
 > [!NOTE]
-> [Immediate Assembler](#immediate-assembler) handles the job of extending immediate value into full 32-bits. It is usually called Sign-Extend / Zero-Extend Unit, but [Immediate Assembler](#immediate-assembler) sounds a lot cooler to me.
+> [ConstrolSignals.sv](../hardware/packages/ControlSignals.sv) contains all the possible values for all the Control Signals, and [OtherSignals.sv](../hardware/packages/OtherSignals.sv) for other few signals.
 
-After processing, all those values are pass to the next stage using registers.<br>
+Instruction Decoder is a subunit of Control Unit that extract data from all the fields from instruction. It is done by using the opcode field, which is always bit 0 to 6 for all instruction, as a selector for multiple MUX(s) (1 MUX for each of the field), with input of each MUX being range of instruction's bit. It also generates an additional signal that tell the processor which type is the format for the instruction.<br>
+If the opcode is unknown, the Instruction Decoder will have it output simulate the output of it encountering `NOP` instruction (`addi zero, zero, 0`).<br>
+
+Operation Decoder is also a subunit of Control Unit. This unit generates multiple Control Signals for controlling how other unit behave for this instruction. This unit took opcode, funct3, funct7 and immediate field value that have been extracted by Instruction Decoder for generating those Control Signals. The following are Control Signals generate by the Operation Decoder.<br>
+1. `ALUOperand`
+    - 2-bits value for ALU to choose its operands.
+    - `0` for rs1/2 data, and `1` for instruction address or extended immediate value.
+2. `ALUOp`
+    - Control Signal for choosing ALU's operation.
+3. `ComOp`
+    - Control Signal for choosing Jmp Handler comparator's operation, which lives beside ALU inside Execution Unit.
+4. `JmpOp`
+    - Not quite a Control Signals by itself, but combine with the result of Jmp Handler's comparator will result in a Control Signal for controlling the source of PC's next address.
+5. `ReadOp`
+    - This Control Signal specified if the processor wanted to read from any device on the System Bus, if so, how many bytes.
+6. `WriteOp`
+    - This is similar to `ReadOp`, but for writing data to instead.
+7. `rdSrc`
+    - This specifies the source of data writing into `rd` register.
+8. `rdWrite`
+    - A Control Signal for telling the Register File if the processor wanted to write to any register or not.
+
+#### Immediate Assembler
+Immediate Assembler is a unit that handle the job of extending/assembling incomplete immediate field value into usable 32-bits form. It uses a signal from the Control Unit, which tell what is the format of the instruction as a guideline to assemble the full 32-bits value.<br>
+Immediate Assembler is just 32 MUXes with the type of instruction as a selector input. Each MUX is corresponded to 1 bit inside the finish 32-bits extended immediate value.<br>
+
+#### Register File
+![Register File Diagram](./imgs/microarchitecture/components/microarchitecture-Register_File.drawio.png)<br>
+Register File is where all the usable 32-bits registers live. Inside, there are 32 registers with the first one always have a value of 0. All registers are both synchronous read and write.<br>
+For reading operation, Register File have two read address inputs, each of the input are hook to a MUX's selector which is hook to all registers output then the output of that MUX are feed into a read register making it synchronous read. Having two independent MUXes for each read address input means that the Register File supports reading from 2 registers simultaneously.<br>
+For write operation, the Register File could write to only one register per clock cycle. There are three inputs for write operation, first is the address of the target register, second is write enable Control Signal (`rdWrite`), and the last one is the data that would be write into the target register.<br>
+On the same clock cycle, if both read and write operation target the same register, the Register File will "write the data first then read that written data". This is write-then-read style, but in the real implementation, there will be a combinational logic checking for address clashing. If there is a clashing between the address of writing and reading operation, the Register File will write the data as normal, but will also route the write data into the read register also, giving it write-then-read capability.<br>
+
+Inside this stage's registers block, there are register for Control Signals from Control Unit and extended immediate value. The data from Register File are already a synchronous read.<br>
 
 ### Execute Stage (EX)
-![Entire datapath of execute Stage](./imgs/microarchitecture/execute_stage.png)<br>
+![Execute Stage Diagram](./imgs/microarchitecture/stages/execute_stage.png)<br>
 All the math and logic stuffs happen in this stage.<br>
-The [ALU](#arithmetic-and-logic-unit-alu) computes all the math and logic related operations. The Control Signal which tell the [ALU](#arithmetic-and-logic-unit-alu) what to do, and what operands to choose are generated from [ID Stage](#decode-stage-id).<br>
-If the operation is jump operation, no matter if it is conditional or unconditional, the [ALU](#arithmetic-and-logic-unit-alu)'s flags and `JmpOp` value are passed to a unit called [Jmp Handler](#jmp-handler). The [Jmp Handler](#jmp-handler) generates new Control Signal called `PCSrc`, which specify if the [PC](#program-counter-pc) should jump or not.<br>
+
+#### Execution Unit
+![Execution Unit Diagram](./imgs/microarchitecture/components/eu.png)<br>
+The Execution Unit is the sole unit for this stage. It does three things simultaneously. First, it computes the address for next instruction. Second, it does ALU's usual stuff. Third, it handles jumping logic for both conditional and unconditional jumping.<br>
+
+![Jmp Handler Diagram](./imgs/microarchitecture/components/jmp_handler.png)<br>
+Jmp Handler (it used to be a typo, but I think it's cool, so I kept the typo version.) handle any jumping logic and give out the result as a Control Signal for controlling the PC.<br>
+In the final Control Signal, there are three possible values for the `PCSrc` Control Signal, which are next address, jump address and `JALR` jump address, the last two are jump difference form of ALU's result. And, if you look at the possible value for `JmpOp` signal, you might notice that value of `PCSrc` is `JmpOp` + the result of logic condition (for branch operation), which could only be `1` or `0`, and extract out the only first two MSB bits. This is all what Jmp Handler does, compare, add, extract.<br>
 
 > [!NOTE]
-> Modern processor move the [Jmp Handler](#jmp-handler)'s functionality to [ID Stage](#decode-stage-id), which use dedicated comparator instead of [ALU](#arithmetic-and-logic-unit-alu)'s flags. This reduces the penalty of branch operation down to 1 cycle.
+> Modern processor move the Jmp Handler's functionality to [ID Stage](#decode-stage-id) with dedicated adder for computing jump address. This reduces the penalty of jump operation down to 1 cycle. But, 3 cycles penalty look funny to me, so I just make the entire thing wait to be arrived at [WB Stage](#write-back-stage-wb).
 
-There is also an adder, which always add 4 to the [PC](#program-counter-pc), before passing to the next stage. This value is used for when the processor wanted to jump, but also wanted to remember the return address. This adder helps to achieve this functionality.<br>
-
-This stage also ended with many registers to pass all sort of values to the next stage.<br>
+After all that, all result from this stage must go through stage's registers block due to all the component being combinational logic.<br>
 
 ### Memory Stage (MEM)
-![Entire datapath of memory Stage](./imgs/microarchitecture/memory_stage.png)<br>
-After address calculation done by the ALU, the processor put the 32-bits result into the [Address Decoder](#address-decoder) to find out the target device ([Data Memory](#data-memory) or any peripheral) then sent out the remaining 31-bits address, `rs2` data (write data) and the Control Signals (`MEMRead` and `MEMWrite`) to it correspond destination ([Data Memory](#data-memory) or [Peripheral Controller](#peripheral-controller) for any peripheral device).<br>
+![Memory Stage Diagram](./imgs/microarchitecture/stages/memory_stage.png)<br>
+This stage of pipeline is specifically for interaction with any memory or peripheral connected to the CPU.<br>
+When you think about it, any peripheral could be either write to or read from just like a memory device there is no special instruction for specific device, which is why C0 use MMIO. MMIO is a trick where every memory device addresses and peripheral addresses are assigned under the same memory space, making everything accessible by the CPU under the same address space under the same set of instructions.<br>
 
-If the target device is peripheral then the [Peripheral Controller](#peripheral-controller) will decode the remaining 31-bits to pinpoint the exact target peripheral, before passing `rs2` data (write data) and the Control Signals (`MEMRead` and `MEMWrite`) to that peripheral just like what [Address Decoder](#address-decoder) does.<br>
+#### System Bus
+![System Bus Diagram](./imgs/microarchitecture/components/system_bus.png)<br>
+System Bus is where all the controller of each device lives on. It makes all devices connected to it accessible by the processor.<br>
 
-The [Address Decoder](#address-decoder) also generates new Control Signal that controls the behavior of a mux that switches between data read from [Data Memory](#data-memory) and the [Peripheral Controller](#peripheral-controller), before passing the read data to the interstage register.<br>
+Address Decoder is the first thing to occur in the System Bus.<br>
+The first thing it does is checking if `WriteOp` and `ReadOp` is conflicting with each other to prevent the same instruction trying to both read and write to the same device, which should be impossible to do. If there is a conflict, the Address Decoder will set the output of itself for those signals to no read and no write. Otherwise, it will let the input signals pass through to the output directly. The validated `ReadOp` Control Signals is also pass through outside of System Bus also for [Write Back Stage](#write-back-stage-wb).<br>
+The second thing it does is finding the device that correspond to the address it received. The first few MSB bit is what Address Decoder use to determine the target device, while the remaining is used for selecting those devices internal address like Data Memory's address. After finding out what the device is, the Address Decoder generates a device enable for enabling that device and disable the other. It also generates Control Signal for telling the other part CPU which device have been read from. This signal is called `DeviceDataSrc`.<br>
 
-Again, this stage passes some data to the next stage using multiple registers.<br>
+![Data Memory Controller Diagram](./imgs/microarchitecture/components/microarchitecture-Data_Mem_Controller.drawio.png)<br>
+Data Memory is the only memory device that is accessible by the System Bus (Instruction Memory can only be access by the PC, with it data being instruction only). It is byte addressable and have a structure similar to Instruction Memory. 4 Blocks of memory each hold one byte per address, with each block correspond to address mod by n just like Instruction Memory. The only difference between the two is Data Memory could be written to. It uses a mask for write enable for each block of memory. If the bit of a mask at specific index match block index then that memory block will be written to at that clock cycle.<br>
 
-### Writeback Stage (WB)
-![Entire datapath of writeback Stage](./imgs/microarchitecture/writeback_stage.png)<br>
-This stage return all the data from all the previous stages back to their correspond destination. The write back data are the following.<br>
-1. [Program Counter](#program-counter-pc)'s jump address.
-    - The [PC](#program-counter-pc) will have to either choose its value + 4 (the one calculated inside the [IF Stage](#fetch-stage-if)) or the jump address, which is just an [ALU](#arithmetic-and-logic-unit-alu)'s result (calculated inside [EX Stage](#execute-stage-ex)). The `PCSrc` signal from [EX Stage](#execute-stage-ex) that have been pass to this stage using register is used for choosing between the two.
-2. `rd`'s write data.<br>
-    - The processor use `rdSrc` Control Signal from [ID Stage](#decode-stage-id) to choose between next instruction address, [ALU](#arithmetic-and-logic-unit-alu)'s result or read data from the device as a data writing into `rd` with an address it got from [ID Stage](#decode-stage-id). There is also `rdWrite` Control Signal that tell whether if the processor really wanted to write the data or not.
+LCD Controller is a controller for LCD device (1602 and 2004 with no I2C). Even though there is a "Controller" inside its name, the only thing it does is wire the write data to an output register that have been wired to the outside world. The signal timing must be controls by the program.<br>
+In 1 byte write instruction, for LCD Controller the only possible mode is 4-bits mode instead of full 8-bits mode, and it will assume that the LCD is already in 4-bits mode. The last 4 LSB bits of write data will go into d0 - d3 pins, and fifth and sixth bit will be rs and e signal respectively.<br>
+In 2 or 4 bytes write instruction, the controller will assume that the LCD is already set to 8-bits mode. The last 1 byte of write data will go directly to d0 - d7 of the LCD, and ninth and tenth bit will be rs and e signal respectively.<br>
+If the LCD Controller is selected, but the validated `WriteOp` is unknown then the output register will be reset back to 0.<br>
+For reading operation, the LCD itself could be read from, but it required a 5V converter, so what I do is tied the read data from the controller to 0.<br>
+
+Button Controller is a controller for a button matrix. This time the controller does more than wiring input and output for program, it now handles debouncing for each button, and outputting the button that has been pressed.<br>
+For reading operation, it'll give out the index of a button that has the most index on both row and column line. For my case, the button with the highest priority will be at index 20, which is on row 5 and column 4 (most right and bottom switch inside the matrix).<br>
+The Button Controller doesn't support writing operation, so nothing will happen.<br>
+
+<b>For any read operation of any device, the processor will read the full 32-bits data first then later slice out the requested size then extend into 32-bits form using validated `ReadOp`.</b><br>
 
 > [!NOTE]
-> The write back of `PCSrc` Control Signal could be moved to [EX Stage](#execute-stage-ex) after computing this Control Signal, this make the branch penalty goes down to 2 cycles, or even better, the [ID Stage](#decode-stage-id). But, 4 cycles branch penalty look "insane" to me, so WB stage here I come. Just thinks about that 4 instructions wasted.
+> If you wanted to, you can add more device to the processor as many as you want, but do keep in mind that more devices = less address space for all device including the new one.
+> My friend have tried adding VGA Controller on a CPU based on this one. It was very fun.
+
+There is no register for data read from any devices due to all of them being synchronous read, but for validated `ReadOp`, `DeviceDataSrc` and other signal from previous stage, there will be a set of register for that.<br>
+
+### Write Back Stage (WB)
+![Write Back Stage Diagram](./imgs/microarchitecture/stages/write_back_stage.png)<br>
+Write Back Stage is a stage for putting everything back to the designated registers.<br>
+
+Before writing any data, the read data from all the devices must be first passed through a Device Data MUX, which chooses what device the CPU is trying to read from using `DeviceDataSrc` Control Signal. After choosing, the selected data goes into a Bit Extender for extending the data into correct 32-bits form. It's done by using the validated `ReadOp` Control Signal to slice out the requested size then extend that sliced data into 32-bits form of signed/unsigned type.<br>
+
+With extended device data, ALU's result and next instruction address, The Register File MUX choose which data goes into Register File between these three. It uses `rdSrc` Control Signal as the selector for this.<br>
+
+For jump operation, the `PCSrc` and ALU's result will be passed to the Program Counter, and let its internal MUX does it thing.<br>
 
 # Hardware Design
 This section covers each component inside the processor. This is difference from the [Microarchitecture](#microarchitecture) section in that, this section goes into inner working of each hardware unit that make the [Microarchitecture](#microarchitecture) possible, rather than how data flow through them.<br>
@@ -919,8 +1144,8 @@ This unit generates all sort values from `opcode`, `funct3/7` and `imm`. It took
 All the operation values generated by Operation Decoder are the following.<br>
 1. `ALUOperand`
     - This is a 2-bits Control Signal is for controlling which data is the operand for the [ALU](#arithmetic-and-logic-unit-alu) by [Operand Multiplexers](#operand-multiplexer).<br>
-    The first operand (`rs1`/[`PC`](#program-counter-pc)) mux uses the LSB of the Control Signal, while the other mux (`rs2`/`imm`) uses MSB.
-    - If the bit value is `0`, this would mean it will use `rs1` or `rs2` as the operand depending on the input of the mux, while `1` is for the other input of the mux, which is current address or extended immediate.
+    The first operand (`rs1`/[`PC`](#program-counter-pc)) MUX uses the LSB of the Control Signal, while the other MUX (`rs2`/`imm`) uses MSB.
+    - If the bit value is `0`, this would mean it will use `rs1` or `rs2` as the operand depending on the input of the MUX, while `1` is for the other input of the MUX, which is current address or extended immediate.
 2. `ALUOp`
     - This is a 5-bits Control Signal for controlling the operation performed by the [ALU](#arithmetic-and-logic-unit-alu).
     - The first bit (MSB) is for letting the processor knows if the operation is normal math/logic or for branch operation. (0 = math/logic, 1 = branch)
@@ -989,7 +1214,7 @@ There are a total of 5 inputs for Register File (not counting reset data and clo
 
 For reading data from two registers, there are two specific 5-bits inputs, both are for selecting the source register. The design of this Register File support reading from 2 registers simultaneously.<br>
 
-For writing data into the Register File, there are 1-bit input for enabling the write mode (Write Enable), another 5-bits input for selecting the destination register (Write Address), and the other is the 32-bits data that would be writing into a register (Write Data). The Write Address is plugged into a mux for selecting the destination for Write Enable input, but the Write Data input is directly connect to all registers (except x0).<br>
+For writing data into the Register File, there are 1-bit input for enabling the write mode (Write Enable), another 5-bits input for selecting the destination register (Write Address), and the other is the 32-bits data that would be writing into a register (Write Data). The Write Address is plugged into a MUX for selecting the destination for Write Enable input, but the Write Data input is directly connect to all registers (except x0).<br>
 x0 register or constant zero register doesn't have any input plug to it (except reset input), making it impossible to write to this register.<br>
 When writing to any registers (except x0), two condition must be met. First, the Write Enable of target register must be high. Second, the clock must be at the edge of the trigger, which would be low to high in this design.<br>
 
@@ -1025,7 +1250,7 @@ Execution Unit packs multiple components for handling the [EX Stage](#execute-st
 
 There are 7 inputs and only 3 outputs for EU, the description for each will be in their correspond unit below.<br>
 ### Operand Multiplexer
-There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Operation Decoder](#operation-decoder) generates the signal for controlling these multiplexers. This Control Signal is called [`ALUOperand`](#operation-decoder). Each of the mux use a difference bit of the Control Signal. The first operand use LSB bit, while the second use MSB bit of the Control Signal.
+There are two Operand Multiplexers, each is for selecting the operand for the [ALU](#arithmetic-and-logic-unit-alu) between two source (between `PC` and `rs1`, `imm` and `rs2`). The [Operation Decoder](#operation-decoder) generates the signal for controlling these multiplexers. This Control Signal is called [`ALUOperand`](#operation-decoder). Each of the MUX use a difference bit of the Control Signal. The first operand use LSB bit, while the second use MSB bit of the Control Signal.
 ### Arithmetic and Logic Unit (ALU)
 Arithmetic and Logic Unit handles most of the math and logic operation. The only math it doesn't handle are calculating the next instruction address, and for the [PC](#program-counter-pc) to jump or not, that would be the job of a [+ 4 Adder](#-4-adder) and [Jmp Handler](#jmp-handler) respectively.<br>
 The ALU use Control Signal from the [Control Unit](#control-unit-cu) to select it operation, this Control Signal is called [`ALUOp`](#operation-decoder). The operands for calculation will be selected by two [Operand Multiplexer](#operand-multiplexer). And, the result of the calculation is, of course, 32-bits.<br>
